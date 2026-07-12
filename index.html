@@ -85,7 +85,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 /* ACTIONS */
 .act-card{background:rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.07);border-radius:14px;overflow:hidden;margin-bottom:8px;}
 .act-hdr{display:flex;flex-direction:column;align-items:center;text-align:center;gap:4px;padding:10px 12px;background:rgba(255,255,255,.03);border-bottom:1px solid rgba(255,255,255,.05);}
-.act-hdr-emoji{font-size:26px;}
+.act-hdr-emoji{font-size:26px;width:48px;height:48px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}.act-hdr-emoji img{width:48px;height:48px;border-radius:50%;object-fit:cover;}
 .act-hdr-info{flex:1;}
 .act-hdr-name{font-size:13px;font-weight:600;color:#fff;}
 .act-hdr-desc{font-size:10px;color:#7eceff;margin-top:1px;}
@@ -266,7 +266,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
           <stop offset="100%" stop-color="#070e1a"/>
         </radialGradient>
       </defs>
-      <rect width="460" height="240" fill="url(#mapBg)"/>
+      <rect id="map-bg" width="460" height="240" fill="url(#mapBg)" style="display:none"/>
+      <image id="map-png" href="map1.png" x="0" y="0" width="460" height="240" preserveAspectRatio="xMidYMid slice"/>
       <g id="map-edges"></g><g id="map-nodes"></g><g id="map-markers"></g>
     </svg></div>
     <div class="act-card">
@@ -1064,7 +1065,9 @@ function renderMap(){
     <div style="flex:1;padding:6px 4px;font-size:10px;font-weight:700;text-align:center;border-radius:7px 7px 0 0;border:1px solid ${region==='johto'?'#60a5fa':'rgba(255,255,255,.05)'};border-bottom:none;background:${region==='johto'?'rgba(96,165,250,.12)':'rgba(255,255,255,.01)'};color:${region==='johto'?'#60a5fa':johtoUnlocked?'#555':'#333'}">${johtoUnlocked?'🌏':'🔒'} Регіон Джото</div>
   </div>`;
   if(region==='johto'){
-    // Johto map
+    // Johto map — use gradient background
+    document.getElementById('map-png').style.display='none';
+    document.getElementById('map-bg').style.display='';
     document.getElementById('map-edges').innerHTML='';
     let nh='';
     Object.values(LOCS_JOHTO).forEach(loc=>{
@@ -1092,39 +1095,31 @@ function renderMap(){
     document.getElementById('map-markers').innerHTML=mh;
     return;
   }
-  // Kanto map
-  const drawn=new Set();let eh='';
-  Object.values(LOCS).forEach(loc=>{
-    loc.connects.forEach(tid=>{
-      const key=[loc.id,tid].sort().join('-');
-      if(drawn.has(key))return;drawn.add(key);
-      const t=LOCS[tid];
-      const ul=d.unlockedLocs.includes(loc.id)&&d.unlockedLocs.includes(tid);
-      eh+=ul
-        ?`<line x1="${loc.cx}" y1="${loc.cy}" x2="${t.cx}" y2="${t.cy}" stroke="rgba(255,255,255,.18)" stroke-width="2" stroke-linecap="round"/>`
-        :`<line x1="${loc.cx}" y1="${loc.cy}" x2="${t.cx}" y2="${t.cy}" stroke="rgba(255,255,255,.06)" stroke-width="1.5" stroke-dasharray="5,4"/>`;
-    });
-  });
-  document.getElementById('map-edges').innerHTML=eh;
-  let nh='';
+  // Kanto map — PNG background, SVG overlays only
+  document.getElementById('map-png').style.display='';
+  document.getElementById('map-bg').style.display='none';
+  document.getElementById('map-edges').innerHTML='';
+  const r=26;let nh='';
   Object.values(LOCS).forEach(loc=>{
     const ul=d.unlockedLocs.includes(loc.id);
     const isHere=d.location===loc.id;
     const canGo=!isHere&&ul;
-    const r=isHere?22:17;
     const done=ul&&isLocComplete(loc.id);
-    const label=loc.mLabel||loc.name;
     if(isHere){
-      nh+=`<circle cx="${loc.cx}" cy="${loc.cy}" r="${r+9}" fill="${loc.color}" opacity=".2"/>`;
-      nh+=`<circle cx="${loc.cx}" cy="${loc.cy}" r="${r+4}" fill="none" stroke="${loc.stroke}" stroke-width="1" opacity=".45"/>`;
+      nh+=`<circle cx="${loc.cx}" cy="${loc.cy}" r="${r+10}" fill="${loc.color}" opacity=".18"/>`;
+      nh+=`<circle cx="${loc.cx}" cy="${loc.cy}" r="${r+5}" fill="none" stroke="${loc.stroke}" stroke-width="1.5" opacity=".55"/>`;
+      nh+=`<circle cx="${loc.cx}" cy="${loc.cy}" r="${r}" fill="none" stroke="${loc.stroke}" stroke-width="2.5" opacity=".9"/>`;
     }
-    nh+=`<g style="cursor:${canGo||isHere?'pointer':'default'};opacity:${ul?1:.28}" ${canGo?`onclick="onLocClick('${loc.id}')"`:''}>`
-      +`<circle cx="${loc.cx}" cy="${loc.cy}" r="${r}" fill="${ul?loc.color:'#0c1929'}" stroke="${isHere?loc.stroke:ul?loc.stroke+'88':'#1e293b'}" stroke-width="${isHere?2.5:1.5}"/>`
-      +`<text x="${loc.cx}" y="${loc.cy+1}" text-anchor="middle" dominant-baseline="middle" font-size="${isHere?15:11}" font-family="sans-serif">${loc.emoji}</text>`
-      +`<text x="${loc.cx}" y="${loc.cy+r+11}" text-anchor="middle" font-size="${isHere?9.5:8}" fill="${ul?'#e2e8f0':'#3d4f63'}" font-family="sans-serif" font-weight="${isHere?'700':'500'}">${label}</text>`
-      +(done?`<circle cx="${loc.cx+r-1}" cy="${loc.cy-r+1}" r="5.5" fill="#fbbf24" stroke="#070e1a" stroke-width="1.5"/><text x="${loc.cx+r-1}" y="${loc.cy-r+2}" text-anchor="middle" dominant-baseline="middle" font-size="7" font-weight="700" font-family="sans-serif" fill="#070e1a">✓</text>`:'')
-      +`</g>`;
-    if(!ul&&loc.unlockReq) nh+=`<text x="${loc.cx}" y="${loc.cy-r-4}" text-anchor="middle" font-size="11" font-family="sans-serif">${loc.unlockReq.keyPoke?'🔑':'🔒'}</text>`;
+    if(!ul){
+      nh+=`<circle cx="${loc.cx}" cy="${loc.cy}" r="${r}" fill="rgba(3,8,20,0.68)"/>`;
+      if(loc.unlockReq) nh+=`<text x="${loc.cx}" y="${loc.cy+1.5}" text-anchor="middle" dominant-baseline="middle" font-size="15" font-family="sans-serif">${loc.unlockReq.keyPoke?'🔑':'🔒'}</text>`;
+    } else if(canGo){
+      nh+=`<circle cx="${loc.cx}" cy="${loc.cy}" r="${r}" fill="transparent" stroke="rgba(255,255,255,.08)" stroke-width="1" style="cursor:pointer" onclick="onLocClick('${loc.id}')"/>`;
+    }
+    if(done){
+      nh+=`<circle cx="${loc.cx+r-2}" cy="${loc.cy-r+2}" r="7" fill="#fbbf24" stroke="#070e1a" stroke-width="1.5"/>`;
+      nh+=`<text x="${loc.cx+r-2}" y="${loc.cy-r+3}" text-anchor="middle" dominant-baseline="middle" font-size="8.5" font-weight="700" font-family="sans-serif" fill="#070e1a">✓</text>`;
+    }
   });
   document.getElementById('map-nodes').innerHTML=nh;
   const byLoc={};
@@ -1132,9 +1127,8 @@ function renderMap(){
   let mh='';
   Object.entries(byLoc).forEach(([lid,list])=>{
     const loc=LOCS[lid];if(!loc)return;
-    const nr=loc.id===d.location?22:17;
     const offs=list.length===1?[0]:list.length===2?[-8,8]:[-10,0,10];
-    list.forEach((p,i)=>{mh+=`<circle cx="${loc.cx+offs[i]}" cy="${loc.cy-nr-9}" r="5" fill="${p.border}" stroke="#fff" stroke-width="1.5"/>`;});
+    list.forEach((p,i)=>{mh+=`<circle cx="${loc.cx+offs[i]}" cy="${loc.cy-r-7}" r="6" fill="${p.border}" stroke="#fff" stroke-width="2"/>`;});
   });
   document.getElementById('map-markers').innerHTML=mh;
 }
@@ -1157,8 +1151,10 @@ function onLocClick(locId){
   }
   const cost=ECOST.move;
   if(d.energy<cost){qM(()=>mEmoji('⚡','Мало енергії',`Потрібно ${cost} ⚡ на перехід.\n\nДодай сторінки через ☰`,[{l:'Додати',ok:true,cb:()=>{closeModal();openSidePanel();}},{l:'Ок',cb:closeModal}]));return;}
-  qM(()=>mEmoji(loc.emoji,'Перейти до '+loc.name,`Витратити ${cost} ⚡ і перейти до ${loc.name}?`,
-    [{l:'Так!',ok:true,cb:()=>{closeModal();doMove(locId);}},{l:'Ні',cb:closeModal}]));
+  const _li=LOC_ICONS[locId];
+  const _btns=[{l:'Так!',ok:true,cb:()=>{closeModal();doMove(locId);}},{l:'Ні',cb:closeModal}];
+  if(_li) qM(()=>mImg(_li,'Перейти до '+loc.name,`Витратити ${cost} ⚡ і перейти до ${loc.name}?`,_btns));
+  else qM(()=>mEmoji(loc.emoji,'Перейти до '+loc.name,`Витратити ${cost} ⚡ і перейти до ${loc.name}?`,_btns));
 }
 
 function doMove(locId){
@@ -1175,7 +1171,9 @@ function doMove(locId){
 function renderActions(){
   const d=pd();
   const loc=cLoc();
-  document.getElementById('act-emoji').textContent=loc.emoji;
+  const _li=LOC_ICONS[loc.id];
+  if(_li) document.getElementById('act-emoji').innerHTML=`<img src="${_li}" style="width:48px;height:48px;border-radius:50%;object-fit:cover">`;
+  else document.getElementById('act-emoji').textContent=loc.emoji;
   document.getElementById('act-name').textContent=loc.name;
   let locDesc=loc.desc||'';
   if(loc.pool&&loc.pool.length){
@@ -1976,7 +1974,33 @@ async function loadFromCloud(pid){
 }
 
 
-initState();showSelect();
+// ═══════════ LOC ICONS ═══════════
+let LOC_ICONS={};
+function loadLocIcons(){
+  const img=new Image();
+  img.onload=function(){
+    const W=2830,cols=7;
+    const colW=W/cols;
+    // srcCY and srcR calibrated for loc1.png (2830x1472): circles in upper ~35% of image
+    const srcCY=258,srcR=182;
+    const order=['oak','pallet','forest','glade','caves','shore','map2'];
+    order.forEach((id,i)=>{
+      const c=document.createElement('canvas');
+      const sz=64;c.width=c.height=sz;
+      const ctx=c.getContext('2d');
+      ctx.beginPath();ctx.arc(sz/2,sz/2,sz/2,0,Math.PI*2);ctx.clip();
+      const srcX=i*colW+colW/2;
+      ctx.drawImage(img,srcX-srcR,srcCY-srcR,srcR*2,srcR*2,0,0,sz,sz);
+      LOC_ICONS[id]=c.toDataURL();
+    });
+    LOC_ICONS['butterfly']=LOC_ICONS['glade'];
+    renderActions();
+  };
+  img.onerror=function(){};
+  img.src='loc1.png';
+}
+
+initState();showSelect();loadLocIcons();
 window.addEventListener('visibilitychange',()=>{
   if(document.visibilityState==='hidden'&&cur)
     localStorage.setItem('rpg_state_'+cur,JSON.stringify(state.players[cur]));
