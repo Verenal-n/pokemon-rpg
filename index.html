@@ -1,0 +1,1926 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Читальний Світ — Покемон</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#1a1a2e;color:#eee;min-height:100vh;}
+.app{max-width:480px;margin:0 auto;min-height:100vh;background:#16213e;position:relative;}
+.screen{display:none;min-height:100vh;flex-direction:column;}.screen.active{display:flex;}
+
+/* SELECT */
+.sel-bg{background:linear-gradient(160deg,#1a1a2e,#16213e,#0f3460);padding:2rem 1rem;flex:1;overflow-y:auto;}
+.sel-title{text-align:center;padding:2rem 0 1.5rem;}
+.sel-title h1{font-size:26px;font-weight:700;color:#fff;margin-bottom:4px;}
+.sel-title p{font-size:13px;color:#7eceff;}
+.sel-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+.sel-card{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:16px;padding:1.25rem .75rem;cursor:pointer;text-align:center;transition:all .2s;}
+.sel-card:hover{background:rgba(255,255,255,.14);transform:translateY(-2px);}
+.sel-av{width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:24px;margin:0 auto 8px;}
+.sel-name{font-size:14px;font-weight:600;color:#fff;margin-bottom:3px;}
+.sel-sub{font-size:10px;color:#7eceff;margin-bottom:5px;}
+.spill{font-size:10px;font-weight:500;padding:2px 7px;border-radius:20px;background:rgba(126,206,255,.15);color:#7eceff;display:inline-block;margin:2px 1px;}
+.spill-red{background:rgba(255,100,100,.2);color:#ff9999;}
+.spill-atk{background:rgba(251,146,60,.2);color:#fb923c;}
+
+/* HEADER */
+.hdr{background:rgba(0,0,0,.45);padding:9px 12px;display:flex;align-items:center;gap:8px;border-bottom:1px solid rgba(255,255,255,.08);flex-shrink:0;}
+.back-btn{background:none;border:none;cursor:pointer;font-size:18px;color:#7eceff;padding:2px 6px;}
+.hdr-av{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;}
+.hdr-info{flex:1;min-width:0;}
+.hdr-name{font-size:13px;font-weight:600;color:#fff;}
+.hdr-loc{font-size:10px;color:#7eceff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.hdr-res{display:flex;gap:4px;flex-shrink:0;}
+.rpill{background:rgba(255,255,255,.1);border-radius:20px;padding:3px 8px;font-size:10px;font-weight:600;color:#fff;white-space:nowrap;cursor:pointer;}
+.rpill:hover{background:rgba(255,255,255,.2);}
+.rpill-atk{background:rgba(251,146,60,.2);color:#fb923c;}
+
+/* MAIN CONTENT */
+.main-content{flex:1;overflow-y:auto;padding:10px;}
+
+/* POKEBALLS */
+.pball-bar{display:flex;gap:6px;align-items:center;background:rgba(0,0,0,.3);border-radius:12px;padding:8px 12px;margin-bottom:8px;}
+.pball-slot{width:52px;height:52px;border-radius:10px;background:rgba(255,255,255,.05);border:1px dashed rgba(255,255,255,.18);display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative;flex-shrink:0;transition:all .15s;}
+.pball-slot.filled{border:1px solid rgba(126,206,255,.4);background:rgba(126,206,255,.07);}
+.pball-slot.filled:hover{background:rgba(126,206,255,.14);}
+.pball-slot.locked{opacity:.25;cursor:default;}
+.pball-img{width:44px;height:44px;image-rendering:pixelated;}
+.pball-xpbar{position:absolute;bottom:1px;left:3px;right:3px;height:3px;background:rgba(255,255,255,.1);border-radius:2px;overflow:hidden;}
+.pball-xpfill{height:100%;background:#7eceff;border-radius:2px;transition:width .3s;}
+.pball-empty{font-size:20px;opacity:.3;}
+.pball-label{font-size:9px;color:#7eceff;flex:1;text-align:right;}
+
+/* DEX */
+.sec-title{font-size:10px;font-weight:600;color:#7eceff;letter-spacing:.07em;text-transform:uppercase;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center;}
+.dex-tabs{display:flex;gap:4px;overflow-x:auto;margin-bottom:5px;scrollbar-width:none;}
+.dex-tabs::-webkit-scrollbar{display:none;}
+.dex-tab{font-size:9px;font-weight:600;padding:3px 9px;border-radius:12px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.05);color:#888;cursor:pointer;white-space:nowrap;flex-shrink:0;transition:all .15s;}
+.dex-tab.act{background:rgba(126,206,255,.2);border-color:#7eceff;color:#7eceff;}
+.dex-grid{display:flex;flex-direction:row;overflow-x:auto;gap:6px;margin-bottom:10px;padding-bottom:4px;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.1) transparent;}
+.dex-grid::-webkit-scrollbar{height:3px;}.dex-grid::-webkit-scrollbar-thumb{background:rgba(255,255,255,.15);border-radius:2px;}
+.dex-card{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.07);border-radius:10px;padding:0 3px 5px;text-align:center;cursor:pointer;transition:all .15s;overflow:hidden;width:68px;flex-shrink:0;position:relative;}
+.dex-card:hover{background:rgba(255,255,255,.1);}
+.dex-card.act{border-color:#7eceff;background:rgba(126,206,255,.1);}
+.dex-img{width:calc(100% + 6px);height:68px;object-fit:contain;object-position:bottom center;image-rendering:pixelated;margin:0 -3px;display:block;}
+.dex-name{font-size:8px;color:#ccc;margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;line-height:1.2;}
+.dex-sub{font-size:8px;color:#7eceff;line-height:1.2;}
+.dex-empty{flex:1;text-align:center;padding:1.5rem;color:rgba(255,255,255,.25);font-size:12px;}
+.chain-row{display:flex;flex-direction:row;overflow-x:auto;gap:6px;margin-bottom:10px;padding-bottom:4px;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.1) transparent;}
+.chain-row::-webkit-scrollbar{height:3px;}.chain-row::-webkit-scrollbar-thumb{background:rgba(255,255,255,.15);border-radius:2px;}
+.chain-block{background:rgba(251,191,36,.07);border:1px solid rgba(251,191,36,.35);border-radius:10px;padding:5px 8px 5px 6px;display:flex;align-items:center;gap:2px;position:relative;flex-shrink:0;overflow:hidden;}
+.chain-block-badge{position:absolute;top:0;right:0;background:#fbbf24;color:#000;font-size:6px;font-weight:700;padding:1px 5px;border-radius:0 8px 0 5px;letter-spacing:.04em;}
+.chain-sprite{cursor:pointer;text-align:center;flex-shrink:0;opacity:.9;transition:opacity .15s;}
+.chain-sprite:hover{opacity:1;}
+.chain-arrow{color:rgba(251,191,36,.5);font-size:11px;flex-shrink:0;line-height:1;margin-top:-6px;}
+
+/* MAP */
+.map-card{background:rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.07);border-radius:14px;overflow:hidden;margin-bottom:8px;}
+#map-region-tabs{background:rgba(0,0,0,.2);}
+.map-svg{display:block;width:100%;}
+
+
+
+/* ACTIONS */
+.act-card{background:rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.07);border-radius:14px;overflow:hidden;margin-bottom:8px;}
+.act-hdr{display:flex;flex-direction:column;align-items:center;text-align:center;gap:4px;padding:10px 12px;background:rgba(255,255,255,.03);border-bottom:1px solid rgba(255,255,255,.05);}
+.act-hdr-emoji{font-size:26px;}
+.act-hdr-info{flex:1;}
+.act-hdr-name{font-size:13px;font-weight:600;color:#fff;}
+.act-hdr-desc{font-size:10px;color:#7eceff;margin-top:1px;}
+.act-hdr-badge{font-size:9px;font-weight:600;padding:2px 8px;border-radius:20px;margin-top:2px;}
+.act-list{padding:8px;display:flex;flex-direction:column;gap:5px;}
+.act-row{display:flex;align-items:center;gap:8px;padding:9px 10px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.05);border-radius:10px;cursor:pointer;transition:all .15s;}
+.act-row:hover{background:rgba(255,255,255,.09);border-color:rgba(255,255,255,.12);}
+.act-row.combat-row{background:rgba(180,40,40,.15);border-color:rgba(200,60,60,.3);}
+.act-row.combat-row:hover{background:rgba(180,40,40,.25);}
+.act-icon{font-size:18px;flex-shrink:0;}
+.act-body{flex:1;}
+.act-title{font-size:12px;font-weight:600;color:#fff;}
+.act-desc{font-size:10px;color:#888;margin-top:1px;}
+.act-cost{font-size:9px;color:#fbbf24;margin-top:2px;}
+.act-badge{font-size:10px;font-weight:600;padding:2px 7px;border-radius:20px;white-space:nowrap;flex-shrink:0;}
+
+/* COMBAT BANNER in actions */
+.combat-hp-mini{background:rgba(255,255,255,.07);border-radius:4px;height:5px;margin-top:4px;overflow:hidden;}
+.combat-hp-mini-fill{background:#ef4444;height:100%;border-radius:4px;transition:width .4s;}
+
+/* MODAL */
+.modal-ov{position:fixed;inset:0;background:rgba(0,0,0,.72);display:flex;align-items:center;justify-content:center;z-index:500;padding:1rem;}
+.modal-box{background:#1e2d4a;border:1px solid rgba(126,206,255,.18);border-radius:20px;padding:1.5rem;max-width:340px;width:100%;max-height:88vh;overflow-y:auto;}
+.modal-box.wide{max-width:400px;}
+.m-img{width:130px;height:130px;image-rendering:pixelated;display:block;margin:0 auto 10px;}
+.m-emoji{font-size:46px;text-align:center;margin-bottom:10px;}
+.m-title{font-size:16px;font-weight:700;color:#fff;margin-bottom:6px;text-align:center;}
+.m-desc{font-size:12px;color:#aaa;margin-bottom:1.25rem;text-align:center;line-height:1.6;}
+.m-btns{display:flex;gap:8px;}
+.m-btns button{flex:1;font-size:14px;padding:13px 10px;border-radius:12px;font-weight:600;cursor:pointer;min-height:44px;}
+.btn-ok{background:#2563eb;color:#fff;border:none;}
+.btn-ok:hover{background:#1d4ed8;}
+.btn-cancel{background:rgba(255,255,255,.08);color:#ccc;border:1px solid rgba(255,255,255,.15);}
+.btn-cancel:hover{background:rgba(255,255,255,.14);}
+.btn-red{background:#991b1b;color:#fff;border:none;}
+.flbl{font-size:10px;color:#7eceff;font-weight:600;letter-spacing:.04em;text-transform:uppercase;margin-bottom:4px;}
+.finput{width:100%;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.15);border-radius:10px;padding:9px 12px;color:#fff;font-size:13px;outline:none;margin-bottom:10px;}
+.finput:focus{border-color:#7eceff;}
+.ppill{background:rgba(126,206,255,.15);color:#7eceff;font-size:12px;font-weight:600;padding:8px;border-radius:10px;text-align:center;margin-bottom:10px;}
+.shelf-wrap{width:100%;display:flex;flex-direction:column;gap:0;background:#111009;border-radius:10px;padding:0;}
+.shelf-row{display:flex;flex-direction:column;}
+.shelf-books{display:flex;align-items:flex-end;gap:5px;padding:22px 12px 0;overflow-x:scroll;overflow-y:visible;-webkit-overflow-scrolling:touch;touch-action:pan-x;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.15) transparent;}
+.shelf-books::-webkit-scrollbar{height:3px;}.shelf-books::-webkit-scrollbar-track{background:transparent;}.shelf-books::-webkit-scrollbar-thumb{background:rgba(255,255,255,.15);border-radius:2px;}
+.shelf-plank{width:100%;height:22px;background:linear-gradient(180deg,#7a5a32 0%,#5a3e1e 35%,#3e2a10 100%);box-shadow:0 8px 24px rgba(0,0,0,.75),inset 0 2px 0 rgba(255,255,255,.07);border-top:2px solid #9a7a4a;flex-shrink:0;margin-top:0;}
+.book-wrap{position:relative;display:flex;flex-direction:row;flex-shrink:0;cursor:pointer;transition:transform .18s;}
+.book-wrap:hover{transform:translateY(-14px);z-index:20;}
+.book-spine{display:flex;align-items:center;justify-content:center;flex-shrink:0;position:relative;overflow:hidden;}
+.book-cover{position:relative;overflow:hidden;flex-shrink:0;}
+.book-cover::before{content:'';position:absolute;top:0;left:0;bottom:0;width:9px;background:linear-gradient(90deg,rgba(0,0,0,.38) 0%,rgba(0,0,0,.08) 70%,transparent 100%);z-index:2;pointer-events:none;}
+.book-cover img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
+.book-cover-inner{position:absolute;inset:0;display:flex;flex-direction:column;padding:6px 5px 5px;}
+.book-pages-edge{position:absolute;top:3px;right:-5px;bottom:3px;width:5px;background:repeating-linear-gradient(180deg,#f2ede4 0px,#f2ede4 1.2px,#d5d0c6 1.2px,#d5d0c6 2px);border-radius:0 1px 1px 0;box-shadow:1px 0 4px rgba(0,0,0,.35);z-index:-1;}
+.book-tooltip{display:none;position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);white-space:nowrap;background:#241a0e;border:1px solid rgba(201,168,106,.35);border-radius:6px;padding:4px 8px;font-size:10px;color:#c9a86a;z-index:30;pointer-events:none;}
+.book-wrap:hover .book-tooltip{display:block;}
+
+/* HP BAR */
+.hp-wrap{background:rgba(255,255,255,.1);border-radius:4px;height:8px;overflow:hidden;margin:6px 0;}
+.hp-fill{background:#ef4444;height:8px;border-radius:4px;transition:width .4s;}
+.xp-wrap{background:rgba(255,255,255,.1);border-radius:3px;height:4px;overflow:hidden;margin-top:4px;}
+.xp-fill{background:#7eceff;height:4px;border-radius:3px;}
+
+
+/* COMBAT SIDE BY SIDE */
+.battle-screen{display:flex;align-items:center;justify-content:space-around;padding:.75rem 0 .5rem;gap:8px;}
+.battle-my{text-align:center;flex:1;}
+.battle-vs{font-size:14px;font-weight:700;color:#7eceff;flex-shrink:0;}
+.battle-enemy{text-align:center;flex:1;}
+.battle-img-my{width:110px;height:110px;image-rendering:pixelated;display:block;margin:0 auto;}
+.battle-img-en{width:110px;height:110px;image-rendering:pixelated;display:block;margin:0 auto;}
+.battle-name{font-size:12px;font-weight:600;color:#fff;margin-top:4px;}
+.battle-hp{font-size:10px;color:#fca5a5;margin-top:2px;}
+.battle-xp{font-size:10px;color:#7eceff;margin-top:2px;}
+/* COMBAT MODAL */
+.combat-poke{text-align:center;padding:.5rem 0;}
+.c-img{width:110px;height:110px;image-rendering:pixelated;display:block;margin:0 auto 5px;}
+.c-name{font-size:17px;font-weight:700;color:#fff;}
+.c-hp{font-size:11px;color:#fca5a5;margin-top:2px;}
+.my-pokes{display:flex;gap:6px;margin-bottom:10px;}
+.my-poke-item{flex:1;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.09);border-radius:10px;padding:6px;display:flex;align-items:center;gap:5px;}
+.mp-img{width:28px;height:28px;image-rendering:pixelated;flex-shrink:0;}
+
+/* STARTER GRID */
+.starter-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px;}
+.starter-opt{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:10px 6px;text-align:center;cursor:pointer;transition:all .15s;}
+.starter-opt:hover{background:rgba(255,255,255,.1);border-color:#7eceff;}
+.starter-img{width:54px;height:54px;image-rendering:pixelated;display:block;margin:0 auto 4px;}
+.starter-name{font-size:10px;font-weight:600;color:#fff;}
+.starter-type{font-size:9px;color:#7eceff;}
+
+
+/* EVO DOTS */
+.evo-dots{display:flex;gap:2px;justify-content:center;margin-top:1px;}
+.evo-dot{width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,.2);}
+.evo-dot.filled{background:#7eceff;}
+/* TYPE BADGE */
+.type-b{display:inline-block;font-size:9px;font-weight:600;padding:1px 6px;border-radius:8px;margin:1px;color:#fff;}
+
+
+/* QUEST PANEL */
+.quest-panel{background:rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.07);border-radius:14px;overflow:hidden;margin-bottom:8px;}
+.quest-hdr{padding:8px 12px;background:rgba(255,255,255,.03);border-bottom:1px solid rgba(255,255,255,.05);font-size:10px;font-weight:600;color:#fbbf24;text-transform:uppercase;letter-spacing:.07em;}
+.quest-list{padding:8px;display:flex;flex-direction:column;gap:6px;}
+.quest-item{display:flex;align-items:center;gap:8px;padding:8px 10px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.05);border-radius:10px;}
+.quest-pimg{width:36px;height:36px;image-rendering:pixelated;flex-shrink:0;}
+.quest-body{flex:1;}
+.quest-title{font-size:12px;font-weight:600;color:#fff;}
+.quest-desc{font-size:10px;color:#aaa;margin-top:2px;}
+.quest-badge{font-size:9px;font-weight:600;padding:2px 7px;border-radius:20px;white-space:nowrap;flex-shrink:0;}
+/* SHOP ROW */
+.shop-row{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.06);}
+.sh-emoji{font-size:20px;flex-shrink:0;}
+.sh-info{flex:1;}
+.sh-name{font-size:12px;font-weight:600;color:#fff;}
+.sh-desc{font-size:10px;color:#888;margin-top:1px;}
+.sh-price{font-size:11px;font-weight:600;color:#fbbf24;}
+.sh-btn{font-size:11px;padding:5px 12px;border-radius:8px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);color:#fff;cursor:pointer;margin-top:4px;display:block;}
+.sh-btn:disabled{opacity:.3;cursor:not-allowed;}
+.sh-btn:not(:disabled):hover{background:rgba(255,255,255,.2);}
+
+/* DIVIDER */
+.divider{height:1px;background:rgba(255,255,255,.06);margin:10px 0;}
+
+/* SIDE PANEL */
+#side-panel{position:fixed;top:0;right:-340px;width:310px;height:100vh;background:#1e2d4a;border-left:1px solid rgba(126,206,255,.15);z-index:400;transition:right .25s;padding:1rem;overflow-y:auto;}
+#side-panel.open{right:0;}
+#side-ov{position:fixed;inset:0;z-index:399;display:none;background:rgba(0,0,0,.4);}
+#side-ov.open{display:block;}
+
+/* TOAST */
+.toast{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%);background:#1e2d4a;border:1px solid rgba(126,206,255,.3);color:#7eceff;padding:8px 18px;border-radius:20px;font-size:12px;font-weight:600;opacity:0;transition:opacity .3s;pointer-events:none;z-index:700;white-space:nowrap;}
+.toast.show{opacity:1;}
+
+::-webkit-scrollbar{width:4px;}
+::-webkit-scrollbar-thumb{background:rgba(255,255,255,.15);border-radius:2px;}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- SELECT -->
+<div id="screen-select" class="screen active">
+  <div class="sel-bg">
+    <div class="sel-title"><h1>📚 Читальний Світ</h1><p>Хто читає сьогодні?</p>
+      <button onclick="openSettings()" style="margin-top:10px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:20px;color:#7eceff;font-size:11px;padding:5px 14px;cursor:pointer">⚙️ Хмарне збереження</button>
+    </div>
+    <div class="sel-grid" id="sel-grid"></div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div id="screen-main" class="screen">
+  <div class="hdr">
+    <button class="back-btn" onclick="showSelect()">←</button>
+    <div class="hdr-av" id="hdr-av"></div>
+    <div class="hdr-info">
+      <div class="hdr-name" id="hdr-name"></div>
+      <div class="hdr-loc" id="hdr-loc"></div>
+    </div>
+    <div class="hdr-res">
+      <span id="save-status" style="font-size:11px;font-weight:700;display:none;padding:0 4px"></span>
+      <div class="rpill" id="hdr-energy" onclick="openSidePanel()" title="Додати сторінки">⚡0</div>
+      <div class="rpill rpill-atk" id="hdr-atk" title="Очки атаки">⚔️0</div>
+      <div class="rpill" id="hdr-coins">🪙0</div>
+      <div class="rpill" onclick="openSidePanel()">☰</div>
+    </div>
+  </div>
+  <div class="main-content">
+    <div class="pball-bar" id="pball-bar"></div>
+    <div class="sec-title"><span>Покедекс</span><span id="dex-count" style="font-weight:400;color:#888;font-size:10px;text-transform:none;letter-spacing:0"></span></div>
+    <div class="dex-tabs" id="dex-tabs"></div>
+    <div class="dex-grid" id="dex-grid"></div>
+    <div id="dex-complete"></div>
+    <div id="quest-panel" style="display:none" class="quest-panel"><div class="quest-hdr">📋 Квести</div><div class="quest-list" id="quest-list"></div></div>
+    <div class="map-card"><div id="map-region-tabs"></div><svg id="map-svg" class="map-svg" viewBox="0 0 460 240" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <radialGradient id="mapBg" cx="50%" cy="50%" r="70%">
+          <stop offset="0%" stop-color="#162032"/>
+          <stop offset="100%" stop-color="#070e1a"/>
+        </radialGradient>
+      </defs>
+      <rect width="460" height="240" fill="url(#mapBg)"/>
+      <g id="map-edges"></g><g id="map-nodes"></g><g id="map-markers"></g>
+    </svg></div>
+    <div class="act-card">
+      <div class="act-hdr">
+        <div class="act-hdr-emoji" id="act-emoji"></div>
+        <div class="act-hdr-info"><div class="act-hdr-name" id="act-name"></div><div class="act-hdr-desc" id="act-desc"></div></div>
+        <div class="act-hdr-badge" id="act-badge"></div>
+      </div>
+      <div class="act-list" id="act-list"></div>
+    </div>
+  </div>
+</div>
+</div>
+
+<div id="side-ov" onclick="closeSidePanel()"></div>
+<div id="side-panel">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;">
+    <span style="font-size:14px;font-weight:700;color:#fff">Меню гравця</span>
+    <button onclick="closeSidePanel()" style="background:none;border:none;cursor:pointer;font-size:18px;color:#7eceff">✕</button>
+  </div>
+  <div id="side-content"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ═══════════ DATA ═══════════
+const PLAYERS=[
+  {id:'lionhard',  name:'Lionhard',  emoji:'🦁', color:'#d97706', border:'#92400e'},
+  {id:'esperanza', name:'Esperanza', emoji:'🌸', color:'#be185d', border:'#9d174d'},
+  {id:'demetrius', name:'Demetrius', emoji:'⚡', color:'#1d4ed8', border:'#1e3a8a'},
+];
+
+const POKE=[
+  {id:1, name:'Бульбазавр',    pid:1,   loc:'pallet', rar:'starter', types:['Трава','Отрута'],  evo:2,  evoXp:100, evoN:'Івізавр'},
+  {id:2, name:'Івізавр',       pid:2,   loc:'pallet', rar:'evolved', types:['Трава','Отрута'],  evo:3,  evoXp:200, evoN:'Венузавр'},
+  {id:3, name:'Венузавр',      pid:3,   loc:'pallet', rar:'evolved', types:['Трава','Отрута'],  evo:4,  evoXp:300, evoN:'Мега Венузавр', stoneEvo:'mega'},
+  {id:4, name:'Мега Венузавр', pid:3,   loc:'pallet', rar:'mega',    types:['Трава','Отрута']},
+  {id:5, name:'Чармандер',     pid:4,   loc:'pallet', rar:'starter', types:['Вогонь'],           evo:6,  evoXp:100, evoN:'Чармелеон'},
+  {id:6, name:'Чармелеон',     pid:5,   loc:'pallet', rar:'evolved', types:['Вогонь'],           evo:7,  evoXp:200, evoN:'Чаризард'},
+  {id:7, name:'Чаризард',      pid:6,   loc:'pallet', rar:'evolved', types:['Вогонь','Летючий'], evo:8,  evoXp:300, evoN:'Мега Чаризард', stoneEvo:'mega'},
+  {id:8, name:'Мега Чаризард', pid:6,   loc:'pallet', rar:'mega',    types:['Вогонь','Летючий']},
+  {id:9, name:'Сквіртл',       pid:7,   loc:'pallet', rar:'starter', types:['Вода'],             evo:10, evoXp:100, evoN:'Вартортл'},
+  {id:10,name:'Вартортл',      pid:8,   loc:'pallet', rar:'evolved', types:['Вода'],             evo:11, evoXp:200, evoN:'Бластойз'},
+  {id:11,name:'Бластойз',      pid:9,   loc:'pallet', rar:'evolved', types:['Вода'],             evo:12, evoXp:300, evoN:'Мега Бластойз', stoneEvo:'mega'},
+  {id:12,name:'Мега Бластойз', pid:9,   loc:'pallet', rar:'mega',    types:['Вода']},
+  {id:13,name:'Пікачу',        pid:25,  loc:'pallet', rar:'rare',    types:['Електрика'],        evo:14, evoXp:200, evoN:'Райчу'},
+  {id:14,name:'Райчу',         pid:26,  loc:'pallet', rar:'evolved', types:['Електрика']},
+  {id:15,name:'Піджі',         pid:16,  loc:'forest', rar:'common',  types:['Нормальний','Летючий'], evo:16, evoXp:100, evoN:'Піджіотто'},
+  {id:16,name:'Піджіотто',     pid:17,  loc:'forest', rar:'evolved', types:['Нормальний','Летючий'], evo:17, evoXp:200, evoN:'Піджіт'},
+  {id:17,name:'Піджіт',        pid:18,  loc:'forest', rar:'evolved', types:['Нормальний','Летючий'], evo:18, evoXp:300, evoN:'Мега Піджіт', stoneEvo:'mega'},
+  {id:18,name:'Мега Піджіт',   pid:18,  loc:'forest', rar:'mega',    types:['Нормальний','Летючий']},
+  {id:19,name:'Еканс',         pid:23,  loc:'forest', rar:'common',  types:['Отрута'],           evo:20, evoXp:200, evoN:'Ербок'},
+  {id:20,name:'Ербок',         pid:24,  loc:'forest', rar:'evolved', types:['Отрута']},
+  {id:21,name:'Веномат',       pid:49,  loc:'forest', rar:'common',  types:['Комаха','Отрута'],  evo:22, evoXp:200, evoN:'Веномот'},
+  {id:22,name:'Веномот',       pid:49,  loc:'forest', rar:'evolved', types:['Комаха','Отрута']},
+  {id:23,name:'Беллспраут',    pid:69,  loc:'forest', rar:'common',  types:['Трава','Отрута'],   evo:24, evoXp:200, evoN:'Вайлплюм'},
+  {id:24,name:'Вайлплюм',      pid:71,  loc:'forest', rar:'evolved', types:['Трава','Отрута']},
+  {id:25,name:'Клефейрі',      pid:35,  loc:'forest', rar:'uncommon',types:['Фея'],              evo:26, evoXp:200, evoN:'Клефейбл'},
+  {id:26,name:'Клефейбл',      pid:36,  loc:'forest', rar:'evolved', types:['Фея']},
+  {id:27,name:'Пінсір',        pid:127, loc:'forest', rar:'rare',    types:['Комаха'],           evo:28, evoXp:300, evoN:'Мега Пінсір', stoneEvo:'mega'},
+  {id:28,name:'Мега Пінсір',   pid:127, loc:'forest', rar:'mega',    types:['Комаха']},
+  {id:29,name:'Оддіш',         pid:43,  loc:'glade',  rar:'common',  types:['Трава','Отрута'],   evo:30, evoXp:100, evoN:'Ґльум'},
+  {id:30,name:'Ґльум',         pid:44,  loc:'glade',  rar:'evolved', types:['Трава','Отрута'],   evo:31, evoXp:200, evoN:'Вайлплюм'},
+  {id:31,name:'Вайлплюм',      pid:45,  loc:'glade',  rar:'evolved', types:['Трава','Отрута']},
+  {id:33,name:'Катерпі',       pid:10,  loc:'glade',  rar:'common',  types:['Комаха'],           evo:34, evoXp:100, evoN:'Метапод'},
+  {id:34,name:'Метапод',       pid:11,  loc:'glade',  rar:'evolved', types:['Комаха'],           evo:35, evoXp:200, evoN:'Баттерфрі'},
+  {id:35,name:'Баттерфрі',     pid:12,  loc:'glade',  rar:'evolved', types:['Комаха','Летючий'], isKey:{loc:'butterfly',desc:'Відкриває Поляну метеликів'}},
+  {id:36,name:'Раттата',       pid:19,  loc:'glade',  rar:'common',  types:['Нормальний'],       evo:37, evoXp:200, evoN:'Ратікейт'},
+  {id:37,name:'Ратікейт',      pid:20,  loc:'glade',  rar:'evolved', types:['Нормальний']},
+  {id:38,name:'Мяут',          pid:52,  loc:'glade',  rar:'uncommon',types:['Нормальний'],       evo:39, evoXp:200, evoN:'Персіан'},
+  {id:39,name:'Персіан',       pid:53,  loc:'glade',  rar:'evolved', types:['Нормальний']},
+  {id:40,name:'Бьютіфлай',    pid:267, loc:'butterfly',rar:'common',  types:['Комаха','Летючий']},
+  {id:41,name:'Джеодуд',       pid:74,  loc:'caves',  rar:'common',  types:['Камінь','Земля'],   evo:42, evoXp:100, evoN:'Ґравелер'},
+  {id:42,name:'Ґравелер',      pid:75,  loc:'caves',  rar:'evolved', types:['Камінь','Земля'],   evo:43, evoXp:200, evoN:'Ґолем'},
+  {id:43,name:'Ґолем',         pid:76,  loc:'caves',  rar:'evolved', types:['Камінь','Земля']},
+  {id:44,name:'Зубат',         pid:41,  loc:'caves',  rar:'common',  types:['Отрута','Летючий'],  evo:45, evoXp:100, evoN:'Ґолбат'},
+  {id:45,name:'Ґолбат',        pid:42,  loc:'caves',  rar:'evolved', types:['Отрута','Летючий'],  evo:46, evoXp:200, evoN:'Кробат'},
+  {id:46,name:'Кробат',        pid:169, loc:'caves',  rar:'evolved', types:['Отрута','Летючий']},
+  {id:47,name:'Діґлетт',       pid:50,  loc:'caves',  rar:'common',  types:['Земля'],             evo:48, evoXp:200, evoN:'Дуґтріо'},
+  {id:48,name:'Дуґтріо',       pid:51,  loc:'caves',  rar:'evolved', types:['Земля']},
+  {id:49,name:'Ларвітар',      pid:246, loc:'caves',  rar:'rare',    types:['Камінь'],            evo:50, evoXp:100, evoN:'Пюпітар'},
+  {id:50,name:'Пюпітар',       pid:247, loc:'caves',  rar:'evolved', types:['Камінь'],            evo:51, evoXp:200, evoN:'Тіранітар'},
+  {id:51,name:'Тіранітар',     pid:248, loc:'caves',  rar:'evolved', types:['Камінь'],            evo:52, evoXp:300, evoN:'Мега Тіранітар', stoneEvo:'mega'},
+  {id:52,name:'Мега Тіранітар',pid:248, loc:'caves',  rar:'mega',    types:['Камінь']},
+  {id:53,name:'Артікуно',      pid:144, loc:'caves',  rar:'legendary',types:['Лід','Летючий'],    isKey:{loc:'map2',desc:'Відкриває перехід до Регіону Джото!'}},
+  {id:54,name:'Чімчар',        pid:390, loc:'glade',  rar:'rare',     types:['Вогонь'],            evo:55, evoXp:100, evoN:'Монферно'},
+  {id:55,name:'Монферно',      pid:391, loc:'glade',  rar:'evolved',  types:['Вогонь','Бойовий'],  evo:56, evoXp:200, evoN:'Інфернейп'},
+  {id:56,name:'Інфернейп',     pid:392, loc:'glade',  rar:'evolved',  types:['Вогонь','Бойовий'],  evo:57, evoXp:300, evoN:'Мега Інфернейп', stoneEvo:'mega'},
+  {id:57,name:'Мега Інфернейп',pid:392, loc:'glade',  rar:'mega',     types:['Вогонь','Бойовий'],  isKey:{loc:'caves',desc:'Відкриває Печери!'}},
+  {id:58,name:'Дастокс',      pid:269, loc:'butterfly',rar:'common',   types:['Комаха','Отрута']},
+  {id:59,name:'Мотім',        pid:414, loc:'butterfly',rar:'common',   types:['Комаха','Летючий']},
+  {id:60,name:'Маскрейн',     pid:284, loc:'butterfly',rar:'evolved',  types:['Комаха','Летючий']},
+  {id:61,name:'Вольказона',   pid:637, loc:'butterfly',rar:'evolved',  types:['Комаха','Вогонь']},
+  {id:65,name:'Серскіт',      pid:283, loc:'butterfly',rar:'uncommon', types:['Комаха','Вода'],   evo:60, evoXp:200, evoN:'Маскрейн'},
+  {id:66,name:'Лярвеста',     pid:636, loc:'butterfly',rar:'rare',     types:['Комаха','Вогонь'], evo:61, evoXp:200, evoN:'Вольказона'},
+  {id:67,name:'Магікарп',     pid:129, loc:'shore',    rar:'common',   types:['Вода'],             evo:68, evoXp:200, evoN:'Ґаладос'},
+  {id:68,name:'Ґаладос',      pid:130, loc:'shore',    rar:'evolved',  types:['Вода','Летючий'],   evo:69, evoXp:300, evoN:'Мега Ґаладос', stoneEvo:'mega'},
+  {id:69,name:'Мега Ґаладос', pid:130, loc:'shore',    rar:'mega',     types:['Вода','Темний']},
+  {id:70,name:'Псайдак',      pid:54,  loc:'shore',    rar:'common',   types:['Вода'],             evo:71, evoXp:200, evoN:'Ґолдак'},
+  {id:71,name:'Ґолдак',       pid:55,  loc:'shore',    rar:'evolved',  types:['Вода']},
+  {id:72,name:'Горсі',        pid:116, loc:'shore',    rar:'uncommon', types:['Вода'],             evo:73, evoXp:200, evoN:'Сідра'},
+  {id:73,name:'Сідра',        pid:117, loc:'shore',    rar:'evolved',  types:['Вода']},
+  {id:74,name:'Лапрас',       pid:131, loc:'shore',    rar:'legendary',types:['Вода','Лід']},
+];
+
+const HP_RANGE={common:[60,100],uncommon:[120,200],rare:[250,400],legendary:[500,800],starter:[80,80],evolved:[0,0],mega:[0,0]};
+const TYPE_C={'Трава':'#15803d','Отрута':'#6d28d9','Вогонь':'#b45309','Вода':'#1d4ed8','Летючий':'#0369a1','Електрика':'#a16207','Нормальний':'#4b5563','Комаха':'#3f6212','Земля':'#92400e','Камінь':'#374151','Фея':'#be185d','Лід':'#0e7490','Бойовий':'#b91c1c','Темний':'#1e3a5f'};
+const STONES={mega:{name:'Мега-камінь',emoji:'💎'}};
+const SHOP_ITEMS=[
+  {id:'lure',      name:'Приманка',          desc:'100% зустріч з покемоном',     emoji:'🎣', price:20},
+  {id:'rare_lure', name:'Рідкісна приманка', desc:'100% зустріч з рідкісним',     emoji:'✨', price:50},
+  {id:'xp_amulet', name:'Амулет досвіду',    desc:'×1.5 XP за наступний бій',     emoji:'🔮', price:30},
+  {id:'mega',      name:'Мега-камінь',       desc:'Мега еволюція (Пінсір, Піджіт, стартери…)', emoji:'💎', price:100},
+  {id:'evo_crystal',name:'Кристал пробудження',desc:'Миттєво готує покемона до еволюції',      emoji:'💠', price:150},
+];
+
+
+const STONE_FRAGS={
+  forest:    ['mega'],
+  glade:     ['mega'],
+  butterfly: ['mega'],
+  caves:     ['mega'],
+  shore:     ['mega'],
+  newbark:   ['mega'],
+};
+const LOCS={
+  oak:{id:'oak',name:'Лабораторія Оука',mLabel:'Лаб. Оука',emoji:'🧪',cx:46,cy:122,
+    color:'#1e3a1e',stroke:'#4ade80',badge:'Старт',badgeBg:'rgba(74,222,128,.2)',badgeTxt:'#4ade80',
+    connects:['pallet'],actions:['oak_lab']},
+  pallet:{id:'pallet',name:'Містечко Палет',mLabel:'Палет',emoji:'🏘️',cx:148,cy:122,
+    color:'#166534',stroke:'#4ade80',badge:'Зона 1',badgeBg:'rgba(74,222,128,.15)',badgeTxt:'#4ade80',
+    connects:['oak','forest'],pool:[13,15,36],rarePool:[13],encounterChance:.5,
+    actions:['grass','pokecenter','shop']},
+  forest:{id:'forest',name:'Ліс Вірідіан',mLabel:'Ліс Вірідіан',emoji:'🌲',cx:242,cy:62,
+    color:'#064e3b',stroke:'#34d399',badge:'Зона 2',badgeBg:'rgba(52,211,153,.2)',badgeTxt:'#34d399',
+    connects:['pallet','glade'],pool:[15,19,21,23,25],rarePool:[27],encounterChance:.55,
+    unlockReq:{count:3},actions:['grass','grass_rare']},
+  glade:{id:'glade',name:'Поляна',mLabel:'Поляна',emoji:'🌸',cx:328,cy:122,
+    color:'#3b0764',stroke:'#a78bfa',badge:'Зона 3',badgeBg:'rgba(167,139,250,.2)',badgeTxt:'#a78bfa',
+    connects:['forest','caves','butterfly'],pool:[29,33,36,38],rarePool:[35,54],encounterChance:.5,
+    unlockReq:{count:6},actions:['grass','grass_rare']},
+  butterfly:{id:'butterfly',name:'Поляна метеликів',mLabel:'Метелики',emoji:'🦋',cx:242,cy:182,
+    color:'#500724',stroke:'#f9a8d4',badge:'Зона 3',badgeBg:'rgba(249,168,212,.2)',badgeTxt:'#f9a8d4',
+    connects:['glade'],pool:[40,58,59,65],rarePool:[66],encounterChance:.8,
+    unlockReq:{keyPoke:35},actions:['grass','grass_rare']},
+  caves:{id:'caves',name:'Печери',mLabel:'Печери',emoji:'⛏️',cx:398,cy:62,
+    color:'#1c1917',stroke:'#a8a29e',badge:'Зона 4',badgeBg:'rgba(168,162,158,.2)',badgeTxt:'#a8a29e',
+    connects:['glade','shore'],pool:[41,44,47,49],rarePool:[53],encounterChance:.55,
+    unlockReq:{keyPoke:57},actions:['grass','grass_rare']},
+  shore:{id:'shore',name:'Морський берег',mLabel:'Берег',emoji:'🌊',cx:440,cy:122,
+    color:'#0c2a4a',stroke:'#38bdf8',badge:'Зона 5',badgeBg:'rgba(56,189,248,.2)',badgeTxt:'#38bdf8',
+    connects:['caves'],pool:[67,70,72],rarePool:[74],encounterChance:.6,
+    unlockReq:{count:14},actions:['grass','grass_rare']},
+  map2:{id:'map2',name:'Регіон Джото',mLabel:'Рег. Джото',emoji:'🌏',cx:398,cy:182,
+    color:'#172554',stroke:'#60a5fa',badge:'Карта 2',badgeBg:'rgba(96,165,250,.2)',badgeTxt:'#60a5fa',
+    connects:['caves'],pool:[],rarePool:[],encounterChance:0,
+    unlockReq:{keyPoke:53},actions:['enter_johto']},
+};
+
+const LOCS_JOHTO={
+  newbark:{id:'newbark',name:'Нью-Барк-Таун',mLabel:'Нью-Барк',emoji:'🏙️',cx:200,cy:120,
+    color:'#1e3a5f',stroke:'#60a5fa',badge:'Джото 1',badgeBg:'rgba(96,165,250,.2)',badgeTxt:'#60a5fa',
+    connects:[],pool:[],rarePool:[],encounterChance:0,
+    actions:['shop','pokecenter','exchanger','return_kanto']},
+};
+
+// Energy cost per action
+const ECOST={grass:1,grass_rare:2,move:1,item_search:1};
+
+// ═══════════ STATE ═══════════
+let state={players:{}};
+let cur=null;
+let mQueue=[];
+let mOpen=false;
+let SCRIPT_URL=localStorage.getItem('rpg_script_url')||'';
+let _saveTimer=null;
+let dexTypeFilter='all';
+
+function initState(){
+  PLAYERS.forEach(p=>{
+    if(!state.players[p.id]) state.players[p.id]={
+      energy:3, atk:0, coins:0,
+      location:'oak', region:'kanto',
+      collection:[], activePokes:[], pokeballs:1,
+      inventory:{},
+      unlockedLocs:['oak'],
+      hasStarter:false, startersGiven:0, oakPending:false,
+      enemy:null, amuletActive:false,
+      totalPages:0, books:[],
+    };
+  });
+}
+
+function pd(){return state.players[cur];}
+function pl(){return PLAYERS.find(x=>x.id===cur);}
+function cLoc(){const d=pd();return((d.region||'kanto')==='johto'?LOCS_JOHTO:LOCS)[d.location];}
+function _anyLoc(id){return LOCS[id]||LOCS_JOHTO[id];}
+function gp(id){return POKE.find(p=>p.id===id);}
+function img(pid){return`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pid}.png`;}
+function ri(a,b){return Math.floor(Math.random()*(b-a+1))+a;}
+function p2e(p){const b=Math.max(1,Math.floor(p/100));const bonus=(p>=200?1:0)+(p>=400?2:0)+(p>=600?3:0);return b+bonus;}
+
+// ═══════════ MODAL QUEUE ═══════════
+function qM(fn){mQueue.push(fn);if(!mOpen)nextM();}
+function nextM(){if(!mQueue.length){mOpen=false;return;}mOpen=true;mQueue.shift()();}
+function closeModal(){const m=document.getElementById('mOv');if(m)m.remove();nextM();}
+
+function mImg(src,title,desc,btns){_mShow(`<img class="m-img" src="${src}" onerror="this.style.display='none'">`,title,desc,btns);}
+function mEmoji(em,title,desc,btns){_mShow(`<div class="m-emoji">${em}</div>`,title,desc,btns);}
+function _mShow(top,title,desc,btns){
+  const bb=btns||[{l:'Ок',ok:true,cb:closeModal}];
+  window._mb=bb;
+  const bh=bb.map((b,i)=>`<button class="${b.ok?'btn-ok':'btn-cancel'}" onclick="window._mb[${i}].cb()">${b.l}</button>`).join('');
+  document.body.insertAdjacentHTML('beforeend',`<div class="modal-ov" id="mOv"><div class="modal-box">${top}<div class="m-title">${title}</div><div class="m-desc">${(desc||'').replace(/\n/g,'<br>')}</div><div class="m-btns">${bh}</div></div></div>`);
+}
+function mHTML(html,wide=false){
+  document.body.insertAdjacentHTML('beforeend',`<div class="modal-ov" id="mOv"><div class="modal-box ${wide?'wide':''}" style="text-align:left">${html}</div></div>`);
+}
+
+// ═══════════ SCREENS ═══════════
+function show(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');}
+
+function renderSelGrid(){
+  document.getElementById('sel-grid').innerHTML=PLAYERS.map(p=>{
+    const d=state.players[p.id];
+    return`<div class="sel-card" onclick="openPlayer('${p.id}')">
+      <div class="sel-av" style="background:${p.color};border:2px solid ${p.border}">${p.emoji}</div>
+      <div class="sel-name">${p.name}</div>
+      <div class="sel-sub">${(_anyLoc(d.location))?.emoji||''} ${(_anyLoc(d.location))?.name||''}</div>
+      <div>
+        <span class="spill">${d.collection.length} покемонів</span>
+        <span class="spill">⚡${d.energy}</span>
+        <span class="spill spill-atk">⚔️${d.atk}</span>
+        ${d.enemy?'<span class="spill spill-red">⚔️ Бій!</span>':''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function showSelect(){
+  cur=null;
+  if(SCRIPT_URL){
+    document.getElementById('sel-grid').innerHTML=PLAYERS.map(p=>`
+      <div class="sel-card" style="pointer-events:none;opacity:.5">
+        <div class="sel-av" style="background:${p.color};border:2px solid ${p.border}">${p.emoji}</div>
+        <div class="sel-name">${p.name}</div>
+        <div class="sel-sub" style="color:#7eceff">завантаження…</div>
+      </div>`).join('');
+    show('screen-select');
+    await Promise.all(PLAYERS.map(async p=>{
+      const cloud=await loadFromCloud(p.id);
+      if(cloud&&Object.keys(cloud).length>0) state.players[p.id]=Object.assign({},state.players[p.id],cloud);
+    }));
+  }
+  renderSelGrid();
+  show('screen-select');
+}
+
+function openPlayer(id){
+  initState();dexTypeFilter='all';
+  cur=id;checkUnlocks();renderMain();show('screen-main');
+}
+
+// ═══════════ MAIN ═══════════
+function renderMain(){
+  const d=pd();const p=pl();
+  const av=document.getElementById('hdr-av');
+  av.textContent=p.emoji;av.style.background=p.color;
+  document.getElementById('hdr-name').textContent=p.name;
+  document.getElementById('hdr-loc').textContent='📍 '+(cLoc()?.name||'');
+  renderRes();renderPballs();renderDex();renderQuests();renderMap();renderActions();
+}
+
+function renderRes(){
+  const d=pd();
+  document.getElementById('hdr-energy').textContent='⚡'+d.energy;
+  document.getElementById('hdr-atk').textContent='⚔️'+d.atk;
+  document.getElementById('hdr-coins').textContent='🪙'+d.coins;
+}
+
+// ═══════════ POKEBALLS ═══════════
+function renderPballs(){
+  const d=pd();let h='';
+  for(let i=0;i<3;i++){
+    if(i<d.pokeballs){
+      const ci=d.activePokes[i];
+      const c=ci!==undefined?d.collection[ci]:null;
+      const pk=c?gp(c.dbId):null;
+      if(pk){
+        const xpPct=pk.evo?Math.min(100,Math.round(c.xp/(pk.evoXp||1)*100)):100;
+        h+=`<div class="pball-slot filled" onclick="openSlotMenu(${i})">
+          <img class="pball-img" src="${img(pk.pid)}" onerror="this.style.display='none'">
+          <div class="pball-xpbar"><div class="pball-xpfill" style="width:${xpPct}%"></div></div>
+        </div>`;
+      } else {
+        h+=`<div class="pball-slot" onclick="openSlotPicker(${i})"><div class="pball-empty">⚪</div></div>`;
+      }
+    } else {
+      h+=`<div class="pball-slot locked"><div class="pball-empty">🔒</div></div>`;
+    }
+  }
+  h+=`<div class="pball-label">Активні покемони</div>`;
+  document.getElementById('pball-bar').innerHTML=h;
+}
+
+function openSlotMenu(si){
+  const d=pd();const ci=d.activePokes[si];
+  if(ci===undefined){openSlotPicker(si);return;}
+  const c=d.collection[ci];const pk=gp(c.dbId);
+  if(!pk){openSlotPicker(si);return;}
+  const xpPct=pk.evo?Math.min(100,Math.round(c.xp/(pk.evoXp||1)*100)):100;
+  const canEvo=pk.evo&&!pk.stoneEvo&&c.xp>=(pk.evoXp||0);
+  const canEvoS=pk.stoneEvo&&pk.evo&&(d.inventory[pk.stoneEvo]||0)>0&&c.xp>=(pk.evoXp||0);
+  const needsStone=pk.stoneEvo&&pk.evo&&c.xp>=(pk.evoXp||0);
+  const stoneOwned=(d.inventory[pk.stoneEvo]||0)>0;
+  const types=pk.types.map(t=>`<span class="type-b" style="background:${TYPE_C[t]||'#374151'}">${t}</span>`).join('');
+  mHTML(`<img class="m-img" src="${img(pk.pid)}" onerror="this.style.display='none'">
+    <div class="m-title">${pk.name}</div>
+    <div style="text-align:center;margin-bottom:8px">${types}</div>
+    <div style="font-size:11px;color:#aaa;text-align:center">XP: ${c.xp}${pk.evo?' / '+pk.evoXp:' (макс)'}</div>
+    <div class="xp-wrap" style="margin-bottom:12px"><div class="xp-fill" style="width:${xpPct}%"></div></div>
+    ${pk.isKey?`<div style="background:rgba(74,222,128,.1);border:1px solid rgba(74,222,128,.25);border-radius:8px;padding:8px;font-size:11px;color:#4ade80;margin-bottom:10px">🔑 ${pk.isKey.desc}</div>`:''}
+    ${canEvo||canEvoS?`<button class="btn-ok" style="width:100%;margin-bottom:8px;padding:13px;font-size:14px;min-height:44px" onclick="doEvoSlot(${si})">🌟 Еволюція в ${pk.evoN}!</button>`:''}
+    <div style="display:flex;gap:8px">
+      <button class="btn-cancel" style="flex:1;padding:13px;font-size:14px;min-height:44px" onclick="closeModal();openSlotPicker(${si})">Змінити</button>
+      <button class="btn-cancel" style="flex:1" onclick="closeModal()">Закрити</button>
+    </div>`);
+}
+
+function doEvoSlot(si){
+  const d=pd();const ci=d.activePokes[si];const c=d.collection[ci];const pk=gp(c.dbId);
+  if(pk.stoneEvo)d.inventory[pk.stoneEvo]--;
+  const nPk=POKE.find(p=>p.id===pk.evo);
+  const old=pk.name;c.dbId=nPk.id;c.xp=0;
+  closeModal();renderPballs();renderDex();saveToCloud(cur);
+  qM(()=>mImg(img(nPk.pid),old+' → '+nPk.name,'Еволюція!',[{l:'Чудово!',ok:true,cb:closeModal}]));
+}
+
+let _slotSi=0,_slotTypeFilter='all';
+let _sideTab='pages';
+
+function openSlotPicker(si){
+  const d=pd();
+  if(!d.collection.length){qM(()=>mEmoji('😅','Немає покемонів','Спочатку злови когось!',[{l:'Ок',ok:true,cb:closeModal}]));return;}
+  _slotSi=si;_slotTypeFilter='all';
+  mHTML(_buildSlotPickerHTML(),true);
+}
+
+function setSlotType(t){
+  _slotTypeFilter=t;
+  const box=document.querySelector('#mOv .modal-box');
+  if(box)box.innerHTML=_buildSlotPickerHTML();
+}
+
+function _buildSlotPickerHTML(){
+  const si=_slotSi;const d=pd();
+  const used=new Set(d.activePokes.filter((_,i)=>i!==si));
+  const allTypes=[...new Set(d.collection.flatMap(c=>gp(c.dbId)?.types||[]))];
+  const items=d.collection.map((c,i)=>{
+    const pk=gp(c.dbId);
+    if(!pk)return null;
+    const isMax=!pk.evo;
+    const canEvo=pk.evo&&!pk.stoneEvo&&c.xp>=(pk.evoXp||0);
+    const canEvoStone=!!(pk.stoneEvo&&pk.evo);
+    const pct=pk.evo&&pk.evoXp?c.xp/pk.evoXp:isMax?1:0;
+    return{c,i,pk,isMax,canEvo,canEvoStone,pct};
+  }).filter(Boolean).sort((a,b)=>{
+    if(a.isMax!==b.isMax)return a.isMax?1:-1;
+    if(a.canEvo!==b.canEvo)return a.canEvo?-1:1;
+    return a.pct-b.pct;
+  });
+  const filtered=_slotTypeFilter==='all'?items:items.filter(({pk})=>pk.types?.includes(_slotTypeFilter));
+  const tabs=['all',...allTypes].map(t=>`<button onclick="setSlotType('${t}')" style="border-radius:20px;padding:4px 10px;font-size:10px;cursor:pointer;font-family:inherit;border:1px solid ${_slotTypeFilter===t?'rgba(167,139,250,.5)':'rgba(255,255,255,.1)'};background:${_slotTypeFilter===t?'rgba(167,139,250,.2)':'rgba(255,255,255,.05)'};color:${_slotTypeFilter===t?'#a78bfa':'#888'}">${t==='all'?'Всі':t}</button>`).join('');
+  const rows=filtered.map(({c,i,pk,isMax,canEvo,canEvoStone,pct})=>{
+    const isUsed=used.has(i);
+    const barPct=Math.min(100,Math.round(pct*100));
+    const xpTxt=isMax?'⭐ Максимум':canEvo?'🌟 Готовий до еволюції!':canEvoStone?'💎 Потрібен камінь':`XP: ${c.xp} / ${pk.evoXp}`;
+    const xpClr=isMax?'#888':canEvo?'#4ade80':canEvoStone?'#fbbf24':'#a78bfa';
+    return`<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.06);cursor:${isUsed?'not-allowed':'pointer'};opacity:${isUsed?.4:1}" ${isUsed?'':`onclick="pickSlot(${si},${i})"`}>
+      <img src="${img(pk.pid)}" style="width:38px;height:38px;image-rendering:pixelated;flex-shrink:0" onerror="this.style.display='none'">
+      <div style="flex:1;min-width:0">
+        <div style="font-size:13px;font-weight:600;color:#fff;display:flex;flex-wrap:wrap;gap:4px;align-items:center">${pk.name}
+          ${pk.types.map(t=>`<span style="font-size:9px;padding:1px 5px;border-radius:10px;background:rgba(255,255,255,.08);color:#aaa">${t}</span>`).join('')}
+        </div>
+        <div style="font-size:10px;color:${xpClr};margin-top:2px">${xpTxt}</div>
+        ${!isMax?`<div style="height:3px;background:rgba(255,255,255,.08);border-radius:2px;margin-top:4px"><div style="width:${barPct}%;height:100%;background:${xpClr};border-radius:2px"></div></div>`:''}
+      </div>
+      ${isUsed?'<span style="font-size:10px;color:#555;flex-shrink:0">активний</span>':''}
+    </div>`;
+  }).join('');
+  return`<div class="m-title" style="margin-bottom:10px">Слот ${si+1} — обери покемона</div>
+    <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:10px">${tabs}</div>
+    <div style="max-height:350px;overflow-y:auto">${rows||'<div style="color:#888;font-size:12px;padding:10px 0">Немає покемонів цього типу</div>'}</div>
+    <button class="btn-cancel" style="width:100%;margin-top:10px;padding:13px;font-size:14px;min-height:44px" onclick="closeModal()">Скасувати</button>`;
+}
+
+function pickSlot(si,ci){pd().activePokes[si]=ci;closeModal();renderPballs();renderDex();}
+
+// ═══════════ DEX ═══════════
+function getEvoDepth(dbId){
+  const baseId=getBaseDbId(dbId);
+  let depth=0,cur=POKE.find(p=>p.id===baseId);
+  while(cur&&cur.id!==dbId){depth++;if(!cur.evo)break;cur=POKE.find(p=>p.id===cur.evo);}
+  return depth;
+}
+
+function setDexTab(type){dexTypeFilter=type;renderDex();}
+
+function renderDex(){
+  const d=pd();
+  const uniqueRoots=new Set(d.collection.map(c=>getBaseDbId(c.dbId)));
+  const doneCount=[...uniqueRoots].filter(r=>isChainComplete(d,r)).length;
+  document.getElementById('dex-count').textContent=d.collection.length+' спіймано'+(doneCount?' · '+doneCount+' ✓':'');
+  const grid=document.getElementById('dex-grid');
+  const completeEl=document.getElementById('dex-complete');
+  const tabsEl=document.getElementById('dex-tabs');
+  if(!d.collection.length){tabsEl.innerHTML='';grid.innerHTML='<div class="dex-empty">Іди в траву — лови покемонів!</div>';completeEl.innerHTML='';return;}
+
+  // type tabs from current collection
+  const allTypes=[...new Set(d.collection.flatMap(c=>gp(c.dbId)?.types||[]))];
+  tabsEl.innerHTML=[`<div class="dex-tab ${dexTypeFilter==='all'?'act':''}" onclick="setDexTab('all')">Всі</div>`,
+    ...allTypes.map(t=>`<div class="dex-tab ${dexTypeFilter===t?'act':''}" onclick="setDexTab('${t}')">${t}</div>`)
+  ].join('');
+
+  // sort: group by evo chain (base first), chains ordered by first catch
+  const baseFirst={};
+  d.collection.forEach((c,i)=>{if(!gp(c.dbId))return;const b=getBaseDbId(c.dbId);if(!(b in baseFirst))baseFirst[b]=i;});
+  const sorted=d.collection
+    .map((c,i)=>({...c,_i:i,_b:getBaseDbId(c.dbId),_d:getEvoDepth(c.dbId)}))
+    .filter(c=>gp(c.dbId))
+    .sort((a,b)=>{const df=baseFirst[a._b]-baseFirst[b._b];return df!==0?df:a._d-b._d;});
+
+  // separate complete chains from incomplete
+  const doneRoots=new Set();
+  const doneChains=[];
+  const incomplete=[];
+  sorted.forEach(c=>{
+    const root=c._b;
+    if(isChainComplete(d,c.dbId)){
+      if(!doneRoots.has(root)){doneRoots.add(root);doneChains.push(root);}
+    } else {
+      incomplete.push(c);
+    }
+  });
+  // sort completed chains newest-first (by last collection index of final form)
+  doneChains.sort((a,b)=>{
+    const fa=getFullChain(a);const fb=getFullChain(b);
+    const findLast=(fid)=>d.collection.reduce((mx,c,i)=>c.dbId===fid?i:mx,-1);
+    return findLast(fa[fa.length-1])-findLast(fb[fb.length-1]);
+  }).reverse();
+
+  // filter incomplete by active tab
+  const view=dexTypeFilter==='all'?incomplete:incomplete.filter(c=>gp(c.dbId)?.types?.includes(dexTypeFilter));
+  if(!view.length&&!doneChains.length){grid.innerHTML='<div class="dex-empty" style="min-width:180px">Немає покемонів цього типу</div>';completeEl.innerHTML='';return;}
+
+  grid.innerHTML=view.map(c=>{
+    const i=c._i;
+    const pk=gp(c.dbId);
+    const isAct=d.activePokes.includes(i);
+    const canEvo=pk.evo&&!pk.stoneEvo&&c.xp>=(pk.evoXp||0);
+    const needStone=pk.stoneEvo&&pk.evo&&c.xp>=(pk.evoXp||0);
+    const evoDots=getEvoDots(pk.id);
+    const dotsHtml=evoDots.total>1?`<div class="evo-dots">${Array.from({length:evoDots.total},(_,j)=>`<div class="evo-dot ${j<evoDots.current?'filled':''}"></div>`).join('')}</div>`:'';
+    const isMax=!pk.evo;
+    const subTxt=needStone?'💎 Камінь!':canEvo?'🌟 Ево!':isMax?'Макс':'XP:'+c.xp;
+    const dupeCount=d.collection.filter(x=>x.dbId===c.dbId).length;
+    return`<div class="dex-card ${isAct?'act':''}" onclick="openDexCard(${i})">
+      ${isMax?'<div style="position:absolute;top:2px;right:3px;font-size:9px;line-height:1;color:#fbbf24">⭐</div>':''}
+      ${dupeCount>1?`<div style="position:absolute;top:0;left:0;background:#ef4444;color:#fff;font-size:7px;font-weight:700;padding:1px 4px;border-radius:0 0 5px 0;line-height:1.5">×${dupeCount}</div>`:''}
+      <img class="dex-img" src="${img(pk.pid)}" onerror="this.outerHTML='<div style=font-size:24px;text-align:center;height:52px;line-height:52px>${pk.name[0]}</div>'">
+      <div class="dex-name">${pk.name}</div>
+      <div class="dex-sub">${subTxt}</div>
+      ${dotsHtml}
+    </div>`;
+  }).join('');
+
+  // render completed chains section
+  if(!doneChains.length){completeEl.innerHTML='';return;}
+  const chainHtml=doneChains.map(rootId=>{
+    const chainIds=getFullChain(rootId);
+    const sprites=chainIds.map((fid,idx)=>{
+      const pk=gp(fid);
+      const ci=d.collection.findIndex(c=>c.dbId===fid);
+      const isAct=ci>=0&&d.activePokes.includes(ci);
+      return(idx>0?`<div class="chain-arrow">→</div>`:'')+
+        `<div class="chain-sprite" onclick="${ci>=0?'openDexCard('+ci+')':''}">
+          <img style="width:38px;height:38px;object-fit:contain;image-rendering:pixelated" src="${img(pk.pid)}" onerror="this.style.display='none'">
+          <div style="font-size:6.5px;color:${isAct?'#7eceff':'#999'};overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:44px;margin-top:1px;line-height:1.2">${pk.name}</div>
+        </div>`;
+    }).join('');
+    return`<div class="chain-block"><div class="chain-block-badge">✓</div>${sprites}</div>`;
+  }).join('');
+  completeEl.innerHTML=`<div style="font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:#fbbf24;margin:4px 0 5px;opacity:.8">🏆 Завершені</div><div class="chain-row">${chainHtml}</div>`;
+}
+
+function getBaseDbId(dbId){
+  // Walk back up the evo chain to find the base form
+  let base=POKE.find(p=>p.id===dbId);
+  if(!base)return dbId;
+  let prev=POKE.find(p=>p.evo===base.id);
+  while(prev){base=prev;prev=POKE.find(p=>p.evo===base.id);}
+  // also check altEvoFrom
+  if(base.altEvoFrom){const alt=POKE.find(p=>p.id===base.altEvoFrom);if(alt)base=alt;}
+  return base.id;
+}
+function getFullChain(rootId){
+  const chain=[];let cur=rootId;const seen=new Set();
+  while(cur&&!seen.has(cur)){seen.add(cur);chain.push(cur);const pk=gp(cur);cur=pk?.evo??null;}
+  return chain;
+}
+function isChainComplete(d,dbId){
+  const root=getBaseDbId(dbId);
+  const chain=getFullChain(root);
+  const finalId=chain[chain.length-1];
+  return d.collection.some(c=>c.dbId===finalId);
+}
+
+function getPokeLocName(dbId){
+  const baseId=getBaseDbId(dbId);
+  const pk=gp(baseId);if(!pk)return"—";
+  if(pk.rar==="starter") return"Лабораторія Проф. Оука";
+  const allLocs=[...Object.values(LOCS),...Object.values(LOCS_JOHTO)];
+  const loc=allLocs.find(l=>l.pool&&l.pool.includes(baseId));
+  if(loc) return loc.name;
+  const rloc=allLocs.find(l=>l.rarePool&&l.rarePool.includes(baseId));
+  if(rloc) return rloc.name+" (рідкісна трава)";
+  return"—";
+}
+function getEvoDots(dbId){
+  let base=POKE.find(p=>p.id===dbId);
+  if(!base)return{total:1,current:1};
+  let root=base;
+  for(let p of POKE){if(p.evo===base.id){root=p;break;}}
+  for(let p of POKE){if(p.evo===root.id){root=p;break;}}
+  let total=1,node=root;
+  while(node&&node.evo){total++;node=POKE.find(p=>p.id===node.evo);}
+  node=root;let step=1;
+  while(node&&node.id!==dbId){node=POKE.find(p=>p.id===node.evo);step++;if(!node)break;}
+  return{total,current:step};
+}
+
+
+function renderQuests(){
+  const d=pd();
+  const quests=[];
+
+  // Helper: count unique species (not counting duplicates of same dbId)
+  const uniqueIds=new Set(d.collection.map(c=>c.dbId));
+  const uniqueCount=uniqueIds.size;
+
+  // Quest 0: visit Oak first
+  if(!d.hasStarter){
+    quests.push({
+      img:img(1),
+      title:'Відвідай Проф. Оука',
+      desc:'Зайди в лабораторію і отримай свого першого покемона!',
+      badge:'Перший крок',badgeBg:'rgba(74,222,128,.2)',badgeTxt:'#4ade80'
+    });
+  }
+
+  // Quest: unlock forest
+  if(d.hasStarter&&!d.unlockedLocs.includes('forest')){
+    const ok=uniqueCount>=3;
+    quests.push({
+      img:img(16),
+      title:'Відкрити Ліс Вірідіан',
+      desc:'Злови 3 різних покемони (зараз: '+uniqueCount+'/3)',
+      badge:ok?'Готово!':'В процесі',
+      badgeBg:ok?'rgba(74,222,128,.2)':'rgba(52,211,153,.2)',
+      badgeTxt:ok?'#4ade80':'#34d399'
+    });
+  }
+
+  // Quest: unlock glade
+  if(d.unlockedLocs.includes('forest')&&!d.unlockedLocs.includes('glade')){
+    const ok=uniqueCount>=6;
+    quests.push({
+      img:img(43),
+      title:'Відкрити Поляну',
+      desc:'Злови 6 різних покемонів (зараз: '+uniqueCount+'/6)',
+      badge:ok?'Готово!':'В процесі',
+      badgeBg:ok?'rgba(74,222,128,.2)':'rgba(167,139,250,.2)',
+      badgeTxt:ok?'#4ade80':'#a78bfa'
+    });
+  }
+
+  // Quest: Butterfree → Butterfly Glade
+  if(d.unlockedLocs.includes('glade')&&!d.unlockedLocs.includes('butterfly')){
+    const hasButter=d.collection.some(c=>c.dbId===35);
+    const hasMeta=d.collection.some(c=>c.dbId===34);
+    const hasCat=d.collection.some(c=>c.dbId===33);
+    let desc,badge;
+    if(hasButter){desc='Баттерфрі є! Поляна метеликів відкриється автоматично.';badge='Готово!';}
+    else if(hasMeta){desc='Метапод → Баттерфрі (потрібно 100 XP)';badge='В процесі';}
+    else if(hasCat){desc='Катерпі → Метапод (50 XP) → Баттерфрі (100 XP)';badge='В процесі';}
+    else{desc='Еволюція: Катерпі→Метапод→Баттерфрі';badge='Отримай Баттерфрі';}
+    quests.push({
+      img:img(12),
+      title:'Відкрити Поляну метеликів',
+      desc,badge,
+      badgeBg:hasButter?'rgba(74,222,128,.2)':'rgba(249,168,212,.2)',
+      badgeTxt:hasButter?'#4ade80':'#f9a8d4'
+    });
+  }
+
+  // Quest: Мега Інфернейп → Caves
+  if(d.unlockedLocs.includes('glade')&&!d.unlockedLocs.includes('caves')){
+    const hasMI=d.collection.some(c=>c.dbId===57);
+    const hasI =d.collection.some(c=>c.dbId===56);
+    const hasMF=d.collection.some(c=>c.dbId===55);
+    const hasC =d.collection.some(c=>c.dbId===54);
+    const hasMega=(d.inventory['mega']||0)>0;
+    let desc,badge;
+    if(hasMI){desc='Мега Інфернейп є! Печери відкриваються.';badge='Готово!';}
+    else if(hasI&&hasMega){desc='Інфернейп є + Мега-камінь є! Відкрий картку Інфернейпа і еволюціонуй.';badge='Еволюціонуй!';}
+    else if(hasI){desc='Інфернейп є! Потрібен 💎 Мега-камінь (збери 3 фрагменти на Поляні або купи в Магазині за 100🪙)';badge='Потрібен Мега-камінь';}
+    else if(hasMF){desc='Монферно → Інфернейп (200 XP) → Мега Інфернейп (💎 Мега-камінь)';badge='В процесі';}
+    else if(hasC){desc='Чімчар → Монферно (100 XP) → Інфернейп (200 XP) → Мега (💎)';badge='В процесі';}
+    else{desc='Ланцюг: Чімчар→Монферно→Інфернейп→Мега Інфернейп (💎 Мега-камінь)';badge='Отримай Мега Інфернейпа';}
+    quests.push({
+      img:hasI||hasMF?img(392):img(390),
+      title:'Відкрити Печери',
+      desc,badge,
+      badgeBg:hasMI?'rgba(74,222,128,.2)':'rgba(251,146,60,.2)',
+      badgeTxt:hasMI?'#4ade80':'#fb923c'
+    });
+  }
+
+  // Quest: Articuno → Johto
+  if(d.unlockedLocs.includes('caves')&&!d.unlockedLocs.includes('map2')){
+    const hasArt=d.collection.some(c=>c.dbId===53);
+    quests.push({
+      img:img(144),
+      title:'Відкрити Регіон Джото',
+      desc:hasArt?'Артікуно спійманий! Переходь до Регіону Джото.':'Злови легендарного Артікуно в Печерах (рідкісна трава)',
+      badge:hasArt?'Готово!':'Шукай в Печерах',
+      badgeBg:hasArt?'rgba(74,222,128,.2)':'rgba(96,165,250,.2)',
+      badgeTxt:hasArt?'#4ade80':'#60a5fa'
+    });
+  }
+
+  // Quest: stone evolutions (only for caught pokemon that need stone)
+  d.collection.forEach(c=>{
+    const pk=gp(c.dbId);
+    if(!pk||!pk.stoneEvo||!pk.evo)return;
+    const stone=STONES[pk.stoneEvo];
+    const has=(d.inventory[pk.stoneEvo]||0)>0;
+    // avoid duplicates
+    if(quests.some(q=>q.title===pk.name+' → '+pk.evoN))return;
+    quests.push({
+      img:img(pk.pid),
+      title:pk.name+' → '+pk.evoN,
+      desc:has?'Камінь є! Відкрий картку покемона і еволюціонуй.':'Потрібен '+stone.emoji+' '+stone.name+'. Знайди в траві або купи в Магазині.',
+      badge:has?'Еволюціонуй!':'Потрібен камінь',
+      badgeBg:has?'rgba(74,222,128,.2)':'rgba(251,191,36,.2)',
+      badgeTxt:has?'#4ade80':'#fbbf24'
+    });
+  });
+
+  const panel=document.getElementById('quest-panel');
+  const list=document.getElementById('quest-list');
+  if(!quests.length){panel.style.display='none';return;}
+  panel.style.display='block';
+  list.innerHTML=quests.map(q=>`<div class="quest-item">
+    <img class="quest-pimg" src="${q.img}" onerror="this.style.display='none'">
+    <div class="quest-body">
+      <div class="quest-title">${q.title}</div>
+      <div class="quest-desc">${q.desc}</div>
+    </div>
+    <span class="quest-badge" style="background:${q.badgeBg};color:${q.badgeTxt}">${q.badge}</span>
+  </div>`).join('');
+}
+
+function openDexCard(i){
+  const d=pd();const c=d.collection[i];if(!c)return;const pk=gp(c.dbId);
+  if(!pk){qM(()=>mEmoji('❓','Невідомий покемон','Цей покемон більше не існує в грі.',[{l:'Ок',ok:true,cb:closeModal}]));return;}
+  const isAct=d.activePokes.includes(i);
+  const canEvoXp=pk.evo&&!pk.stoneEvo&&c.xp>=(pk.evoXp||0);
+  const canEvoS=pk.stoneEvo&&pk.evo&&(d.inventory[pk.stoneEvo]||0)>0&&c.xp>=(pk.evoXp||0);
+  const needsStone=pk.stoneEvo&&pk.evo&&c.xp>=(pk.evoXp||0);
+  const stoneOwned=(d.inventory[pk.stoneEvo]||0)>0;
+  const isDupe=d.collection.filter(x=>x.dbId===c.dbId).length>1;
+  const hasCrystal=(d.inventory['evo_crystal']||0)>0;
+  const canUseCrystal=hasCrystal&&pk.evo&&c.xp<(pk.evoXp||0);
+  const xpPct=pk.evo?Math.min(100,Math.round(c.xp/(pk.evoXp||1)*100)):100;
+  const types=pk.types.map(t=>`<span class="type-b" style="background:${TYPE_C[t]||'#374151'}">${t}</span>`).join('');
+  mHTML(`<img class="m-img" src="${img(pk.pid)}" onerror="this.style.display='none'">
+    <div class="m-title">${pk.name}${isAct?' ★':''}</div>
+    <div style="text-align:center;margin-bottom:8px">${types}</div>
+    <div style="font-size:11px;color:#aaa;text-align:center">XP: ${c.xp}${pk.evo?' / '+pk.evoXp:' (макс)'}</div>
+    <div class="xp-wrap" style="margin:6px 0 6px"><div class="xp-fill" style="width:${xpPct}%"></div></div>
+    ${needsStone?`<div style="background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.25);border-radius:8px;padding:7px;font-size:11px;color:#fbbf24;text-align:center;margin-bottom:8px">
+      ${STONES[pk.stoneEvo]?.emoji||'💎'} Потрібен ${STONES[pk.stoneEvo]?.name||'камінь'} для еволюції<br>
+      <span style="color:${stoneOwned?'#4ade80':'#f87171'}">${stoneOwned?'✓ Є в інвентарі':'✗ Ще не маєш'}</span>
+    </div>`:''}
+    ${pk.isKey?`<div style="background:rgba(74,222,128,.1);border:1px solid rgba(74,222,128,.25);border-radius:8px;padding:8px;font-size:11px;color:#4ade80;margin-bottom:10px">🔑 ${pk.isKey.desc}</div>`:''}
+    ${canEvoXp||canEvoS?`<button class="btn-ok" style="width:100%;margin-bottom:8px;padding:13px;font-size:14px;min-height:44px" onclick="doEvoDex(${i})">🌟 Еволюція в ${pk.evoN}!</button>`:''}
+    ${canUseCrystal?`<button style="width:100%;margin-bottom:8px;padding:13px;font-size:14px;min-height:44px;background:linear-gradient(135deg,rgba(52,211,153,.15),rgba(16,185,129,.1));border:1px solid rgba(52,211,153,.5);border-radius:10px;color:#34d399;font-weight:700;cursor:pointer" onclick="useEvoCrystal(${i})">💠 Кристал пробудження → готовий до еволюції</button>`:''}
+    ${isDupe?`<button class="btn-cancel" style="width:100%;margin-bottom:8px;padding:13px;font-size:14px;min-height:44px" onclick="sellDupe(${i})">Продати дублікат — 🪙${dupeP(pk)}</button>`:''}
+    <div style="font-size:10px;color:#888;text-align:center;margin-bottom:8px">📍 Де ловиться: <b style="color:#aaa">${getPokeLocName(c.dbId)}</b></div>
+    <button class="btn-cancel" style="width:100%;padding:13px;font-size:14px;min-height:44px" onclick="closeModal()">Закрити</button>`);
+}
+
+function doEvoDex(i){
+  const d=pd();const c=d.collection[i];const pk=gp(c.dbId);
+  if(pk.stoneEvo)d.inventory[pk.stoneEvo]--;
+  const nPk=POKE.find(p=>p.id===pk.evo);
+  const old=pk.name;c.dbId=nPk.id;c.xp=0;
+  closeModal();renderPballs();renderDex();saveToCloud(cur);
+  qM(()=>mImg(img(nPk.pid),old+' → '+nPk.name,'Еволюція!',[{l:'Чудово!',ok:true,cb:closeModal}]));
+}
+
+function useEvoCrystal(i){
+  const d=pd();const c=d.collection[i];const pk=gp(c.dbId);
+  if(!pk||!pk.evo||(d.inventory['evo_crystal']||0)<=0)return;
+  c.xp=pk.evoXp||0;
+  d.inventory['evo_crystal']--;
+  closeModal();renderDex();saveToCloud(cur);
+  qM(()=>mEmoji('💠','Кристал використано!',`${pk.name} готовий до еволюції!\nXP: ${c.xp} / ${pk.evoXp}`,[{l:'Чудово!',ok:true,cb:()=>{closeModal();openDexCard(i);}}]));
+}
+
+function dupeP(pk){return{starter:15,common:5,uncommon:10,rare:20,evolved:12,mega:30,legendary:50}[pk.rar]||5;}
+
+function sellDupe(i){
+  const d=pd();const c=d.collection[i];const pk=gp(c.dbId);
+  const price=dupeP(pk);
+  d.activePokes=d.activePokes.map(ai=>ai===i?undefined:ai>i?ai-1:ai).filter(x=>x!==undefined);
+  d.collection.splice(i,1);d.coins+=price;
+  closeModal();renderMain();
+  qM(()=>mEmoji('🪙',`+${price} монет!`,pk.name+' продано.',[{l:'Ок',ok:true,cb:closeModal}]));
+}
+
+// ═══════════ UNLOCK CHECK ═══════════
+function checkUnlocks(){
+  const d=pd();const opened=[];
+  const uniqueCount=new Set(d.collection.map(c=>c.dbId)).size;
+  Object.values(LOCS).forEach(loc=>{
+    if(d.unlockedLocs.includes(loc.id)||!loc.unlockReq)return;
+    const req=loc.unlockReq;
+    const cntOk=!req.count||uniqueCount>=req.count;
+    const keyOk=!req.keyPoke||d.collection.some(c=>c.dbId===req.keyPoke);
+    if(cntOk&&keyOk){d.unlockedLocs.push(loc.id);opened.push(loc);}
+  });
+  return opened;
+}
+
+
+function isLocComplete(locId){
+  const loc=LOCS[locId];
+  if(!loc||!loc.pool)return false;
+  const needed=[...new Set([...(loc.pool||[]),...(loc.rarePool||[])])];
+  const caught=new Set(pd().collection.map(c=>c.dbId));
+  return needed.every(id=>caught.has(id));
+}
+
+function renderMap(){
+  const d=pd();
+  const region=d.region||'kanto';
+  const johtoUnlocked=d.unlockedLocs.includes('map2');
+  // region tabs
+  document.getElementById('map-region-tabs').innerHTML=`<div style="display:flex;gap:4px;padding:8px 8px 0">
+    <div style="flex:1;padding:6px 4px;font-size:10px;font-weight:700;text-align:center;border-radius:7px 7px 0 0;border:1px solid ${region==='kanto'?'#4ade80':'rgba(255,255,255,.07)'};border-bottom:none;background:${region==='kanto'?'rgba(74,222,128,.12)':'rgba(255,255,255,.02)'};color:${region==='kanto'?'#4ade80':'#666'}">🗺️ Регіон Канто</div>
+    <div style="flex:1;padding:6px 4px;font-size:10px;font-weight:700;text-align:center;border-radius:7px 7px 0 0;border:1px solid ${region==='johto'?'#60a5fa':'rgba(255,255,255,.05)'};border-bottom:none;background:${region==='johto'?'rgba(96,165,250,.12)':'rgba(255,255,255,.01)'};color:${region==='johto'?'#60a5fa':johtoUnlocked?'#555':'#333'}">${johtoUnlocked?'🌏':'🔒'} Регіон Джото</div>
+  </div>`;
+  if(region==='johto'){
+    // Johto map
+    document.getElementById('map-edges').innerHTML='';
+    let nh='';
+    Object.values(LOCS_JOHTO).forEach(loc=>{
+      const isHere=d.location===loc.id;
+      const r=isHere?22:17;
+      if(isHere){
+        nh+=`<circle cx="${loc.cx}" cy="${loc.cy}" r="${r+9}" fill="${loc.color}" opacity=".2"/>`;
+        nh+=`<circle cx="${loc.cx}" cy="${loc.cy}" r="${r+4}" fill="none" stroke="${loc.stroke}" stroke-width="1" opacity=".45"/>`;
+      }
+      nh+=`<g style="cursor:default">`
+        +`<circle cx="${loc.cx}" cy="${loc.cy}" r="${r}" fill="${loc.color}" stroke="${loc.stroke}" stroke-width="${isHere?2.5:1.5}"/>`
+        +`<text x="${loc.cx}" y="${loc.cy+1}" text-anchor="middle" dominant-baseline="middle" font-size="${isHere?15:11}" font-family="sans-serif">${loc.emoji}</text>`
+        +`<text x="${loc.cx}" y="${loc.cy+r+11}" text-anchor="middle" font-size="${isHere?9.5:8}" fill="#e2e8f0" font-family="sans-serif" font-weight="${isHere?'700':'500'}">${loc.mLabel||loc.name}</text>`
+        +`</g>`;
+    });
+    document.getElementById('map-nodes').innerHTML=nh;
+    const byLoc={};
+    PLAYERS.forEach(p=>{if((state.players[p.id].region||'kanto')==='johto'){const lid=state.players[p.id].location;if(!byLoc[lid])byLoc[lid]=[];byLoc[lid].push(p);}});
+    let mh='';
+    Object.entries(byLoc).forEach(([lid,list])=>{
+      const loc=LOCS_JOHTO[lid];if(!loc)return;
+      const nr=22;const offs=list.length===1?[0]:list.length===2?[-8,8]:[-10,0,10];
+      list.forEach((p,i)=>{mh+=`<circle cx="${loc.cx+offs[i]}" cy="${loc.cy-nr-9}" r="5" fill="${p.border}" stroke="#fff" stroke-width="1.5"/>`;});
+    });
+    document.getElementById('map-markers').innerHTML=mh;
+    return;
+  }
+  // Kanto map
+  const drawn=new Set();let eh='';
+  Object.values(LOCS).forEach(loc=>{
+    loc.connects.forEach(tid=>{
+      const key=[loc.id,tid].sort().join('-');
+      if(drawn.has(key))return;drawn.add(key);
+      const t=LOCS[tid];
+      const ul=d.unlockedLocs.includes(loc.id)&&d.unlockedLocs.includes(tid);
+      eh+=ul
+        ?`<line x1="${loc.cx}" y1="${loc.cy}" x2="${t.cx}" y2="${t.cy}" stroke="rgba(255,255,255,.18)" stroke-width="2" stroke-linecap="round"/>`
+        :`<line x1="${loc.cx}" y1="${loc.cy}" x2="${t.cx}" y2="${t.cy}" stroke="rgba(255,255,255,.06)" stroke-width="1.5" stroke-dasharray="5,4"/>`;
+    });
+  });
+  document.getElementById('map-edges').innerHTML=eh;
+  let nh='';
+  Object.values(LOCS).forEach(loc=>{
+    const ul=d.unlockedLocs.includes(loc.id);
+    const isHere=d.location===loc.id;
+    const canGo=!isHere&&ul;
+    const r=isHere?22:17;
+    const done=ul&&isLocComplete(loc.id);
+    const label=loc.mLabel||loc.name;
+    if(isHere){
+      nh+=`<circle cx="${loc.cx}" cy="${loc.cy}" r="${r+9}" fill="${loc.color}" opacity=".2"/>`;
+      nh+=`<circle cx="${loc.cx}" cy="${loc.cy}" r="${r+4}" fill="none" stroke="${loc.stroke}" stroke-width="1" opacity=".45"/>`;
+    }
+    nh+=`<g style="cursor:${canGo||isHere?'pointer':'default'};opacity:${ul?1:.28}" ${canGo?`onclick="onLocClick('${loc.id}')"`:''}>`
+      +`<circle cx="${loc.cx}" cy="${loc.cy}" r="${r}" fill="${ul?loc.color:'#0c1929'}" stroke="${isHere?loc.stroke:ul?loc.stroke+'88':'#1e293b'}" stroke-width="${isHere?2.5:1.5}"/>`
+      +`<text x="${loc.cx}" y="${loc.cy+1}" text-anchor="middle" dominant-baseline="middle" font-size="${isHere?15:11}" font-family="sans-serif">${loc.emoji}</text>`
+      +`<text x="${loc.cx}" y="${loc.cy+r+11}" text-anchor="middle" font-size="${isHere?9.5:8}" fill="${ul?'#e2e8f0':'#3d4f63'}" font-family="sans-serif" font-weight="${isHere?'700':'500'}">${label}</text>`
+      +(done?`<circle cx="${loc.cx+r-1}" cy="${loc.cy-r+1}" r="5.5" fill="#fbbf24" stroke="#070e1a" stroke-width="1.5"/><text x="${loc.cx+r-1}" y="${loc.cy-r+2}" text-anchor="middle" dominant-baseline="middle" font-size="7" font-weight="700" font-family="sans-serif" fill="#070e1a">✓</text>`:'')
+      +`</g>`;
+    if(!ul&&loc.unlockReq) nh+=`<text x="${loc.cx}" y="${loc.cy-r-4}" text-anchor="middle" font-size="11" font-family="sans-serif">${loc.unlockReq.keyPoke?'🔑':'🔒'}</text>`;
+  });
+  document.getElementById('map-nodes').innerHTML=nh;
+  const byLoc={};
+  PLAYERS.forEach(p=>{if((state.players[p.id].region||'kanto')==='kanto'){const lid=state.players[p.id].location;if(!byLoc[lid])byLoc[lid]=[];byLoc[lid].push(p);}});
+  let mh='';
+  Object.entries(byLoc).forEach(([lid,list])=>{
+    const loc=LOCS[lid];if(!loc)return;
+    const nr=loc.id===d.location?22:17;
+    const offs=list.length===1?[0]:list.length===2?[-8,8]:[-10,0,10];
+    list.forEach((p,i)=>{mh+=`<circle cx="${loc.cx+offs[i]}" cy="${loc.cy-nr-9}" r="5" fill="${p.border}" stroke="#fff" stroke-width="1.5"/>`;});
+  });
+  document.getElementById('map-markers').innerHTML=mh;
+}
+
+function onLocClick(locId){
+  const d=pd();
+  if(d.enemy){qM(()=>mEmoji('⚔️','Бій!','Спочатку переможи ворога!',[{l:'Ок',ok:true,cb:closeModal}]));return;}
+  const cost=ECOST.move;
+  if(d.energy<cost){qM(()=>mEmoji('⚡','Мало енергії',`Потрібно ${cost} ⚡ на перехід.\n\nДодай сторінки через ☰`,[{l:'Додати',ok:true,cb:()=>{closeModal();openSidePanel();}},{l:'Ок',cb:closeModal}]));return;}
+  const loc=LOCS[locId];
+  qM(()=>mEmoji(loc.emoji,'Перейти до '+loc.name,`Витратити ${cost} ⚡ і перейти до ${loc.name}?`,
+    [{l:'Так!',ok:true,cb:()=>{closeModal();doMove(locId);}},{l:'Ні',cb:closeModal}]));
+}
+
+function doMove(locId){
+  const d=pd();d.energy-=ECOST.move;d.location=locId;
+  const loc=cLoc();
+  document.getElementById('hdr-loc').textContent='📍 '+loc.name;
+  renderRes();renderMap();renderActions();
+  const opened=checkUnlocks();renderMap();
+  opened.forEach(u=>qM(()=>mEmoji('🎉','Відкрито!',`${u.emoji} ${u.name} тепер доступна!`,[{l:'Чудово!',ok:true,cb:closeModal}])));
+  showToast('→ '+loc.name);
+}
+
+// ═══════════ ACTIONS ═══════════
+function renderActions(){
+  const d=pd();
+  const loc=cLoc();
+  document.getElementById('act-emoji').textContent=loc.emoji;
+  document.getElementById('act-name').textContent=loc.name;
+  let locDesc=loc.desc||'';
+  if(loc.pool&&loc.pool.length){
+    const allPool=[...new Set([...(loc.pool||[]),...(loc.rarePool||[])])];
+    const caught=allPool.filter(id=>d.collection.some(c=>c.dbId===id));
+    const allDone=caught.length>=allPool.length;
+    locDesc+=(locDesc?' · ':'')+'Спіймано: '+caught.length+'/'+allPool.length+(allDone?' ✓':'');
+  }
+  document.getElementById('act-desc').textContent=locDesc;
+  const ab=document.getElementById('act-badge');
+  ab.textContent=loc.badge;ab.style.background=loc.badgeBg;ab.style.color=loc.badgeTxt;
+  const rows=[];
+  // combat row first
+  if(d.enemy){
+    const e=d.enemy;const pct=Math.max(0,Math.round(e.hp/e.maxHp*100));
+    rows.push(`<div class="act-row combat-row" onclick="openCombat()">
+      <div class="act-icon">⚔️</div>
+      <div class="act-body">
+        <div class="act-title" style="color:#fca5a5">${e.name} — Бій! HP: ${e.hp}/${e.maxHp}</div>
+        <div class="combat-hp-mini"><div class="combat-hp-mini-fill" style="width:${pct}%"></div></div>
+        <div class="act-desc">⚔️${d.atk} очки атаки доступно</div>
+      </div>
+      <span class="act-badge" style="background:rgba(200,50,50,.3);color:#fca5a5">Атакувати</span>
+    </div>`);
+  }
+  (loc.actions||[]).forEach(a=>{
+    const inv=d.inventory;
+    if(a==='oak_lab'){
+      if(!d.hasStarter) rows.push(aRow('🧪','Проф. Оук','Отримай стартового покемона!','Зайти','rgba(74,222,128,.2)','#4ade80','openOak()',0));
+      else rows.push(aRow('🧪','Проф. Оук',oakHint(),'Зайти','rgba(156,163,175,.2)','#9ca3af','openOakVisit()',0));
+    }
+    if(a==='grass'){
+      const hl=(inv['lure']||0)>0;
+      rows.push(aRow('🌿','Висока трава',`${Math.round((loc.encounterChance||0.5)*100)}% шанс${hl?' → 100% (приманка є)':''}`,hl?'🎣 Приманка':'Шукати','rgba(167,139,250,.2)','#a78bfa',`goGrass(false,${hl})`,ECOST.grass));
+    }
+    if(a==='grass_rare'){
+      const hr=(inv['rare_lure']||0)>0;
+      rows.push(aRow('✨','Рідкісна трава',hr?'100% рідкісний':'20% шанс рідкісного',hr?'✨ Рід.прим':'Шукати','rgba(251,191,36,.2)','#fbbf24',`goGrass(true,${hr})`,ECOST.grass_rare));
+    }
+    if(a==='pokecenter') rows.push(aRow('🏥','Покемон-центр','Еволюції, XP обмін, продаж','Зайти','rgba(96,165,250,.2)','#60a5fa','openPC()',0));
+    if(a==='shop') rows.push(aRow('🛒','Магазин','Приманки, амулети, камені','Зайти','rgba(251,191,36,.2)','#fbbf24','openShop()',0));;
+    if(a==='enter_johto') rows.push(aRow('🌏','Перейти до Регіону Джото','Артікуно відчинив шлях!','Перейти','rgba(96,165,250,.2)','#60a5fa','enterJohto()',0));
+    if(a==='exchanger') rows.push(aRow('💱','Міняла','Обміняй очки атаки та монети','Обмін','rgba(251,191,36,.15)','#fbbf24','openExchanger()',0));
+    if(a==='return_kanto') rows.push(aRow('🗺️','Повернутись до Канто','Перейти назад до Регіону Канто','Назад','rgba(74,222,128,.15)','#4ade80','returnToKanto()',0));
+  });
+  document.getElementById('act-list').innerHTML=rows.join('');
+}
+
+function aRow(icon,title,desc,badge,bbg,btxt,onclick,cost){
+  const costHtml=cost>0?`<div class="act-cost">⚡${cost} енергії</div>`:'';
+  return`<div class="act-row" onclick="${onclick}">
+    <div class="act-icon">${icon}</div>
+    <div class="act-body"><div class="act-title">${title}</div><div class="act-desc">${desc}</div>${costHtml}</div>
+    <span class="act-badge" style="background:${bbg};color:${btxt}">${badge}</span>
+  </div>`;
+}
+
+function noEnergy(){qM(()=>mEmoji('⚡','Мало енергії','Прочитай книгу та додай сторінки через ☰',[{l:'Додати сторінки',ok:true,cb:()=>{closeModal();openSidePanel();}},{l:'Ок',cb:closeModal}]));}
+
+// ═══════════ OAK ═══════════
+// Пороги зростають: 10, 20, 35, 55, 80, 110, 145, 185, 230
+// (кількість покемонів у колекції включно з дублікатами)
+const OAK_MILESTONES=[10,20,35,55,80,110,145,185,230];
+
+function oakHint(){
+  const d=pd();const n=d.collection.length;const sg=d.startersGiven;
+  if(!d.hasStarter)return'Поговорити з Оуком';
+  if(sg>OAK_MILESTONES.length)return'Оук захоплений твоєю колекцією!';
+  const next=OAK_MILESTONES[sg-1];
+  return`Ще ${Math.max(0,next-n)} покемонів → подарунок від Оука`;
+}
+
+function openOak(){
+  const starters=[1,5,9];const rnd=starters[ri(0,2)];const pk=gp(rnd);
+  qM(()=>mHTML(`<img class="m-img" src="${img(pk.pid)}" onerror="this.style.display='none'">
+    <div class="m-title">Проф. Оук</div>
+    <div class="m-desc">Вітаю, молодий тренере!<br>Твій стартовий покемон:<br><b style="color:#7eceff">${pk.name}</b>!</div>
+    <div class="m-btns"><button class="btn-ok" onclick="receiveStarter(${pk.id})">Взяти ${pk.name}!</button></div>`));
+}
+
+function receiveStarter(dbId){
+  const d=pd();const pk=gp(dbId);
+  d.collection.push({dbId,xp:0});
+  d.activePokes=[0];
+  d.hasStarter=true;d.startersGiven=1;
+  if(!d.unlockedLocs.includes('pallet'))d.unlockedLocs.push('pallet');
+  closeModal();renderMain();saveToCloud(cur);
+  qM(()=>mImg(img(pk.pid),'Отримано!',`${pk.name} тепер твій!\n\nПалет відкрито — іди в Високу траву і лови покемонів!`,[{l:'Починаємо!',ok:true,cb:closeModal}]));
+}
+
+function openOakVisit(){
+  const d=pd();
+  if(d.oakPending||checkOakBonus())openOakBonus();
+  else qM(()=>mEmoji('🧪','Проф. Оук','Лови більше покемонів!\n\n'+oakHint(),[{l:'Дякую!',ok:true,cb:closeModal}]));
+}
+
+function openOakBonus(){
+  const d=pd();
+  const n=d.collection.length;
+  const opts=[1,5,9].map(sid=>{const pk=gp(sid);
+    const owned=d.collection.filter(c=>c.dbId===sid).length;
+    return`<div class="starter-opt" onclick="giveBonus(${sid})">
+      <img class="starter-img" src="${img(pk.pid)}" onerror="this.style.display='none'">
+      <div class="starter-name">${pk.name}</div>
+      <div class="starter-type">${pk.types.join(' / ')}${owned?' ×'+owned:''}</div>
+    </div>`;}).join('');
+  qM(()=>mHTML(`<div class="m-emoji">🧪</div>
+    <div class="m-title">Проф. Оук</div>
+    <div class="m-desc">У тебе вже ${n} покемонів! Обирай бонусного стартера для еволюції:</div>
+    <div class="starter-grid">${opts}</div>
+    <button class="btn-cancel" style="width:100%;padding:13px;font-size:14px;min-height:44px" onclick="closeModal()">Пізніше</button>`));
+}
+
+function giveBonus(dbId){
+  const d=pd();const pk=gp(dbId);
+  d.collection.push({dbId,xp:0});d.startersGiven++;d.oakPending=false;
+  closeModal();renderMain();saveToCloud(cur);
+  qM(()=>mImg(img(pk.pid),'Від Оука!',pk.name+' тепер у твоїй колекції!',[{l:'Чудово!',ok:true,cb:closeModal}]));
+}
+
+// ═══════════ GRASS ═══════════
+function goGrass(rare,useLure){
+  const d=pd();const loc=cLoc();
+  if(d.enemy){showToast('Спочатку закінчи бій!');return;}
+  const costK=rare?'grass_rare':'grass';
+  if(d.energy<ECOST[costK]){noEnergy();return;}
+  d.energy-=ECOST[costK];renderRes();
+  if(useLure){const k=rare?'rare_lure':'lure';if((d.inventory[k]||0)>0)d.inventory[k]--;}
+
+  // Always give something
+  const roll=Math.random();
+  const pokeChance=useLure?1.0:rare?0.2:loc.encounterChance;
+
+  const rawPool=(rare?loc.rarePool:loc.pool)||[];
+  const pool=rawPool.filter(id=>!isChainComplete(d,id));
+  if(roll<pokeChance && pool.length){
+    // Pokemon encounter
+    const dbId=pickPool(pool);
+    const pk=gp(dbId);
+    const [mn,mx]=HP_RANGE[pk.rar]||[50,100];
+    const maxHp=Math.round(ri(mn,mx)/5)*5||50;
+    d.enemy={dbId,name:pk.name,pid:pk.pid,hp:maxHp,maxHp};
+    renderActions();
+    qM(()=>mImg(img(pk.pid),'Дикий '+pk.name+'!','Зустріч! Дикий '+pk.name+'!\nHP: '+maxHp+'\n\nАтакуй — витрачай ⚔️ очки атаки!',[{l:'До бою!',ok:true,cb:()=>{closeModal();openCombat();}}]));
+  } else {
+    // Loot instead of pokemon
+    doGrassLoot(loc,rare);
+  }
+}
+
+function doGrassLoot(loc,rare){
+  const d=pd();
+  const r=Math.random();
+  if(rare){
+    // Rare grass: fragment, rare_lure, coins, xp_amulet
+    if(r<0.35){
+      const locId=loc.id;
+      const possibleStones=STONE_FRAGS[locId];
+      if(!possibleStones){
+        const coins=ri(10,30);d.coins+=coins;renderRes();
+        qM(()=>mEmoji('🪙','+'+coins+' монет!','Знайшов монети в рідкісній траві!',[{l:'Ок',ok:true,cb:closeModal}]));
+        return;
+      }
+      const stoneType=possibleStones[ri(0,possibleStones.length-1)];
+      const fragKey='frag_'+stoneType;
+      d.inventory[fragKey]=(d.inventory[fragKey]||0)+1;
+      const fragCount=d.inventory[fragKey];
+      const stone=STONES[stoneType];
+      if(fragCount>=3){
+        d.inventory[fragKey]=0;
+        d.inventory[stoneType]=(d.inventory[stoneType]||0)+1;
+        qM(()=>mEmoji(stone.emoji,'Камінь зібрано!','Три фрагменти обєдналися в '+stone.name+'! Використай для еволюції.',[{l:'Чудово!',ok:true,cb:closeModal}]));
+      } else {
+        qM(()=>mEmoji('🪨','Фрагмент каменю!','Знайшов фрагмент '+stone.name+' ('+fragCount+'/3). Збери 3 щоб отримати камінь!',[{l:'Ок',ok:true,cb:closeModal}]));
+      }
+    } else if(r<0.55){
+      d.inventory['rare_lure']=(d.inventory['rare_lure']||0)+1;
+      qM(()=>mEmoji('✨','Знахідка!','Знайшов Рідкісну приманку!',[{l:'Чудово!',ok:true,cb:closeModal}]));
+    } else if(r<0.78){
+      const coins=ri(10,30);d.coins+=coins;renderRes();
+      qM(()=>mEmoji('🪙','+'+coins+' монет!','Знайшов монети в рідкісній траві!',[{l:'Ок',ok:true,cb:closeModal}]));
+    } else if(r<0.92){
+      d.inventory['xp_amulet']=(d.inventory['xp_amulet']||0)+1;
+      qM(()=>mEmoji('🔮','Амулет досвіду!','Знайшов Амулет досвіду! ×1.5 XP за наступний бій.',[{l:'Чудово!',ok:true,cb:closeModal}]));
+    } else {
+      d.inventory['evo_crystal']=(d.inventory['evo_crystal']||0)+1;
+      qM(()=>mEmoji('💠','Рідкісна знахідка!','Знайшов Кристал пробудження! Миттєво готує покемона до еволюції.',[{l:'Чудово!',ok:true,cb:closeModal}]));
+    }
+  } else {
+    // Regular grass: coins, lure, rare_lure
+    if(r<0.45){
+      const coins=ri(3,12);d.coins+=coins;renderRes();
+      qM(()=>mEmoji('🪙','+'+coins+' монет!','Знайшов монети в траві!',[{l:'Ок',ok:true,cb:closeModal}]));
+    } else if(r<0.80){
+      d.inventory['lure']=(d.inventory['lure']||0)+1;
+      qM(()=>mEmoji('🎣','Знахідка!','Знайшов Приманку!',[{l:'Чудово!',ok:true,cb:closeModal}]));
+    } else {
+      d.inventory['rare_lure']=(d.inventory['rare_lure']||0)+1;
+      qM(()=>mEmoji('✨','Знахідка!','Знайшов Рідкісну приманку!',[{l:'Чудово!',ok:true,cb:closeModal}]));
+    }
+  }
+}
+
+function pickPool(pool){
+  const W={common:10,uncommon:4,rare:2,legendary:1,starter:0,evolved:0,mega:0};
+  const w=[];pool.forEach(id=>{const pk=gp(id);const n=W[pk.rar]||1;for(let i=0;i<n;i++)w.push(id);});
+  return w[ri(0,w.length-1)];
+}
+
+// ═══════════ COMBAT ═══════════
+function openCombat(){
+  const d=pd();const e=d.enemy;if(!e)return;
+  const pct=Math.max(0,Math.round(e.hp/e.maxHp*100));
+  const actives=d.activePokes.map(ci=>d.collection[ci]).filter(Boolean);
+  const myPoke=actives[0];
+  const myPk=myPoke?gp(myPoke.dbId):null;
+  const canAtk=d.atk>0;
+  const dmg=Math.min(d.atk,e.hp);
+  const amuletHas=(d.inventory['xp_amulet']||0)>0&&!d.amuletActive;
+  // My pokemon (left)
+  const myLeft=myPk?`<div class="battle-my">
+    <img class="battle-img-my" src="${img(myPk.pid)}" onerror="this.style.display='none'">
+    <div class="battle-name">${myPk.name}</div>
+    <div class="battle-xp">XP: ${myPoke.xp}</div>
+  </div>`:`<div class="battle-my" style="opacity:.4"><div style="font-size:40px">❓</div><div class="battle-name" style="font-size:10px">Немає покемона</div></div>`;
+  // Extra active pokes row
+  const extraPokes=actives.slice(1).map(c=>{const pk=gp(c.dbId);return`<img src="${img(pk.pid)}" style="width:28px;height:28px;image-rendering:pixelated;opacity:.7" title="${pk.name}">`;}).join('');
+  mHTML(`<div class="battle-screen">
+    ${myLeft}
+    <div class="battle-vs">VS</div>
+    <div class="battle-enemy">
+      <img class="battle-img-en" src="${img(e.pid)}" onerror="this.style.display='none'">
+      <div class="battle-name">${e.name}</div>
+      <div class="battle-hp">HP: ${e.hp}/${e.maxHp}</div>
+    </div>
+  </div>
+  <div class="hp-wrap"><div class="hp-fill" style="width:${pct}%"></div></div>
+  ${extraPokes?`<div style="display:flex;gap:4px;justify-content:center;margin-bottom:8px;align-items:center"><span style="font-size:10px;color:#888">Також активні:</span>${extraPokes}</div>`:''}
+  ${d.amuletActive?'<div style="text-align:center;font-size:11px;color:#4ade80;margin-bottom:8px">🔮 Амулет активний — ×1.5 XP!</div>':''}
+  <div style="background:rgba(255,255,255,.05);border-radius:10px;padding:10px;margin-bottom:10px;font-size:12px;color:#aaa">
+    Доступно ⚔️: <b style="color:#fb923c">${d.atk}</b> очки атаки<br>
+    Завдамо шкоди: <b style="color:#ef4444">${dmg}</b><br>
+    Залишиться HP: <b style="color:#fff">${Math.max(0,e.hp-dmg)}</b>
+    ${dmg>=e.hp?'<br><b style="color:#4ade80">→ Покемон буде спійманий!</b>':''}
+  </div>
+  <div style="display:flex;gap:8px;margin-bottom:8px">
+    <button class="btn-cancel" style="flex:1;padding:13px;font-size:14px;min-height:44px" onclick="closeModal()">Пізніше</button>
+    <button class="${canAtk?'btn-ok':'btn-cancel'}" style="flex:1;padding:13px;font-size:14px;min-height:44px" onclick="${canAtk?'doAttack()':''}" ${canAtk?'':'disabled'}>⚔️ Атакувати!</button>
+  </div>
+  ${amuletHas?`<button class="btn-cancel" style="width:100%;font-size:11px" onclick="useAmulet()">🔮 Амулет ×${d.inventory['xp_amulet']}</button>`:''}
+  ${!canAtk?'<div style="text-align:center;font-size:11px;color:#fbbf24;margin-top:8px">Додай сторінки через ☰ щоб отримати ⚔️ очки атаки</div>':''}`);
+}
+
+function useAmulet(){
+  const d=pd();
+  if(!(d.inventory['xp_amulet']>0))return;
+  d.inventory['xp_amulet']--;d.amuletActive=true;
+  closeModal();showToast('🔮 Амулет активовано!');openCombat();
+}
+
+function doAttack(){
+  const d=pd();const e=d.enemy;
+  if(!e||d.atk<=0)return;
+  const dmg=Math.min(d.atk,e.hp);
+  d.atk-=dmg;e.hp-=dmg;
+  if(e.hp<=0){
+    // VICTORY
+    const pk=gp(e.dbId);
+    const isDupe=d.collection.some(c=>c.dbId===e.dbId);
+    d.collection.push({dbId:e.dbId,xp:0});
+    if(d.activePokes.length===0) d.activePokes=[d.collection.length-1];
+    const coins=Math.max(1,Math.floor(dmg/10));d.coins+=coins;
+    // XP to actives
+    const evoMsgs=giveXp(dmg);
+    d.amuletActive=false;d.enemy=null;
+    closeModal();renderRes();renderPballs();renderDex();renderActions();saveToCloud(cur);
+    // check unlocks
+    const opened=checkUnlocks();renderMap();
+    // check oak bonus
+    const needOak=checkOakBonus();
+    // queue in priority: catch → evos → unlocks → oak
+    qM(()=>mImg(img(pk.pid),isDupe?pk.name+' — дублікат!':'Спіймано!',
+      `${pk.name} ${isDupe?'вже є! Дублікат в PC.':'в Покедексі!'}\n+${coins} 🪙`,
+      [{l:'Чудово!',ok:true,cb:closeModal}]));
+    evoMsgs.forEach(m=>qM(()=>mImg(img(m.pid),m.title,m.desc,[{l:'Чудово!',ok:true,cb:closeModal}])));
+    opened.forEach(u=>qM(()=>mEmoji('🎉','Відкрито!',`${u.emoji} ${u.name} доступна!`,[{l:'Чудово!',ok:true,cb:closeModal}])));
+    if(needOak){pd().oakPending=true;qM(()=>mEmoji('🧪','Проф. Оук кличе!','Є сюрприз! Зайди до лабораторії.',[{l:'Ок!',ok:true,cb:closeModal}]));}
+  } else {
+    closeModal();renderRes();renderActions();
+    qM(()=>mImg(img(e.pid),'Удар!',`${dmg} шкоди!\n${e.name} залишилось ${e.hp} HP.\n\nДодай ще сторінки і атакуй знову!`,
+      [{l:'Атакувати далі',ok:true,cb:()=>{closeModal();openCombat();}},{l:'Пізніше',cb:closeModal}]));
+  }
+}
+
+function giveXp(amount){
+  const d=pd();const msgs=[];
+  const mult=d.amuletActive?1.5:1;
+  const xpAmt=Math.round(amount*mult);
+  d.activePokes.forEach(ci=>{
+    const c=d.collection[ci];if(!c)return;
+    const pk=gp(c.dbId);
+    if(!pk.evo){
+      // max evo → coins bonus
+      d.coins+=Math.floor(xpAmt*0.1);
+      return;
+    }
+    c.xp+=xpAmt;
+    if(!pk.stoneEvo&&c.xp>=pk.evoXp){
+      const nPk=POKE.find(p=>p.id===pk.evo);
+      const old=pk.name;
+      c.dbId=nPk.id;c.xp=0;
+      msgs.push({pid:nPk.pid,title:old+' → '+nPk.name,desc:'Еволюція!'});
+    }
+  });
+  return msgs;
+}
+
+function checkOakBonus(){
+  const d=pd();
+  if(!d.hasStarter)return false;
+  if(d.oakPending)return false;
+  const sg=d.startersGiven;
+  if(sg>OAK_MILESTONES.length)return false;
+  return d.collection.length>=OAK_MILESTONES[sg-1];
+}
+
+// ═══════════ ITEM SEARCH ═══════════
+function doItemSearch(){
+  const d=pd();
+  if(d.energy<ECOST.item_search){noEnergy();return;}
+  d.energy-=ECOST.item_search;renderRes();
+  const r=Math.random();
+  if(r<.35){const c=ri(5,25);d.coins+=c;renderRes();qM(()=>mEmoji('🪙',`+${c} монет!`,'Знайшов монети!',[{l:'Чудово!',ok:true,cb:closeModal}]));}
+  else if(r<.5){const sks=Object.keys(STONES);const sk=sks[ri(0,sks.length-1)];d.inventory[sk]=(d.inventory[sk]||0)+1;const s=STONES[sk];qM(()=>mEmoji(s.emoji,'Знахідка!',s.name+' знайдено!',[{l:'Чудово!',ok:true,cb:closeModal}]));}
+  else qM(()=>mEmoji('💨','Нічого','Пусто...',[{l:'Ок',ok:true,cb:closeModal}]));
+}
+
+// ═══════════ POKECENTER ═══════════
+function openPC(){
+  const d=pd();
+  const rows=d.collection.map((c,i)=>{
+    const pk=gp(c.dbId);
+    if(!pk)return'';
+    const isAct=d.activePokes.includes(i);
+    const canEvoXp=pk.evo&&!pk.stoneEvo&&c.xp>=(pk.evoXp||0);
+    const canEvoS=pk.stoneEvo&&pk.evo&&(d.inventory[pk.stoneEvo]||0)>0&&c.xp>=(pk.evoXp||0);
+    const needsStone=pk.stoneEvo&&pk.evo&&c.xp>=(pk.evoXp||0);
+    const isDupe=d.collection.filter(x=>x.dbId===c.dbId).length>1;
+    return`<div style="display:flex;align-items:center;gap:7px;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.06)">
+      <img src="${img(pk.pid)}" style="width:30px;height:30px;image-rendering:pixelated" onerror="this.style.display='none'">
+      <div style="flex:1;min-width:0">
+        <div style="font-size:11px;font-weight:600;color:#fff">${pk.name}${isAct?' ★':''}</div>
+        <div style="font-size:9px;color:#888">XP: ${c.xp}${pk.evo?' / '+pk.evoXp:' (макс)'}</div>
+      </div>
+      ${canEvoXp||canEvoS?`<button class="sh-btn" onclick="pcEvo(${i})">${canEvoS?(STONES[pk.stoneEvo]?.emoji||'💎'):'🌟'}</button>`:''}
+      ${isDupe?`<button class="sh-btn" onclick="pcSell(${i})">🪙${dupeP(pk)}</button>`:''}
+    </div>`;
+  }).join('');
+  mHTML(`<div class="m-title" style="margin-bottom:10px">🏥 Покемон-центр</div>
+    <div style="max-height:240px;overflow-y:auto;margin-bottom:10px">${rows||'<div style="font-size:12px;color:#555;text-align:center;padding:1rem">Немає покемонів</div>'}</div>
+    <div class="divider"></div>
+    <div style="font-size:10px;color:#7eceff;font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin:10px 0 6px">Передати XP між покемонами</div>
+    <div style="display:flex;gap:6px;margin-bottom:6px">
+      <select id="pc-from" style="flex:1;background:#0d1b2a;color:#fff;border:1px solid rgba(255,255,255,.2);border-radius:8px;padding:6px;font-size:11px">
+        ${d.collection.map((c,i)=>{const pk=gp(c.dbId);if(!pk)return'';return`<option value="${i}">${pk.name} (${c.xp} XP)</option>`;}).join('')}
+      </select>
+      <div style="color:#7eceff;font-size:12px;align-self:center">→</div>
+      <select id="pc-to" style="flex:1;background:#0d1b2a;color:#fff;border:1px solid rgba(255,255,255,.2);border-radius:8px;padding:6px;font-size:11px">
+        ${d.collection.map((c,i)=>{const pk=gp(c.dbId);if(!pk)return'';return`<option value="${i}">${pk.name} (${c.xp} XP)</option>`;}).join('')}
+      </select>
+    </div>
+    <div style="display:flex;gap:6px;margin-bottom:10px">
+      <input type="number" id="pc-amt" placeholder="скільки XP" min="1" class="finput" style="flex:1;margin:0">
+      <button class="btn-ok" onclick="pcXpTransfer()" style="padding:0 14px;font-size:11px">OK</button>
+    </div>
+    <button class="btn-cancel" style="width:100%;padding:13px;font-size:14px;min-height:44px" onclick="closeModal()">Закрити</button>`,true);
+}
+
+function pcEvo(i){
+  const d=pd();const c=d.collection[i];const pk=gp(c.dbId);
+  if(pk.stoneEvo)d.inventory[pk.stoneEvo]--;
+  const nPk=POKE.find(p=>p.id===pk.evo);
+  const old=pk.name;c.dbId=nPk.id;c.xp=0;
+  closeModal();renderMain();saveToCloud(cur);
+  qM(()=>mImg(img(nPk.pid),old+' → '+nPk.name,'Еволюція!',[{l:'Чудово!',ok:true,cb:closeModal}]));
+}
+
+function pcSell(i){
+  const d=pd();const c=d.collection[i];const pk=gp(c.dbId);const price=dupeP(pk);
+  d.activePokes=d.activePokes.map(ai=>ai===i?undefined:ai>i?ai-1:ai).filter(x=>x!==undefined);
+  d.collection.splice(i,1);d.coins+=price;
+  closeModal();renderMain();
+  qM(()=>mEmoji('🪙',`+${price} монет!`,pk.name+' продано.',[{l:'Ок',ok:true,cb:closeModal}]));
+}
+
+function pcXpTransfer(){
+  const d=pd();
+  const fi=parseInt(document.getElementById('pc-from').value);
+  const ti=parseInt(document.getElementById('pc-to').value);
+  const amt=parseInt(document.getElementById('pc-amt').value);
+  if(fi===ti){showToast('Оберіть різних покемонів');return;}
+  if(!amt||amt<1){showToast('Введи кількість');return;}
+  const from=d.collection[fi];const to=d.collection[ti];
+  if(from.xp<amt){showToast(`Не вистачає XP (є: ${from.xp})`);return;}
+  from.xp-=amt;to.xp+=amt;
+  const pkFrom=gp(from.dbId);const pkTo=gp(to.dbId);
+  closeModal();renderMain();
+  showToast(`${amt} XP: ${pkFrom.name} → ${pkTo.name}`);
+  const pkToD=gp(to.dbId);
+  if(!pkToD.stoneEvo&&pkToD.evo&&to.xp>=(pkToD.evoXp||0)){
+    setTimeout(()=>qM(()=>mImg(img(POKE.find(p=>p.id===pkToD.evo).pid),pkToD.name+' готовий до еволюції!','Відкрий в Покедексі!',[{l:'Ок',ok:true,cb:closeModal}])),400);
+  }
+}
+
+// ═══════════ SHOP ═══════════
+function openShop(){
+  const d=pd();
+  const rows=SHOP_ITEMS.map((si,i)=>{
+    const qty=d.inventory[si.id]||0;
+    return`<div class="shop-row">
+      <span class="sh-emoji">${si.emoji}</span>
+      <div class="sh-info"><div class="sh-name">${si.name}${qty>0?` ×${qty}`:''}</div><div class="sh-desc">${si.desc}</div></div>
+      <div style="text-align:right;flex-shrink:0"><div class="sh-price">🪙${si.price}</div>
+      <button class="sh-btn" onclick="buyItem('${si.id}',${si.price})" ${d.coins<si.price?'disabled':''}>Купити</button></div>
+    </div>`;
+  }).join('');
+  mHTML(`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+    <div class="m-title" style="margin:0">🛒 Магазин</div>
+    <div style="font-size:14px;font-weight:700;color:#fbbf24">🪙${d.coins}</div>
+  </div>${rows}
+  <button class="btn-cancel" style="width:100%;margin-top:12px;padding:13px;font-size:14px;min-height:44px" onclick="closeModal()">Закрити</button>`,true);
+}
+
+function buyItem(id,price){
+  const d=pd();if(d.coins<price){showToast('Мало монет!');return;}
+  d.coins-=price;d.inventory[id]=(d.inventory[id]||0)+1;
+  renderRes();renderActions();
+  const si=SHOP_ITEMS.find(x=>x.id===id);
+  closeModal();saveToCloud(cur);
+  qM(()=>mEmoji(si.emoji,'Куплено!',si.name+' в інвентарі.',[{l:'Чудово!',ok:true,cb:closeModal}]));
+}
+
+function enterJohto(){
+  const d=pd();
+  d.region='johto';d.location='newbark';
+  document.getElementById('hdr-loc').textContent='📍 Нью-Барк-Таун';
+  renderRes();renderMap();renderActions();saveToCloud(cur);
+  qM(()=>mEmoji('🌏','Ласкаво просимо до Джото!','Новий регіон відкрито!\n\nНью-Барк-Таун — перше місто Регіону Джото.',[{l:'Дослідимо!',ok:true,cb:closeModal}]));
+}
+
+function returnToKanto(){
+  const d=pd();
+  d.region='kanto';d.location='caves';
+  document.getElementById('hdr-loc').textContent='📍 Печери';
+  renderRes();renderMap();renderActions();saveToCloud(cur);
+  showToast('→ Регіон Канто: Печери');
+}
+
+function openExchanger(){
+  const d=pd();
+  mHTML(`<div class="m-emoji">💱</div>
+    <div class="m-title">Міняла</div>
+    <div class="m-desc">Курс: 10 ⚔️ ATK → 2 🪙<br>або 5 🪙 → 10 ⚔️ ATK</div>
+    <div style="display:flex;gap:8px;margin:16px 0">
+      <button class="btn-ok" style="flex:1;padding:12px 8px" onclick="exchangeAtk2Coins()">Продати ATK<br><span style="font-size:10px;opacity:.7">10 ⚔️ → 2 🪙</span></button>
+      <button class="btn-ok" style="flex:1;padding:12px 8px" onclick="exchangeCoins2Atk()">Купити ATK<br><span style="font-size:10px;opacity:.7">5 🪙 → 10 ⚔️</span></button>
+    </div>
+    <div style="font-size:11px;color:#778;margin-bottom:12px;text-align:center">Маєш: ⚔️${d.atk} ATK · 🪙${d.coins}</div>
+    <button class="btn-cancel" style="width:100%;padding:13px;font-size:14px;min-height:44px" onclick="closeModal()">Закрити</button>`);
+}
+function exchangeAtk2Coins(){
+  const d=pd();
+  if(d.atk<10){showToast('Потрібно мінімум 10 ⚔️ ATK');return;}
+  d.atk-=10;d.coins+=2;renderRes();closeModal();saveToCloud(cur);showToast('10 ⚔️ → 2 🪙');
+}
+function exchangeCoins2Atk(){
+  const d=pd();
+  if(d.coins<5){showToast('Потрібно мінімум 5 🪙');return;}
+  d.coins-=5;d.atk+=10;renderRes();closeModal();saveToCloud(cur);showToast('5 🪙 → 10 ⚔️');
+}
+
+// ═══════════ SIDE PANEL ═══════════
+function openSidePanel(){
+  _sideTab='pages';
+  _rebuildSideContent();
+  document.getElementById('side-panel').classList.add('open');
+  document.getElementById('side-ov').classList.add('open');
+}
+
+function setSideTab(tab){
+  _sideTab=tab;
+  _rebuildSideContent();
+}
+
+function _rebuildSideContent(){
+  const d=pd();
+  const bc=d.books?d.books.length:0;
+  document.getElementById('side-content').innerHTML=`
+    <div style="display:flex;margin-bottom:16px;border-bottom:1px solid rgba(255,255,255,.1)">
+      <button onclick="setSideTab('pages')" style="flex:1;padding:10px 0;font-size:12px;font-weight:700;cursor:pointer;background:none;border:none;border-bottom:2px solid ${_sideTab==='pages'?'#7eceff':'transparent'};color:${_sideTab==='pages'?'#7eceff':'#555'}">📖 Читання</button>
+      <button onclick="setSideTab('library')" style="flex:1;padding:10px 0;font-size:12px;font-weight:700;cursor:pointer;background:none;border:none;border-bottom:2px solid ${_sideTab==='library'?'#7eceff':'transparent'};color:${_sideTab==='library'?'#7eceff':'#555'}">📚 Бібліотека${bc?' ('+bc+')':''}</button>
+    </div>
+    <div id="side-tab-content">${_sideTab==='pages'?_buildPagesHTML():_buildLibraryHTML()}</div>`;
+}
+
+function _buildPagesHTML(){
+  const d=pd();
+  const invR=Object.entries(d.inventory).filter(([k,v])=>v>0).map(([k,v])=>{
+    const si=SHOP_ITEMS.find(x=>x.id===k)||STONES[k];
+    let emoji='📦',name=k;
+    if(si){emoji=si.emoji;name=si.name;}
+    else if(k.startsWith('frag_')){
+      const st=k.replace('frag_','');const s=STONES[st];
+      emoji='🪨';name='Фрагмент '+(s?s.name:st)+' ('+v+'/3)';
+      if(v>=3)emoji=s?s.emoji:'💎';
+    }
+    return`<div style="display:flex;align-items:center;gap:6px;padding:5px 0;font-size:12px;border-bottom:1px solid rgba(255,255,255,.05)">
+      <span style="font-size:16px">${emoji}</span><span style="flex:1;color:#ccc">${name}</span><span style="font-weight:600;color:#fff">×${v}</span></div>`;
+  }).join('');
+  return`<div style="margin-bottom:1rem">
+      <div style="font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:#7eceff;margin-bottom:10px;font-weight:600">Додати книгу</div>
+      <div class="flbl">Назва книги</div>
+      <input type="text" id="sp-book" class="finput" placeholder="Гаррі Поттер і філософський камінь">
+      <div class="flbl">Автор</div>
+      <input type="text" id="sp-author" class="finput" placeholder="Дж. К. Роулінґ">
+      <div class="flbl">Кількість сторінок</div>
+      <input type="number" id="sp-pages" class="finput" placeholder="напр. 300" min="1" oninput="updSP()">
+      <div class="flbl" style="opacity:.6">Посилання на обкладинку <span style="color:#555;font-weight:400">(необов'язково)</span></div>
+      <input type="url" id="sp-cover" class="finput" placeholder="https://…" style="font-size:11px">
+      <div id="sp-prev" style="display:none;margin-bottom:10px"></div>
+      <button class="btn-ok" id="sp-submit" onclick="submitPages()" style="width:100%;padding:14px;font-size:14px;min-height:48px">Зарахувати сторінки</button>
+    </div>
+    <div style="padding-top:1rem;border-top:1px solid rgba(255,255,255,.07);margin-bottom:1rem">
+      <div style="font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:#7eceff;margin-bottom:8px;font-weight:600">Інвентар</div>
+      ${invR||'<div style="font-size:12px;color:#444">Порожньо</div>'}
+    </div>
+    <div style="padding-top:1rem;border-top:1px solid rgba(255,255,255,.07);display:flex;flex-direction:column;gap:6px">
+      <button onclick="closeSidePanel();saveToCloud(cur)" style="width:100%;padding:11px;font-size:12px;font-weight:600;background:rgba(74,222,128,.15);border:1px solid rgba(74,222,128,.25);border-radius:10px;color:#4ade80;cursor:pointer">${SCRIPT_URL?'💾 Зберегти прогрес':'💾 Зберегти (URL не вказано)'}</button>
+      <button onclick="closeSidePanel();openSettings()" style="width:100%;padding:11px;font-size:12px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:10px;color:#7eceff;cursor:pointer">⚙️ Хмарне збереження</button>
+    </div>`;
+}
+
+const _BPALETTE=[
+  ['#6b1f1f','#3a0c0c','#4a1515'],['#1f5858','#0a3030','#153f3f'],
+  ['#32206e','#180f42','#221548'],['#5c3d18','#342008','#3f2a0c'],
+  ['#1f5232','#0a2e1a','#153d22'],['#7a1f52','#420a2c','#551538'],
+  ['#1f3e62','#0a2038','#152d48'],['#4a3c18','#28200a','#33290c'],
+  ['#3e1f6b','#200a3c','#2b1548'],['#5c4a1f','#342808','#3f330c'],
+  ['#1f5c3e','#0a3422','#15402a'],['#622030','#381018','#451520'],
+  ['#20386b','#0a1e3c','#152848'],['#4a1f5c','#28083a','#331540'],
+  ['#1f4a3e','#0a2a22','#15352a'],
+];
+function _colorFor(title){let h=0;for(const c of title)h=(h*31+c.charCodeAt(0))%_BPALETTE.length;return _BPALETTE[Math.abs(h)];}
+function _bookH(p){if(p<100)return 178;if(p<250)return 190;if(p<400)return 202;if(p<600)return 214;if(p<800)return 224;if(p<1000)return 234;return 244;}
+function _coverW(p){if(p<100)return 90;if(p<250)return 100;if(p<400)return 108;if(p<600)return 114;if(p<800)return 119;if(p<1000)return 123;return 127;}
+function _spineW(p){const[A,B,C,D]=[40,1500,6,65];const r=(Math.log(Math.max(p,A))-Math.log(A))/(Math.log(B)-Math.log(A));return Math.round(C+r*(D-C));}
+function _titleSz(text,cw){const b=cw<100?10:cw<115?11:12;if(text.length>30)return b-1;if(text.length>18)return b;return b+1;}
+
+function _renderBookPreviewHTML(book){
+  const p=book.pages||1;
+  const h=_bookH(p),sw=_spineW(p);
+  const coverUrl=book.coverUrl||null;
+  const cw=coverUrl?Math.round(h*2/3):_coverW(p);
+  const [top,bot,spine]=_colorFor(book.title);
+  const scale=0.58;
+  const vh=Math.round(h*scale),vw=Math.round((sw+cw+6)*scale);
+  const spineGrad=`linear-gradient(90deg,${bot} 0%,${spine} 40%,${top} 100%)`;
+  const coverGrad=`linear-gradient(150deg,${top} 0%,${bot} 100%)`;
+  const tsz=_titleSz(book.title,cw);
+  const inner=`<div style="display:flex;flex-direction:row;height:${h}px;flex-shrink:0">
+    <div style="width:${sw}px;height:${h}px;background:${spineGrad};display:flex;align-items:center;justify-content:center;overflow:hidden;box-shadow:inset 2px 0 5px rgba(255,255,255,.06),inset -3px 0 8px rgba(0,0,0,.45)">
+      ${sw>=12?`<span style="writing-mode:vertical-rl;transform:rotate(180deg);font-size:${Math.max(7,sw>20?9:8)}px;font-weight:700;color:rgba(255,255,255,.7);white-space:normal;word-break:break-word;text-align:center;overflow:visible;max-height:${h-16}px">${book.title}</span>`:''}
+    </div>
+    <div style="width:${cw}px;height:${h}px;background:${coverGrad};position:relative;overflow:hidden;box-shadow:2px 2px 0 rgba(0,0,0,.3),4px 5px 0 rgba(0,0,0,.18),6px 10px 20px rgba(0,0,0,.55)">
+      ${coverUrl?`<img src="${coverUrl}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover" onerror="this.style.display='none'">`:''}
+      ${!coverUrl?`<div style="position:absolute;inset:0;display:flex;flex-direction:column;padding:6px 5px 5px">
+        <div style="font-size:8px;opacity:.5;text-transform:uppercase;letter-spacing:.08em;color:#fff;margin-bottom:auto">${book.author||''}</div>
+        <div style="font-size:${tsz}px;font-weight:800;text-align:center;color:#fff;white-space:normal;word-break:break-word;flex:1;display:flex;align-items:center;justify-content:center">${book.title}</div>
+        <div style="font-size:8px;opacity:.45;color:#fff;text-align:right">${p} стор.</div>
+      </div>`:''}
+    </div>
+  </div>`;
+  return`<div style="width:${vw}px;height:${vh}px;overflow:hidden;margin:0 auto 12px"><div style="transform:scale(${scale});transform-origin:top left">${inner}</div></div>`;
+}
+
+function _renderBookHTML(book, i){
+  const p=book.pages||1;
+  const h=_bookH(p),sw=_spineW(p);
+  const coverUrl=book.coverUrl||null;
+  const cw=coverUrl?Math.round(h*2/3):_coverW(p);
+  const [top,bot,spine]=_colorFor(book.title);
+  const tsz=_titleSz(book.title,cw);
+  const spineGrad=`linear-gradient(90deg,${bot} 0%,${spine} 40%,${top} 100%)`;
+  const coverGrad=`linear-gradient(150deg,${top} 0%,${bot} 100%)`;
+  const spineText=sw>=12?`<span style="writing-mode:vertical-rl;transform:rotate(180deg);font-size:${Math.max(7,sw>20?9:8)}px;font-weight:700;color:rgba(255,255,255,.75);white-space:normal;word-break:break-word;text-align:center;overflow:visible;max-height:${h-16}px">${book.title}</span>`:'';
+  const textOverlay=!coverUrl?`<div class="book-cover-inner">
+    <div style="font-size:8px;opacity:.5;text-transform:uppercase;letter-spacing:.08em;color:#fff;margin-bottom:auto">${book.author||''}</div>
+    <div style="font-size:${tsz}px;font-weight:800;text-align:center;color:#fff;white-space:normal;word-break:break-word;overflow:visible;flex:1;display:flex;align-items:center;justify-content:center">${book.title}</div>
+    <div style="font-size:8px;opacity:.45;color:#fff;text-align:right;align-self:flex-end">${p} стор.</div>
+  </div>`:'';
+  return`<div class="book-wrap" style="height:${h}px" onclick="openBookDetail(${i})" title="">
+    <div class="book-tooltip">${book.title} · ${p} стор.</div>
+    <div class="book-spine" style="width:${sw}px;height:${h}px;background:${spineGrad};box-shadow:inset 2px 0 5px rgba(255,255,255,.06),inset -3px 0 8px rgba(0,0,0,.45),-3px 3px 10px rgba(0,0,0,.55)">${spineText}</div>
+    <div class="book-cover" style="width:${cw}px;height:${h}px;background:${coverGrad};box-shadow:2px 2px 0 rgba(0,0,0,.3),4px 5px 0 rgba(0,0,0,.18),6px 10px 20px rgba(0,0,0,.55),inset -4px 0 12px rgba(0,0,0,.22)">
+      ${coverUrl?`<img src="${coverUrl}" onerror="this.style.display='none'">`:''}
+      ${textOverlay}
+      <div class="book-pages-edge"></div>
+    </div>
+  </div>`;
+}
+
+function _buildLibraryHTML(){
+  const d=pd();
+  const books=d.books||[];
+  const totalPages=books.reduce((s,b)=>s+(b.pages||0),0);
+  const header=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+    <div style="font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:#7eceff;font-weight:600">Моя Бібліотека</div>
+    <div style="font-size:11px;color:#778">${books.length} книг · ${totalPages} стор.</div></div>`;
+  if(!books.length){
+    return header+`<div style="text-align:center;padding:40px 0;color:#778;font-size:13px;line-height:2">📚<br>Ще немає книжок.<br>Додай першу книгу!</div>`;
+  }
+  const reversed=[...books].map((b,i)=>({b,i})).reverse();
+  const PER_ROW=4;
+  const rows=[];
+  for(let r=0;r<reversed.length;r+=PER_ROW)rows.push(reversed.slice(r,r+PER_ROW));
+  let shelves='';
+  rows.forEach(row=>{
+    shelves+=`<div class="shelf-row"><div class="shelf-books">${row.map(({b,i})=>_renderBookHTML(b,i)).join('')}</div><div class="shelf-plank"></div></div>`;
+  });
+  return header+`<div class="shelf-wrap">${shelves}</div>`;
+}
+
+
+function openBookDetail(i){
+  const d=pd();const book=(d.books||[])[i];if(!book)return;
+  const [top,bot]=_colorFor(book.title);
+  const cw=_coverW(book.pages||1),h=_bookH(book.pages||1);
+  const coverHtml=book.coverUrl
+    ?`<img src="${book.coverUrl}" style="width:${cw}px;height:${h}px;object-fit:cover;border-radius:4px;display:block;margin:0 auto 10px" onerror="this.style.display='none'">`
+    :`<div style="width:${cw}px;height:${h}px;background:linear-gradient(150deg,${top} 0%,${bot} 100%);border-radius:4px;margin:0 auto 10px"></div>`;
+  mHTML(`${coverHtml}
+    <div class="m-title" style="font-size:15px">${book.title}</div>
+    <div style="text-align:center;font-size:12px;color:#aaa;margin-bottom:4px">${book.author||''}</div>
+    <div style="text-align:center;font-size:11px;color:#778;margin-bottom:12px">${book.pages} стор. · ${book.date||''}</div>
+    <div class="flbl" style="opacity:.6">URL обкладинки</div>
+    <input type="url" id="bd-cover-url" class="finput" placeholder="https://…" value="${book.coverUrl||''}" style="font-size:11px">
+    <button class="btn-ok" style="width:100%;margin-bottom:8px;padding:12px;font-size:13px" onclick="saveBookCover(${i})">Зберегти обкладинку</button>
+    <button class="btn-cancel" style="width:100%;padding:12px;font-size:13px" onclick="confirmDeleteBook(${i})">🗑️ Видалити книгу</button>`);
+}
+
+function saveBookCover(i){
+  const d=pd();const book=(d.books||[])[i];if(!book)return;
+  const url=(document.getElementById('bd-cover-url').value||'').trim();
+  book.coverUrl=url||null;
+  saveToCloud(cur);closeModal();setSideTab('library');
+}
+
+function confirmDeleteBook(i){
+  const d=pd();const book=(d.books||[])[i];if(!book)return;
+  qM(()=>mEmoji('🗑️','Видалити книжку?',`"${book.title}"`,
+    [{l:'Видалити',cb:()=>{closeModal();d.books.splice(i,1);saveToCloud(cur);setSideTab('library');}},
+     {l:'Скасувати',ok:true,cb:closeModal}]));
+}
+
+function closeSidePanel(){
+  document.getElementById('side-panel').classList.remove('open');
+  document.getElementById('side-ov').classList.remove('open');
+}
+
+function updSP(){
+  const v=parseInt(document.getElementById('sp-pages').value);
+  const el=document.getElementById('sp-prev');
+  if(v&&v>0){
+    const e=p2e(v);
+    el.style.display='block';
+    el.innerHTML=`<div class="ppill">+${e} ⚡ енергії · +${v} ⚔️ очки атаки</div>`;
+  } else el.style.display='none';
+}
+
+function submitPages(){
+  const pages=parseInt(document.getElementById('sp-pages').value);
+  const title=(document.getElementById('sp-book').value||'').trim();
+  const author=(document.getElementById('sp-author').value||'').trim();
+  const coverUrl=(document.getElementById('sp-cover').value||'').trim();
+  if(!title){showToast('Введи назву книги');return;}
+  if(!author){showToast('Введи автора');return;}
+  if(!pages||pages<1){showToast('Введи кількість сторінок');return;}
+  const d=pd();
+  const energy=p2e(pages);
+  d.energy+=energy;d.atk+=pages;d.totalPages+=pages;
+  if(!d.books)d.books=[];
+  const book={title,author,pages,date:new Date().toLocaleDateString('uk-UA'),coverUrl:coverUrl||null};
+  d.books.push(book);
+  renderRes();closeSidePanel();saveToCloud(cur);
+  const preview=_renderBookPreviewHTML(book);
+  if(d.enemy){
+    qM(()=>mHTML(`${preview}<div class="m-title">Очки атаки додано!</div><div class="m-desc">+${energy} ⚡ енергії · +${pages} ⚔️ очки атаки<br><br>Тепер маєш ⚔️${d.atk} — атакуй!</div><div class="m-btns"><button class="btn-ok" onclick="closeModal();renderActions();openCombat()">Атакувати!</button><button class="btn-cancel" onclick="closeModal()">Пізніше</button></div>`));
+  } else {
+    qM(()=>mHTML(`${preview}<div class="m-title">Сторінки зараховано!</div><div class="m-desc" style="text-align:center">+${energy} ⚡ енергії · +${pages} ⚔️ очки атаки</div><div class="m-btns"><button class="btn-ok" onclick="closeModal()">Вперед!</button></div>`));
+  }
+}
+
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2200);
+}
+
+// ═══════════ CLOUD SAVE ═══════════
+function showSaveStatus(s){
+  const el=document.getElementById('save-status');if(!el)return;
+  clearTimeout(_saveTimer);
+  if(s==='saving'){el.textContent='💾';el.style.color='#fbbf24';el.style.display='inline';}
+  else if(s==='saved'){el.textContent='✓';el.style.color='#4ade80';el.style.display='inline';_saveTimer=setTimeout(()=>el.style.display='none',2000);}
+  else if(s==='error'){el.textContent='⚠️';el.style.color='#ef4444';el.style.display='inline';_saveTimer=setTimeout(()=>el.style.display='none',3500);}
+  else{el.style.display='none';}
+}
+
+let _jsonpSeq=0;
+function _jsonp(url){
+  return new Promise(resolve=>{
+    const cb='_rpg'+(++_jsonpSeq);
+    const s=document.createElement('script');
+    const t=setTimeout(()=>{console.warn('[JSONP] timeout:',url.substring(0,80));delete window[cb];s.remove();resolve(null);},15000);
+    window[cb]=d=>{clearTimeout(t);delete window[cb];s.remove();resolve(d);};
+    s.onerror=(e)=>{console.error('[JSONP] script error:',e);clearTimeout(t);delete window[cb];s.remove();resolve(null);};
+    s.src=url+(url.includes('?')?'&':'?')+'callback='+cb;
+    console.log('[JSONP] →',url.substring(0,120)+'...');
+    document.head.appendChild(s);
+  });
+}
+
+async function saveToCloud(pid){
+  if(!SCRIPT_URL||!pid)return;
+  showSaveStatus('saving');
+  const stateJson=JSON.stringify(state.players[pid]);
+  console.log('[Save] player:',pid,'state length:',stateJson.length);
+  const url=SCRIPT_URL+'?action=save&playerId='+encodeURIComponent(pid)+'&state='+encodeURIComponent(stateJson);
+  console.log('[Save] url length:',url.length);
+  const r=await _jsonp(url);
+  console.log('[Save] result:',r);
+  showSaveStatus(r&&r.ok?'saved':'error');
+}
+
+async function loadFromCloud(pid){
+  if(!SCRIPT_URL)return null;
+  console.log('[Load] player:',pid);
+  const d=await _jsonp(SCRIPT_URL+'?action=load&playerId='+encodeURIComponent(pid));
+  console.log('[Load] result:',d);
+  return(d&&!d.error&&Object.keys(d).length>0)?d:null;
+}
+
+function openSettings(){
+  const isFile=location.protocol==='file:';
+  const connected=!!SCRIPT_URL;
+  mHTML(`<div class="m-title" style="margin-bottom:6px">⚙️ Хмарне збереження</div>
+    <div style="font-size:11px;color:#aaa;margin-bottom:12px;line-height:1.6">Збереження в Google Таблицях через Apps Script.<br>Стан кожного гравця автоматично зберігається після ключових дій.</div>
+    ${isFile?`<div style="background:rgba(251,146,60,.1);border:1px solid rgba(251,146,60,.3);border-radius:10px;padding:8px 10px;font-size:11px;color:#fb923c;margin-bottom:10px;line-height:1.6">⚠️ Файл відкрито напряму (file://)<br>Збереження не працюватиме. Відкрийте через сервер:<br><b style="color:#fff">npx serve . --listen 8080</b><br>→ http://localhost:8080/pokemon_rpg.html</div>`:''}
+    <div style="background:${connected?'rgba(74,222,128,.1)':'rgba(255,255,255,.05)'};border:1px solid ${connected?'rgba(74,222,128,.25)':'rgba(255,255,255,.1)'};border-radius:10px;padding:8px 10px;font-size:11px;color:${connected?'#4ade80':'#888'};margin-bottom:10px">
+      ${connected?'✓ URL налаштовано':'○ URL не вказано — прогрес зберігається тільки в цьому браузері'}
+    </div>
+    <div class="flbl">Apps Script URL</div>
+    <input type="text" id="set-url" class="finput" value="${SCRIPT_URL}" placeholder="https://script.google.com/macros/s/.../exec">
+    <div style="display:flex;gap:8px;margin-bottom:8px">
+      <button class="btn-ok" style="flex:1;padding:11px;font-size:13px;min-height:44px" onclick="saveSettings()">Зберегти</button>
+      <button class="btn-cancel" style="padding:11px 14px;font-size:13px" onclick="testCloud()">Тест</button>
+      <button class="btn-cancel" style="flex:1" onclick="closeModal()">Закрити</button>
+    </div>
+    <div style="font-size:10px;color:#555;line-height:1.5">Інструкція: відкрийте apps_script.gs, вставте код у Google Apps Script, розгорніть як Web App (Виконати як: Я, Доступ: Усі), скопіюйте URL.</div>`);
+}
+
+function saveSettings(){
+  const u=(document.getElementById('set-url').value||'').trim();
+  SCRIPT_URL=u;localStorage.setItem('rpg_script_url',u);
+  closeModal();showToast(u?'✓ URL збережено':'URL очищено');
+}
+
+async function testCloud(){
+  const u=(document.getElementById('set-url').value||'').trim();
+  if(!u){showToast('Введіть URL');return;}
+  showToast('Тестую...');
+  const d=await _jsonp(u+'?playerId=__test__');
+  if(d===null){showToast('⚠️ Немає відповіді — перевірте URL і доступ');}
+  else if(d.error&&d.error!=='Missing playerId'){showToast('⚠️ '+d.error);}
+  else{showToast('✓ З\'єднання успішне!');}
+}
+
+initState();showSelect();
+</script>
+</body>
+</html>
