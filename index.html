@@ -1151,10 +1151,7 @@ function onLocClick(locId){
   }
   const cost=ECOST.move;
   if(d.energy<cost){qM(()=>mEmoji('⚡','Мало енергії',`Потрібно ${cost} ⚡ на перехід.\n\nДодай сторінки через ☰`,[{l:'Додати',ok:true,cb:()=>{closeModal();openSidePanel();}},{l:'Ок',cb:closeModal}]));return;}
-  const _li=LOC_ICONS[locId];
-  const _btns=[{l:'Так!',ok:true,cb:()=>{closeModal();doMove(locId);}},{l:'Ні',cb:closeModal}];
-  if(_li) qM(()=>mImg(_li,'Перейти до '+loc.name,`Витратити ${cost} ⚡ і перейти до ${loc.name}?`,_btns));
-  else qM(()=>mEmoji(loc.emoji,'Перейти до '+loc.name,`Витратити ${cost} ⚡ і перейти до ${loc.name}?`,_btns));
+  qM(()=>mHTML(`<div style="margin-bottom:10px">${locIconEl(locId,72)}</div><div class="m-title" style="text-align:center">Перейти до ${loc.name}</div><div class="m-desc" style="text-align:center">Витратити ${cost} ⚡ і перейти до ${loc.name}?</div><div class="m-btns"><button class="btn-ok" onclick="closeModal();doMove('${locId}')">Так!</button><button class="btn-cancel" onclick="closeModal()">Ні</button></div>`));
 }
 
 function doMove(locId){
@@ -1171,9 +1168,7 @@ function doMove(locId){
 function renderActions(){
   const d=pd();
   const loc=cLoc();
-  const _li=LOC_ICONS[loc.id];
-  if(_li) document.getElementById('act-emoji').innerHTML=`<img src="${_li}" style="width:48px;height:48px;border-radius:50%;object-fit:cover">`;
-  else document.getElementById('act-emoji').textContent=loc.emoji;
+  document.getElementById('act-emoji').innerHTML=locIconEl(loc.id,48);
   document.getElementById('act-name').textContent=loc.name;
   let locDesc=loc.desc||'';
   if(loc.pool&&loc.pool.length){
@@ -1974,33 +1969,22 @@ async function loadFromCloud(pid){
 }
 
 
-// ═══════════ LOC ICONS ═══════════
-let LOC_ICONS={};
-function loadLocIcons(){
-  const img=new Image();
-  img.onload=function(){
-    const W=2830,cols=7;
-    const colW=W/cols;
-    // srcCY and srcR calibrated for loc1.png (2830x1472): circles in upper ~35% of image
-    const srcCY=258,srcR=182;
-    const order=['oak','pallet','forest','glade','caves','shore','map2'];
-    order.forEach((id,i)=>{
-      const c=document.createElement('canvas');
-      const sz=64;c.width=c.height=sz;
-      const ctx=c.getContext('2d');
-      ctx.beginPath();ctx.arc(sz/2,sz/2,sz/2,0,Math.PI*2);ctx.clip();
-      const srcX=i*colW+colW/2;
-      ctx.drawImage(img,srcX-srcR,srcCY-srcR,srcR*2,srcR*2,0,0,sz,sz);
-      LOC_ICONS[id]=c.toDataURL();
-    });
-    LOC_ICONS['butterfly']=LOC_ICONS['glade'];
-    renderActions();
-  };
-  img.onerror=function(){};
-  img.src='loc1.png';
+// ═══════════ LOC ICONS (CSS sprite — no canvas needed) ═══════════
+// loc1.png: 2830×1472, 7 columns, circles centered at ~18% of height
+// Tune LOC_ICON_CY (0–100) if icons appear too high or too low
+const LOC_ICON_CY=18; // % from top where icon centers are
+function locIconEl(locId,size=64){
+  const IDX={oak:0,pallet:1,forest:2,glade:3,butterfly:3,caves:4,shore:5,map2:6};
+  const i=IDX[locId];
+  if(i===undefined){const l=_anyLoc(locId);return`<div style="font-size:${Math.round(size*.55)}px;text-align:center;line-height:${size}px;width:${size}px;height:${size}px;margin:0 auto">${l?l.emoji:''}</div>`;}
+  const bw=size*7;
+  const bh=Math.round(bw*1472/2830);
+  const bx=-(i*size);
+  const by=-(Math.round(bh*LOC_ICON_CY/100)-Math.round(size/2));
+  return`<div style="width:${size}px;height:${size}px;border-radius:50%;overflow:hidden;background:url(loc1.png) ${bx}px ${by}px;background-size:${bw}px ${bh}px;margin:0 auto;flex-shrink:0"></div>`;
 }
 
-initState();showSelect();loadLocIcons();
+initState();showSelect();
 window.addEventListener('visibilitychange',()=>{
   if(document.visibilityState==='hidden'&&cur)
     localStorage.setItem('rpg_state_'+cur,JSON.stringify(state.players[cur]));
