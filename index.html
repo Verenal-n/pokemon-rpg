@@ -296,9 +296,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 <script>
 // ═══════════ DATA ═══════════
 const PLAYERS=[
-  {id:'lionhard',  name:'Lionhard',  emoji:'🦁', color:'#d97706', border:'#92400e'},
-  {id:'esperanza', name:'Esperanza', emoji:'🌸', color:'#be185d', border:'#9d174d'},
-  {id:'demetrius', name:'Demetrius', emoji:'⚡', color:'#1d4ed8', border:'#1e3a8a'},
+  {id:'lionhard',  name:'Lionhard',  emoji:'🦁', color:'#f97316', border:'#f97316'},
+  {id:'esperanza', name:'Esperanza', emoji:'🌸', color:'#f43f5e', border:'#f43f5e'},
+  {id:'demetrius', name:'Demetrius', emoji:'⚡', color:'#3b82f6', border:'#3b82f6'},
 ];
 
 const POKE=[
@@ -388,7 +388,7 @@ const ITEM_TIPS={
   rare_lure:      'Використовується автоматично при наступному пошуку у рідкісній траві — гарантує зустріч з рідкісним покемоном.',
   xp_amulet:      'Активуй у екрані бою перед атакою — кнопка з\'явиться внизу. Подвоює монети з перемоги в цьому бою. Одноразовий.',
   mega:           'Використай у картці покемона в Покедексі або у Покемон-центрі. Потрібен також достатній рівень XP (80 XP).',
-  evo_crystal:    'Використай у картці покемона в Покедексі. Еволюціює без потрібного XP — тільки для покемонів без каменя.',
+  evo_crystal:    'Використай у картці покемона в Покедексі. Дозволяє покемону еволюціонувати одразу, навіть якщо гравець ще не набрав потрібний XP. Не діє на мега-еволюції (для них потрібен Мега-камінь).',
   xp_card_bronze: 'Натисни "Використати" — одразу зараховується +1 XP. Знаходиться у звичайній траві.',
   xp_card_silver: 'Натисни "Використати" — одразу зараховується +3 XP. Знаходиться у звичайній траві.',
   xp_card_gold:   'Натисни "Використати" — одразу зараховується +5 XP. Знаходиться лише у рідкісній траві.',
@@ -409,7 +409,6 @@ const STONE_FRAGS={
   butterfly: ['mega'],
   caves:     ['mega'],
   shore:     ['mega'],
-  newbark:   ['mega'],
 };
 const LOCS={
   oak:{id:'oak',name:'Лабораторія Оука',mLabel:'Лаб. Оука',emoji:'🧪',cx:46,cy:122,
@@ -433,7 +432,7 @@ const LOCS={
     unlockReq:{keyPoke:35},actions:['grass','grass_rare']},
   caves:{id:'caves',name:'Печери',mLabel:'Печери',emoji:'⛏️',cx:398,cy:62,
     color:'#1c1917',stroke:'#a8a29e',badge:'Зона 4',badgeBg:'rgba(168,162,158,.2)',badgeTxt:'#a8a29e',
-    connects:['glade','shore'],pool:[41,44,47,49],rarePool:[53],encounterChance:.55,
+    connects:['glade','shore','map2'],pool:[41,44,47,49],rarePool:[53],encounterChance:.55,
     unlockReq:{keyPoke:57},actions:['grass','grass_rare']},
   shore:{id:'shore',name:'Морський берег',mLabel:'Берег',emoji:'🌊',cx:440,cy:122,
     color:'#0c2a4a',stroke:'#38bdf8',badge:'Зона 5',badgeBg:'rgba(56,189,248,.2)',badgeTxt:'#38bdf8',
@@ -453,7 +452,7 @@ const LOCS_JOHTO={
 };
 
 // Energy cost per action
-const ECOST={grass:1,grass_rare:2,move:1,item_search:1};
+const ECOST={grass:1,grass_rare:2,move:1};
 
 // ═══════════ STATE ═══════════
 let state={players:{}};
@@ -799,8 +798,6 @@ function getBaseDbId(dbId){
   if(!base)return dbId;
   let prev=POKE.find(p=>p.evo===base.id);
   while(prev){base=prev;prev=POKE.find(p=>p.evo===base.id);}
-  // also check altEvoFrom
-  if(base.altEvoFrom){const alt=POKE.find(p=>p.id===base.altEvoFrom);if(alt)base=alt;}
   return base.id;
 }
 function getFullChain(rootId){
@@ -891,8 +888,8 @@ function renderQuests(){
     const hasCat=d.collection.some(c=>c.dbId===33);
     let desc,badge;
     if(hasButter){desc='Баттерфрі є! Поляна метеликів відкриється автоматично.';badge='Готово!';}
-    else if(hasMeta){desc='Метапод → Баттерфрі (потрібно 100 XP)';badge='В процесі';}
-    else if(hasCat){desc='Катерпі → Метапод (50 XP) → Баттерфрі (100 XP)';badge='В процесі';}
+    else if(hasMeta){desc='Метапод → Баттерфрі (потрібно 30 XP)';badge='В процесі';}
+    else if(hasCat){desc='Катерпі → Метапод (10 XP) → Баттерфрі (30 XP)';badge='В процесі';}
     else{desc='Еволюція: Катерпі→Метапод→Баттерфрі';badge='Отримай Баттерфрі';}
     quests.push({
       img:img(12),
@@ -914,8 +911,8 @@ function renderQuests(){
     if(hasMI){desc='Мега Інфернейп є! Печери відкриваються.';badge='Готово!';}
     else if(hasI&&hasMega){desc='Інфернейп є + Мега-камінь є! Відкрий картку Інфернейпа і еволюціонуй.';badge='Еволюціонуй!';}
     else if(hasI){desc='Інфернейп є! Потрібен 💎 Мега-камінь (збери 3 фрагменти на Поляні або купи в Магазині за 100🪙)';badge='Потрібен Мега-камінь';}
-    else if(hasMF){desc='Монферно → Інфернейп (200 XP) → Мега Інфернейп (💎 Мега-камінь)';badge='В процесі';}
-    else if(hasC){desc='Чімчар → Монферно (100 XP) → Інфернейп (200 XP) → Мега (💎)';badge='В процесі';}
+    else if(hasMF){desc='Монферно → Інфернейп (30 XP) → Мега Інфернейп (💎 Мега-камінь)';badge='В процесі';}
+    else if(hasC){desc='Чімчар → Монферно (10 XP) → Інфернейп (30 XP) → Мега (💎)';badge='В процесі';}
     else{desc='Ланцюг: Чімчар→Монферно→Інфернейп→Мега Інфернейп (💎 Мега-камінь)';badge='Отримай Мега Інфернейпа';}
     quests.push({
       img:hasI||hasMF?img(392):img(390),
@@ -936,6 +933,19 @@ function renderQuests(){
       badge:hasArt?'Готово!':'Шукай в Печерах',
       badgeBg:hasArt?'rgba(74,222,128,.2)':'rgba(96,165,250,.2)',
       badgeTxt:hasArt?'#4ade80':'#60a5fa'
+    });
+  }
+
+  // Quest: unlock shore
+  if(d.unlockedLocs.includes('caves')&&!d.unlockedLocs.includes('shore')){
+    const ok=uniqueCount>=14;
+    quests.push({
+      img:img(129),
+      title:'Відкрити Морський берег',
+      desc:'Злови 14 різних покемонів (зараз: '+uniqueCount+'/14)',
+      badge:ok?'Готово!':'В процесі',
+      badgeBg:ok?'rgba(74,222,128,.2)':'rgba(56,189,248,.2)',
+      badgeTxt:ok?'#4ade80':'#38bdf8'
     });
   }
 
@@ -996,7 +1006,7 @@ function openDexCard(i){
     </div>`:''}
     ${pk.isKey?`<div style="background:rgba(74,222,128,.1);border:1px solid rgba(74,222,128,.25);border-radius:8px;padding:8px;font-size:11px;color:#4ade80;margin-bottom:10px">🔑 ${pk.isKey.desc}</div>`:''}
     ${canEvoXp||canEvoS?`<button class="btn-ok" style="width:100%;margin-bottom:8px;padding:13px;font-size:14px;min-height:44px" onclick="doEvoDex(${i})">🌟 Еволюція в ${pk.evoN}!</button>`:''}
-    ${canUseCrystal?`<button style="width:100%;margin-bottom:8px;padding:13px;font-size:14px;min-height:44px;background:linear-gradient(135deg,rgba(52,211,153,.15),rgba(16,185,129,.1));border:1px solid rgba(52,211,153,.5);border-radius:10px;color:#34d399;font-weight:700;cursor:pointer" onclick="useEvoCrystal(${i})">🟢 Кристал пробудження → еволюція без рівня</button>`:''}
+    ${canUseCrystal?`<button style="width:100%;margin-bottom:8px;padding:13px;font-size:14px;min-height:44px;background:linear-gradient(135deg,rgba(52,211,153,.15),rgba(16,185,129,.1));border:1px solid rgba(52,211,153,.5);border-radius:10px;color:#34d399;font-weight:700;cursor:pointer" onclick="useEvoCrystal(${i})">🟢 Кристал пробудження → еволюціонувати зараз!</button>`:''}
     ${isDupe?`<button class="btn-cancel" style="width:100%;margin-bottom:8px;padding:13px;font-size:14px;min-height:44px" onclick="sellDupe(${i})">Продати дублікат — 🪙${dupeP(pk)}</button>`:''}
     <div style="font-size:10px;color:#888;text-align:center;margin-bottom:8px">📍 Де ловиться: <b style="color:#aaa">${getPokeLocName(c.dbId)}</b></div>
     <button class="btn-cancel" style="width:100%;padding:13px;font-size:14px;min-height:44px" onclick="closeModal()">Закрити</button>`);
@@ -1467,7 +1477,7 @@ function openCombat(){
   const myLeft=myPk?`<div class="battle-my">
     <img class="battle-img-my" src="${img(myPk.pid)}" onerror="this.style.display='none'">
     <div class="battle-name">${myPk.name}</div>
-    <div class="battle-xp">XP: ${myPoke.xp}</div>
+    <div class="battle-xp">📖 ${d.level||0} XP</div>
   </div>`:`<div class="battle-my" style="opacity:.4"><div style="font-size:40px">❓</div><div class="battle-name" style="font-size:10px">Немає покемона</div></div>`;
   // Extra active pokes row
   const extraPokes=actives.slice(1).map(c=>{const pk=gp(c.dbId);return`<img src="${img(pk.pid)}" style="width:28px;height:28px;image-rendering:pixelated;opacity:.7" title="${pk.name}">`;}).join('');
@@ -1517,18 +1527,20 @@ function doAttack(){
     if(d.activePokes.length===0) d.activePokes=[d.collection.length-1];
     const coinDiv=(pk.rar==='rare'||pk.rar==='legendary')?15:10;
     const coins=Math.max(1,Math.floor(dmg/coinDiv));
-    const evoMsgs=giveXp(coins);
+    const mult=d.amuletActive?2:1;
+    d.coins+=Math.floor(coins*mult);
+    d.amuletActive=false;
     d.enemy=null;
     closeModal();renderRes();renderPballs();renderDex();renderActions();saveToCloud(cur);
-    // check unlocks
     const opened=checkUnlocks();renderMap();
-    // check oak bonus
     const needOak=checkOakBonus();
-    // queue in priority: catch → evos → unlocks → oak
     qM(()=>mImg(img(pk.pid),isDupe?pk.name+' — дублікат!':'Спіймано!',
-      `${pk.name} ${isDupe?'вже є! Дублікат в PC.':'в Покедексі!'}\n+${coins} 🪙`,
+      `${pk.name} ${isDupe?'вже є! Дублікат в PC.':'в Покедексі!'}\n+${Math.floor(coins*mult)} 🪙`,
       [{l:'Чудово!',ok:true,cb:closeModal}]));
-    evoMsgs.forEach(m=>qM(()=>mImg(img(m.pid),m.title,m.desc,[{l:'Чудово!',ok:true,cb:closeModal}])));
+    // Show deferred evolution messages from books added during combat
+    const pendingEvo=d._pendingEvo||[];
+    d._pendingEvo=[];
+    pendingEvo.forEach(m=>qM(()=>mImg(img(m.pid),m.title,m.desc,[{l:'Чудово!',ok:true,cb:closeModal}])));
     opened.forEach(u=>qM(()=>mEmoji('🎉','Відкрито!',`${u.emoji} ${u.name} доступна!`,[{l:'Чудово!',ok:true,cb:closeModal}])));
     if(needOak){pd().oakPending=true;qM(()=>mEmoji('🧪','Проф. Оук кличе!','Є сюрприз! Зайди до лабораторії.',[{l:'Ок!',ok:true,cb:closeModal}]));}
   } else {
@@ -1538,13 +1550,6 @@ function doAttack(){
   }
 }
 
-function giveXp(coinBase){
-  const d=pd();
-  const mult=d.amuletActive?2:1;
-  d.coins+=Math.floor(coinBase*mult);
-  d.amuletActive=false;
-  return [];
-}
 
 function checkOakBonus(){
   const d=pd();
@@ -1553,17 +1558,6 @@ function checkOakBonus(){
   const sg=d.startersGiven;
   if(sg>OAK_MILESTONES.length)return false;
   return d.collection.length>=OAK_MILESTONES[sg-1];
-}
-
-// ═══════════ ITEM SEARCH ═══════════
-function doItemSearch(){
-  const d=pd();
-  if(d.energy<ECOST.item_search){noEnergy();return;}
-  d.energy-=ECOST.item_search;renderRes();
-  const r=Math.random();
-  if(r<.35){const c=ri(5,25);d.coins+=c;renderRes();qM(()=>mEmoji('🪙',`+${c} монет!`,'Знайшов монети!',[{l:'Чудово!',ok:true,cb:closeModal}]));}
-  else if(r<.5){const sks=Object.keys(STONES);const sk=sks[ri(0,sks.length-1)];d.inventory[sk]=(d.inventory[sk]||0)+1;const s=STONES[sk];qM(()=>mEmoji(s.emoji,'Знахідка!',s.name+' знайдено!',[{l:'Чудово!',ok:true,cb:closeModal}]));}
-  else qM(()=>mEmoji('💨','Нічого','Пусто...',[{l:'Ок',ok:true,cb:closeModal}]));
 }
 
 // ═══════════ POKECENTER ═══════════
@@ -1608,8 +1602,6 @@ function pcSell(i){
   closeModal();renderMain();
   qM(()=>mEmoji('🪙',`+${price} монет!`,pk.name+' продано.',[{l:'Ок',ok:true,cb:closeModal}]));
 }
-
-function pcXpTransfer(){}
 
 // ═══════════ SHOP ═══════════
 function openShop(){
@@ -1911,11 +1903,13 @@ function submitPages(){
   const evoMsgs=checkLevelEvolutions(d);
   renderRes();closeSidePanel();saveToCloud(cur);
   const preview=_renderBookPreviewHTML(book);
-  const evoHtml=evoMsgs.length?evoMsgs.map(e=>`<div class="evo-notif">🎉 ${e.title}: ${e.desc}</div>`).join(''):'';
   if(d.enemy){
-    qM(()=>mHTML(`${preview}<div class="m-title">Очки атаки додано!</div><div class="m-desc">+${energy} ⚡ · +${atk} ⚔️ · 📖+${lvlGain} XP<br><br>Тепер маєш ⚔️${d.atk} — атакуй!</div>${evoHtml}<div class="m-btns"><button class="btn-ok" onclick="closeModal();renderActions();openCombat()">Атакувати!</button><button class="btn-cancel" onclick="closeModal()">Пізніше</button></div>`));
+    // During combat: defer evo messages until after battle victory
+    if(evoMsgs.length) d._pendingEvo=(d._pendingEvo||[]).concat(evoMsgs);
+    qM(()=>mHTML(`${preview}<div class="m-title">Книга додана!</div><div class="m-desc">+${energy} ⚡ · +${atk} ⚔️ · 📖+${lvlGain} XP<br><br>Тепер маєш ⚔️${d.atk} — атакуй!</div><div class="m-btns"><button class="btn-ok" onclick="closeModal();renderActions();openCombat()">Атакувати!</button><button class="btn-cancel" onclick="closeModal()">Пізніше</button></div>`));
   } else {
-    qM(()=>mHTML(`${preview}<div class="m-title">Сторінки зараховано!</div><div class="m-desc" style="text-align:center">+${energy} ⚡ · +${atk} ⚔️ · 📖XP: ${d.level} (+${lvlGain})</div>${evoHtml}<div class="m-btns"><button class="btn-ok" onclick="closeModal()">Вперед!</button></div>`));
+    const evoHtml=evoMsgs.length?evoMsgs.map(e=>`<div class="evo-notif">🎉 ${e.title}: ${e.desc}</div>`).join(''):'';
+    qM(()=>mHTML(`${preview}<div class="m-title">Книга додана!</div><div class="m-desc" style="text-align:center">+${energy} ⚡ · +${atk} ⚔️ · 📖XP: ${d.level} (+${lvlGain})</div>${evoHtml}<div class="m-btns"><button class="btn-ok" onclick="closeModal()">Вперед!</button></div>`));
   }
 }
 
