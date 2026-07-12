@@ -248,6 +248,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
       <div class="rpill" id="hdr-energy" onclick="openSidePanel()" title="Додати сторінки">⚡0</div>
       <div class="rpill rpill-atk" id="hdr-atk" title="Очки атаки">⚔️0</div>
       <div class="rpill" id="hdr-coins">🪙0</div>
+      <div class="rpill" id="hdr-level" title="Рівень гравця">★0</div>
       <div class="rpill" onclick="openSidePanel()">☰</div>
     </div>
   </div>
@@ -300,74 +301,74 @@ const PLAYERS=[
 ];
 
 const POKE=[
-  {id:1, name:'Бульбазавр',    pid:1,   loc:'pallet', rar:'starter', types:['Трава','Отрута'],  evo:2,  evoXp:100, evoN:'Івізавр'},
-  {id:2, name:'Івізавр',       pid:2,   loc:'pallet', rar:'evolved', types:['Трава','Отрута'],  evo:3,  evoXp:200, evoN:'Венузавр'},
-  {id:3, name:'Венузавр',      pid:3,   loc:'pallet', rar:'evolved', types:['Трава','Отрута'],  evo:4,  evoXp:300, evoN:'Мега Венузавр', stoneEvo:'mega'},
+  {id:1, name:'Бульбазавр',    pid:1,   loc:'pallet', rar:'starter', types:['Трава','Отрута'],  evo:2,  evoLevel:10, evoN:'Івізавр'},
+  {id:2, name:'Івізавр',       pid:2,   loc:'pallet', rar:'evolved', types:['Трава','Отрута'],  evo:3,  evoLevel:30, evoN:'Венузавр'},
+  {id:3, name:'Венузавр',      pid:3,   loc:'pallet', rar:'evolved', types:['Трава','Отрута'],  evo:4,  evoLevel:80, evoN:'Мега Венузавр', stoneEvo:'mega'},
   {id:4, name:'Мега Венузавр', pid:3,   loc:'pallet', rar:'mega',    types:['Трава','Отрута']},
-  {id:5, name:'Чармандер',     pid:4,   loc:'pallet', rar:'starter', types:['Вогонь'],           evo:6,  evoXp:100, evoN:'Чармелеон'},
-  {id:6, name:'Чармелеон',     pid:5,   loc:'pallet', rar:'evolved', types:['Вогонь'],           evo:7,  evoXp:200, evoN:'Чаризард'},
-  {id:7, name:'Чаризард',      pid:6,   loc:'pallet', rar:'evolved', types:['Вогонь','Летючий'], evo:8,  evoXp:300, evoN:'Мега Чаризард', stoneEvo:'mega'},
+  {id:5, name:'Чармандер',     pid:4,   loc:'pallet', rar:'starter', types:['Вогонь'],           evo:6,  evoLevel:10, evoN:'Чармелеон'},
+  {id:6, name:'Чармелеон',     pid:5,   loc:'pallet', rar:'evolved', types:['Вогонь'],           evo:7,  evoLevel:30, evoN:'Чаризард'},
+  {id:7, name:'Чаризард',      pid:6,   loc:'pallet', rar:'evolved', types:['Вогонь','Летючий'], evo:8,  evoLevel:80, evoN:'Мега Чаризард', stoneEvo:'mega'},
   {id:8, name:'Мега Чаризард', pid:6,   loc:'pallet', rar:'mega',    types:['Вогонь','Летючий']},
-  {id:9, name:'Сквіртл',       pid:7,   loc:'pallet', rar:'starter', types:['Вода'],             evo:10, evoXp:100, evoN:'Вартортл'},
-  {id:10,name:'Вартортл',      pid:8,   loc:'pallet', rar:'evolved', types:['Вода'],             evo:11, evoXp:200, evoN:'Бластойз'},
-  {id:11,name:'Бластойз',      pid:9,   loc:'pallet', rar:'evolved', types:['Вода'],             evo:12, evoXp:300, evoN:'Мега Бластойз', stoneEvo:'mega'},
+  {id:9, name:'Сквіртл',       pid:7,   loc:'pallet', rar:'starter', types:['Вода'],             evo:10, evoLevel:10, evoN:'Вартортл'},
+  {id:10,name:'Вартортл',      pid:8,   loc:'pallet', rar:'evolved', types:['Вода'],             evo:11, evoLevel:30, evoN:'Бластойз'},
+  {id:11,name:'Бластойз',      pid:9,   loc:'pallet', rar:'evolved', types:['Вода'],             evo:12, evoLevel:80, evoN:'Мега Бластойз', stoneEvo:'mega'},
   {id:12,name:'Мега Бластойз', pid:9,   loc:'pallet', rar:'mega',    types:['Вода']},
-  {id:13,name:'Пікачу',        pid:25,  loc:'pallet', rar:'rare',    types:['Електрика'],        evo:14, evoXp:200, evoN:'Райчу'},
+  {id:13,name:'Пікачу',        pid:25,  loc:'pallet', rar:'rare',    types:['Електрика'],        evo:14, evoLevel:10, evoN:'Райчу'},
   {id:14,name:'Райчу',         pid:26,  loc:'pallet', rar:'evolved', types:['Електрика']},
-  {id:15,name:'Піджі',         pid:16,  loc:'forest', rar:'common',  types:['Нормальний','Летючий'], evo:16, evoXp:100, evoN:'Піджіотто'},
-  {id:16,name:'Піджіотто',     pid:17,  loc:'forest', rar:'evolved', types:['Нормальний','Летючий'], evo:17, evoXp:200, evoN:'Піджіт'},
-  {id:17,name:'Піджіт',        pid:18,  loc:'forest', rar:'evolved', types:['Нормальний','Летючий'], evo:18, evoXp:300, evoN:'Мега Піджіт', stoneEvo:'mega'},
+  {id:15,name:'Піджі',         pid:16,  loc:'forest', rar:'common',  types:['Нормальний','Летючий'], evo:16, evoLevel:10, evoN:'Піджіотто'},
+  {id:16,name:'Піджіотто',     pid:17,  loc:'forest', rar:'evolved', types:['Нормальний','Летючий'], evo:17, evoLevel:30, evoN:'Піджіт'},
+  {id:17,name:'Піджіт',        pid:18,  loc:'forest', rar:'evolved', types:['Нормальний','Летючий'], evo:18, evoLevel:80, evoN:'Мега Піджіт', stoneEvo:'mega'},
   {id:18,name:'Мега Піджіт',   pid:18,  loc:'forest', rar:'mega',    types:['Нормальний','Летючий']},
-  {id:19,name:'Еканс',         pid:23,  loc:'forest', rar:'common',  types:['Отрута'],           evo:20, evoXp:200, evoN:'Ербок'},
+  {id:19,name:'Еканс',         pid:23,  loc:'forest', rar:'common',  types:['Отрута'],           evo:20, evoLevel:10, evoN:'Ербок'},
   {id:20,name:'Ербок',         pid:24,  loc:'forest', rar:'evolved', types:['Отрута']},
-  {id:21,name:'Веномат',       pid:49,  loc:'forest', rar:'common',  types:['Комаха','Отрута'],  evo:22, evoXp:200, evoN:'Веномот'},
+  {id:21,name:'Веномат',       pid:49,  loc:'forest', rar:'common',  types:['Комаха','Отрута'],  evo:22, evoLevel:10, evoN:'Веномот'},
   {id:22,name:'Веномот',       pid:49,  loc:'forest', rar:'evolved', types:['Комаха','Отрута']},
-  {id:23,name:'Беллспраут',    pid:69,  loc:'forest', rar:'common',  types:['Трава','Отрута'],   evo:24, evoXp:200, evoN:'Вайлплюм'},
+  {id:23,name:'Беллспраут',    pid:69,  loc:'forest', rar:'common',  types:['Трава','Отрута'],   evo:24, evoLevel:10, evoN:'Вайлплюм'},
   {id:24,name:'Вайлплюм',      pid:71,  loc:'forest', rar:'evolved', types:['Трава','Отрута']},
-  {id:25,name:'Клефейрі',      pid:35,  loc:'forest', rar:'uncommon',types:['Фея'],              evo:26, evoXp:200, evoN:'Клефейбл'},
+  {id:25,name:'Клефейрі',      pid:35,  loc:'forest', rar:'uncommon',types:['Фея'],              evo:26, evoLevel:10, evoN:'Клефейбл'},
   {id:26,name:'Клефейбл',      pid:36,  loc:'forest', rar:'evolved', types:['Фея']},
-  {id:27,name:'Пінсір',        pid:127, loc:'forest', rar:'rare',    types:['Комаха'],           evo:28, evoXp:300, evoN:'Мега Пінсір', stoneEvo:'mega'},
+  {id:27,name:'Пінсір',        pid:127, loc:'forest', rar:'rare',    types:['Комаха'],           evo:28, evoLevel:80, evoN:'Мега Пінсір', stoneEvo:'mega'},
   {id:28,name:'Мега Пінсір',   pid:127, loc:'forest', rar:'mega',    types:['Комаха']},
-  {id:29,name:'Оддіш',         pid:43,  loc:'glade',  rar:'common',  types:['Трава','Отрута'],   evo:30, evoXp:100, evoN:'Ґльум'},
-  {id:30,name:'Ґльум',         pid:44,  loc:'glade',  rar:'evolved', types:['Трава','Отрута'],   evo:31, evoXp:200, evoN:'Вайлплюм'},
+  {id:29,name:'Оддіш',         pid:43,  loc:'glade',  rar:'common',  types:['Трава','Отрута'],   evo:30, evoLevel:10, evoN:'Ґльум'},
+  {id:30,name:'Ґльум',         pid:44,  loc:'glade',  rar:'evolved', types:['Трава','Отрута'],   evo:31, evoLevel:30, evoN:'Вайлплюм'},
   {id:31,name:'Вайлплюм',      pid:45,  loc:'glade',  rar:'evolved', types:['Трава','Отрута']},
-  {id:33,name:'Катерпі',       pid:10,  loc:'glade',  rar:'common',  types:['Комаха'],           evo:34, evoXp:100, evoN:'Метапод'},
-  {id:34,name:'Метапод',       pid:11,  loc:'glade',  rar:'evolved', types:['Комаха'],           evo:35, evoXp:200, evoN:'Баттерфрі'},
+  {id:33,name:'Катерпі',       pid:10,  loc:'glade',  rar:'common',  types:['Комаха'],           evo:34, evoLevel:10, evoN:'Метапод'},
+  {id:34,name:'Метапод',       pid:11,  loc:'glade',  rar:'evolved', types:['Комаха'],           evo:35, evoLevel:30, evoN:'Баттерфрі'},
   {id:35,name:'Баттерфрі',     pid:12,  loc:'glade',  rar:'evolved', types:['Комаха','Летючий'], isKey:{loc:'butterfly',desc:'Відкриває Поляну метеликів'}},
-  {id:36,name:'Раттата',       pid:19,  loc:'glade',  rar:'common',  types:['Нормальний'],       evo:37, evoXp:200, evoN:'Ратікейт'},
+  {id:36,name:'Раттата',       pid:19,  loc:'glade',  rar:'common',  types:['Нормальний'],       evo:37, evoLevel:10, evoN:'Ратікейт'},
   {id:37,name:'Ратікейт',      pid:20,  loc:'glade',  rar:'evolved', types:['Нормальний']},
-  {id:38,name:'Мяут',          pid:52,  loc:'glade',  rar:'uncommon',types:['Нормальний'],       evo:39, evoXp:200, evoN:'Персіан'},
+  {id:38,name:'Мяут',          pid:52,  loc:'glade',  rar:'uncommon',types:['Нормальний'],       evo:39, evoLevel:10, evoN:'Персіан'},
   {id:39,name:'Персіан',       pid:53,  loc:'glade',  rar:'evolved', types:['Нормальний']},
   {id:40,name:'Бьютіфлай',    pid:267, loc:'butterfly',rar:'common',  types:['Комаха','Летючий']},
-  {id:41,name:'Джеодуд',       pid:74,  loc:'caves',  rar:'common',  types:['Камінь','Земля'],   evo:42, evoXp:100, evoN:'Ґравелер'},
-  {id:42,name:'Ґравелер',      pid:75,  loc:'caves',  rar:'evolved', types:['Камінь','Земля'],   evo:43, evoXp:200, evoN:'Ґолем'},
+  {id:41,name:'Джеодуд',       pid:74,  loc:'caves',  rar:'common',  types:['Камінь','Земля'],   evo:42, evoLevel:10, evoN:'Ґравелер'},
+  {id:42,name:'Ґравелер',      pid:75,  loc:'caves',  rar:'evolved', types:['Камінь','Земля'],   evo:43, evoLevel:30, evoN:'Ґолем'},
   {id:43,name:'Ґолем',         pid:76,  loc:'caves',  rar:'evolved', types:['Камінь','Земля']},
-  {id:44,name:'Зубат',         pid:41,  loc:'caves',  rar:'common',  types:['Отрута','Летючий'],  evo:45, evoXp:100, evoN:'Ґолбат'},
-  {id:45,name:'Ґолбат',        pid:42,  loc:'caves',  rar:'evolved', types:['Отрута','Летючий'],  evo:46, evoXp:200, evoN:'Кробат'},
+  {id:44,name:'Зубат',         pid:41,  loc:'caves',  rar:'common',  types:['Отрута','Летючий'],  evo:45, evoLevel:10, evoN:'Ґолбат'},
+  {id:45,name:'Ґолбат',        pid:42,  loc:'caves',  rar:'evolved', types:['Отрута','Летючий'],  evo:46, evoLevel:30, evoN:'Кробат'},
   {id:46,name:'Кробат',        pid:169, loc:'caves',  rar:'evolved', types:['Отрута','Летючий']},
-  {id:47,name:'Діґлетт',       pid:50,  loc:'caves',  rar:'common',  types:['Земля'],             evo:48, evoXp:200, evoN:'Дуґтріо'},
+  {id:47,name:'Діґлетт',       pid:50,  loc:'caves',  rar:'common',  types:['Земля'],             evo:48, evoLevel:10, evoN:'Дуґтріо'},
   {id:48,name:'Дуґтріо',       pid:51,  loc:'caves',  rar:'evolved', types:['Земля']},
-  {id:49,name:'Ларвітар',      pid:246, loc:'caves',  rar:'rare',    types:['Камінь'],            evo:50, evoXp:100, evoN:'Пюпітар'},
-  {id:50,name:'Пюпітар',       pid:247, loc:'caves',  rar:'evolved', types:['Камінь'],            evo:51, evoXp:200, evoN:'Тіранітар'},
-  {id:51,name:'Тіранітар',     pid:248, loc:'caves',  rar:'evolved', types:['Камінь'],            evo:52, evoXp:300, evoN:'Мега Тіранітар', stoneEvo:'mega'},
+  {id:49,name:'Ларвітар',      pid:246, loc:'caves',  rar:'rare',    types:['Камінь'],            evo:50, evoLevel:10, evoN:'Пюпітар'},
+  {id:50,name:'Пюпітар',       pid:247, loc:'caves',  rar:'evolved', types:['Камінь'],            evo:51, evoLevel:30, evoN:'Тіранітар'},
+  {id:51,name:'Тіранітар',     pid:248, loc:'caves',  rar:'evolved', types:['Камінь'],            evo:52, evoLevel:80, evoN:'Мега Тіранітар', stoneEvo:'mega'},
   {id:52,name:'Мега Тіранітар',pid:248, loc:'caves',  rar:'mega',    types:['Камінь']},
   {id:53,name:'Артікуно',      pid:144, loc:'caves',  rar:'legendary',types:['Лід','Летючий'],    isKey:{loc:'map2',desc:'Відкриває перехід до Регіону Джото!'}},
-  {id:54,name:'Чімчар',        pid:390, loc:'glade',  rar:'rare',     types:['Вогонь'],            evo:55, evoXp:100, evoN:'Монферно'},
-  {id:55,name:'Монферно',      pid:391, loc:'glade',  rar:'evolved',  types:['Вогонь','Бойовий'],  evo:56, evoXp:200, evoN:'Інфернейп'},
-  {id:56,name:'Інфернейп',     pid:392, loc:'glade',  rar:'evolved',  types:['Вогонь','Бойовий'],  evo:57, evoXp:300, evoN:'Мега Інфернейп', stoneEvo:'mega'},
+  {id:54,name:'Чімчар',        pid:390, loc:'glade',  rar:'rare',     types:['Вогонь'],            evo:55, evoLevel:10, evoN:'Монферно'},
+  {id:55,name:'Монферно',      pid:391, loc:'glade',  rar:'evolved',  types:['Вогонь','Бойовий'],  evo:56, evoLevel:30, evoN:'Інфернейп'},
+  {id:56,name:'Інфернейп',     pid:392, loc:'glade',  rar:'evolved',  types:['Вогонь','Бойовий'],  evo:57, evoLevel:80, evoN:'Мега Інфернейп', stoneEvo:'mega'},
   {id:57,name:'Мега Інфернейп',pid:392, loc:'glade',  rar:'mega',     types:['Вогонь','Бойовий'],  isKey:{loc:'caves',desc:'Відкриває Печери!'}},
   {id:58,name:'Дастокс',      pid:269, loc:'butterfly',rar:'common',   types:['Комаха','Отрута']},
   {id:59,name:'Мотім',        pid:414, loc:'butterfly',rar:'common',   types:['Комаха','Летючий']},
   {id:60,name:'Маскрейн',     pid:284, loc:'butterfly',rar:'evolved',  types:['Комаха','Летючий']},
   {id:61,name:'Вольказона',   pid:637, loc:'butterfly',rar:'evolved',  types:['Комаха','Вогонь']},
-  {id:65,name:'Серскіт',      pid:283, loc:'butterfly',rar:'uncommon', types:['Комаха','Вода'],   evo:60, evoXp:200, evoN:'Маскрейн'},
-  {id:66,name:'Лярвеста',     pid:636, loc:'butterfly',rar:'rare',     types:['Комаха','Вогонь'], evo:61, evoXp:200, evoN:'Вольказона'},
-  {id:67,name:'Магікарп',     pid:129, loc:'shore',    rar:'common',   types:['Вода'],             evo:68, evoXp:200, evoN:'Ґаладос'},
-  {id:68,name:'Ґаладос',      pid:130, loc:'shore',    rar:'evolved',  types:['Вода','Летючий'],   evo:69, evoXp:300, evoN:'Мега Ґаладос', stoneEvo:'mega'},
+  {id:65,name:'Серскіт',      pid:283, loc:'butterfly',rar:'uncommon', types:['Комаха','Вода'],   evo:60, evoLevel:10, evoN:'Маскрейн'},
+  {id:66,name:'Лярвеста',     pid:636, loc:'butterfly',rar:'rare',     types:['Комаха','Вогонь'], evo:61, evoLevel:10, evoN:'Вольказона'},
+  {id:67,name:'Магікарп',     pid:129, loc:'shore',    rar:'common',   types:['Вода'],             evo:68, evoLevel:10, evoN:'Ґаладос'},
+  {id:68,name:'Ґаладос',      pid:130, loc:'shore',    rar:'evolved',  types:['Вода','Летючий'],   evo:69, evoLevel:80, evoN:'Мега Ґаладос', stoneEvo:'mega'},
   {id:69,name:'Мега Ґаладос', pid:130, loc:'shore',    rar:'mega',     types:['Вода','Темний']},
-  {id:70,name:'Псайдак',      pid:54,  loc:'shore',    rar:'common',   types:['Вода'],             evo:71, evoXp:200, evoN:'Ґолдак'},
+  {id:70,name:'Псайдак',      pid:54,  loc:'shore',    rar:'common',   types:['Вода'],             evo:71, evoLevel:10, evoN:'Ґолдак'},
   {id:71,name:'Ґолдак',       pid:55,  loc:'shore',    rar:'evolved',  types:['Вода']},
-  {id:72,name:'Горсі',        pid:116, loc:'shore',    rar:'uncommon', types:['Вода'],             evo:73, evoXp:200, evoN:'Сідра'},
+  {id:72,name:'Горсі',        pid:116, loc:'shore',    rar:'uncommon', types:['Вода'],             evo:73, evoLevel:10, evoN:'Сідра'},
   {id:73,name:'Сідра',        pid:117, loc:'shore',    rar:'evolved',  types:['Вода']},
   {id:74,name:'Лапрас',       pid:131, loc:'shore',    rar:'legendary',types:['Вода','Лід']},
 ];
@@ -375,10 +376,27 @@ const POKE=[
 const HP_RANGE={common:[60,100],uncommon:[120,200],rare:[250,400],legendary:[500,800],starter:[80,80],evolved:[0,0],mega:[0,0]};
 const TYPE_C={'Трава':'#15803d','Отрута':'#6d28d9','Вогонь':'#b45309','Вода':'#1d4ed8','Летючий':'#0369a1','Електрика':'#a16207','Нормальний':'#4b5563','Комаха':'#3f6212','Земля':'#92400e','Камінь':'#374151','Фея':'#be185d','Лід':'#0e7490','Бойовий':'#b91c1c','Темний':'#1e3a5f'};
 const STONES={mega:{name:'Мега-камінь',emoji:'💎'}};
+const ITEM_INFO={
+  xp_card_bronze:{emoji:'🥉',name:'Бронзова карта XP',desc:'+1 XP'},
+  xp_card_silver:{emoji:'🥈',name:'Срібна карта XP',desc:'+3 XP'},
+  xp_card_gold:  {emoji:'🥇',name:'Золота карта XP',desc:'+5 XP'},
+  airship_ticket:{emoji:'🎫',name:'Білет на повітроплав',desc:'Телепортація на будь-яку локацію за 1 ⚡'},
+};
+const ITEM_TIPS={
+  lure:           'Використовується автоматично при наступному пошуку у звичайній траві — гарантує зустріч з покемоном замість лута.',
+  rare_lure:      'Використовується автоматично при наступному пошуку у рідкісній траві — гарантує зустріч з рідкісним покемоном.',
+  xp_amulet:      'Активуй у екрані бою перед атакою — кнопка з\'явиться внизу. Подвоює монети з перемоги в цьому бою. Одноразовий.',
+  mega:           'Використай у картці покемона в Покедексі або у Покемон-центрі. Потрібен також достатній рівень XP (80 XP).',
+  evo_crystal:    'Використай у картці покемона в Покедексі. Еволюціює без потрібного XP — тільки для покемонів без каменя.',
+  xp_card_bronze: 'Натисни "Використати" — одразу зараховується +1 XP. Знаходиться у звичайній траві.',
+  xp_card_silver: 'Натисни "Використати" — одразу зараховується +3 XP. Знаходиться у звичайній траві.',
+  xp_card_gold:   'Натисни "Використати" — одразу зараховується +5 XP. Знаходиться лише у рідкісній траві.',
+  airship_ticket: 'Натисни "Летіти ✈" або клікни на будь-яку відкриту (але не сусідню) локацію на карті. Коштує 1 ⚡. Знаходиться у рідкісній траві.',
+};
 const SHOP_ITEMS=[
   {id:'lure',      name:'Приманка',          desc:'100% зустріч з покемоном',     emoji:'🎣', price:20},
   {id:'rare_lure', name:'Рідкісна приманка', desc:'100% зустріч з рідкісним',     emoji:'✨', price:50},
-  {id:'xp_amulet', name:'Амулет досвіду',    desc:'×1.5 XP за наступний бій',     emoji:'🔮', price:30},
+  {id:'xp_amulet', name:'Амулет досвіду',    desc:'×2 монети у наступному бою',    emoji:'🔮', price:30},
   {id:'mega',      name:'Мега-камінь',       desc:'Мега еволюція (Пінсір, Піджіт, стартери…)', emoji:'💎', price:100},
   {id:'evo_crystal',name:'Кристал пробудження',desc:'Миттєво готує покемона до еволюції',      emoji:'🟢', price:150},
 ];
@@ -455,7 +473,7 @@ function initState(){
       unlockedLocs:['oak'],
       hasStarter:false, startersGiven:0, oakPending:false,
       enemy:null, amuletActive:false,
-      totalPages:0, books:[],
+      totalPages:0, books:[], level:0,
     };
   });
 }
@@ -467,7 +485,8 @@ function _anyLoc(id){return LOCS[id]||LOCS_JOHTO[id];}
 function gp(id){return POKE.find(p=>p.id===id);}
 function img(pid){return`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pid}.png`;}
 function ri(a,b){return Math.floor(Math.random()*(b-a+1))+a;}
-function p2e(p){const b=Math.max(1,Math.floor(p/100));const bonus=(p>=200?1:0)+(p>=400?2:0)+(p>=600?3:0);return b+bonus;}
+function p2e(p){if(p<100)return 2;if(p<250)return 4;if(p<400)return 6;if(p<600)return 8;if(p<850)return 11;if(p<1200)return 14;return 18;}
+function p2l(p){if(p<100)return 1;if(p<250)return 2;if(p<400)return 3;if(p<600)return 5;if(p<850)return 7;if(p<1200)return 10;return 14;}
 
 // ═══════════ MODAL QUEUE ═══════════
 function qM(fn){mQueue.push(fn);if(!mOpen)nextM();}
@@ -500,6 +519,7 @@ function renderSelGrid(){
         <span class="spill">${d.collection.length} покемонів</span>
         <span class="spill">⚡${d.energy}</span>
         <span class="spill spill-atk">⚔️${d.atk}</span>
+        <span class="spill">📖${d.level||0} XP</span>
         ${d.enemy?'<span class="spill spill-red">⚔️ Бій!</span>':''}
       </div>
     </div>`;
@@ -551,6 +571,7 @@ function renderRes(){
   document.getElementById('hdr-energy').textContent='⚡'+d.energy;
   document.getElementById('hdr-atk').textContent='⚔️'+d.atk;
   document.getElementById('hdr-coins').textContent='🪙'+d.coins;
+  document.getElementById('hdr-level').textContent='📖'+(d.level||0);
 }
 
 // ═══════════ POKEBALLS ═══════════
@@ -562,7 +583,7 @@ function renderPballs(){
       const c=ci!==undefined?d.collection[ci]:null;
       const pk=c?gp(c.dbId):null;
       if(pk){
-        const xpPct=pk.evo?Math.min(100,Math.round(c.xp/(pk.evoXp||1)*100)):100;
+        const xpPct=pk.evo?Math.min(100,Math.round(((d.level||0)/(pk.evoLevel||10))*100)):100;
         h+=`<div class="pball-slot filled" onclick="openSlotMenu(${i})">
           <img class="pball-img" src="${img(pk.pid)}" onerror="this.style.display='none'">
           <div class="pball-xpbar"><div class="pball-xpfill" style="width:${xpPct}%"></div></div>
@@ -583,16 +604,17 @@ function openSlotMenu(si){
   if(ci===undefined){openSlotPicker(si);return;}
   const c=d.collection[ci];const pk=gp(c.dbId);
   if(!pk){openSlotPicker(si);return;}
-  const xpPct=pk.evo?Math.min(100,Math.round(c.xp/(pk.evoXp||1)*100)):100;
-  const canEvo=pk.evo&&!pk.stoneEvo&&c.xp>=(pk.evoXp||0);
-  const canEvoS=pk.stoneEvo&&pk.evo&&(d.inventory[pk.stoneEvo]||0)>0&&c.xp>=(pk.evoXp||0);
-  const needsStone=pk.stoneEvo&&pk.evo&&c.xp>=(pk.evoXp||0);
+  const lvl=d.level||0;
+  const xpPct=pk.evo?Math.min(100,Math.round((lvl/(pk.evoLevel||10))*100)):100;
+  const canEvo=pk.evo&&!pk.stoneEvo&&lvl>=(pk.evoLevel||10);
+  const canEvoS=pk.stoneEvo&&pk.evo&&(d.inventory[pk.stoneEvo]||0)>0&&lvl>=(pk.evoLevel||80);
+  const needsStone=pk.stoneEvo&&pk.evo&&lvl>=(pk.evoLevel||80);
   const stoneOwned=(d.inventory[pk.stoneEvo]||0)>0;
   const types=pk.types.map(t=>`<span class="type-b" style="background:${TYPE_C[t]||'#374151'}">${t}</span>`).join('');
   mHTML(`<img class="m-img" src="${img(pk.pid)}" onerror="this.style.display='none'">
     <div class="m-title">${pk.name}</div>
     <div style="text-align:center;margin-bottom:8px">${types}</div>
-    <div style="font-size:11px;color:#aaa;text-align:center">XP: ${c.xp}${pk.evo?' / '+pk.evoXp:' (макс)'}</div>
+    <div style="font-size:11px;color:#aaa;text-align:center">Досвід: ${lvl}${pk.evo?' / '+pk.evoLevel+' XP':' (макс)'}</div>
     <div class="xp-wrap" style="margin-bottom:12px"><div class="xp-fill" style="width:${xpPct}%"></div></div>
     ${pk.isKey?`<div style="background:rgba(74,222,128,.1);border:1px solid rgba(74,222,128,.25);border-radius:8px;padding:8px;font-size:11px;color:#4ade80;margin-bottom:10px">🔑 ${pk.isKey.desc}</div>`:''}
     ${canEvo||canEvoS?`<button class="btn-ok" style="width:100%;margin-bottom:8px;padding:13px;font-size:14px;min-height:44px" onclick="doEvoSlot(${si})">🌟 Еволюція в ${pk.evoN}!</button>`:''}
@@ -606,7 +628,7 @@ function doEvoSlot(si){
   const d=pd();const ci=d.activePokes[si];const c=d.collection[ci];const pk=gp(c.dbId);
   if(pk.stoneEvo)d.inventory[pk.stoneEvo]--;
   const nPk=POKE.find(p=>p.id===pk.evo);
-  const old=pk.name;c.dbId=nPk.id;c.xp=0;
+  const old=pk.name;c.dbId=nPk.id;
   closeModal();renderPballs();renderDex();saveToCloud(cur);
   qM(()=>mImg(img(nPk.pid),old+' → '+nPk.name,'Еволюція!',[{l:'Чудово!',ok:true,cb:closeModal}]));
 }
@@ -635,10 +657,11 @@ function _buildSlotPickerHTML(){
     const pk=gp(c.dbId);
     if(!pk)return null;
     const isMax=!pk.evo;
-    const canEvo=pk.evo&&!pk.stoneEvo&&c.xp>=(pk.evoXp||0);
+    const lvl=d.level||0;
+    const canEvo=pk.evo&&!pk.stoneEvo&&lvl>=(pk.evoLevel||10);
     const canEvoStone=!!(pk.stoneEvo&&pk.evo);
-    const pct=pk.evo&&pk.evoXp?c.xp/pk.evoXp:isMax?1:0;
-    return{c,i,pk,isMax,canEvo,canEvoStone,pct};
+    const pct=pk.evo&&pk.evoLevel?Math.min(1,lvl/pk.evoLevel):isMax?1:0;
+    return{c,i,pk,isMax,canEvo,canEvoStone,pct,lvl};
   }).filter(Boolean).sort((a,b)=>{
     if(a.isMax!==b.isMax)return a.isMax?1:-1;
     if(a.canEvo!==b.canEvo)return a.canEvo?-1:1;
@@ -646,10 +669,10 @@ function _buildSlotPickerHTML(){
   });
   const filtered=_slotTypeFilter==='all'?items:items.filter(({pk})=>pk.types?.includes(_slotTypeFilter));
   const tabs=['all',...allTypes].map(t=>`<button onclick="setSlotType('${t}')" style="border-radius:20px;padding:4px 10px;font-size:10px;cursor:pointer;font-family:inherit;border:1px solid ${_slotTypeFilter===t?'rgba(167,139,250,.5)':'rgba(255,255,255,.1)'};background:${_slotTypeFilter===t?'rgba(167,139,250,.2)':'rgba(255,255,255,.05)'};color:${_slotTypeFilter===t?'#a78bfa':'#888'}">${t==='all'?'Всі':t}</button>`).join('');
-  const rows=filtered.map(({c,i,pk,isMax,canEvo,canEvoStone,pct})=>{
+  const rows=filtered.map(({c,i,pk,isMax,canEvo,canEvoStone,pct,lvl})=>{
     const isUsed=used.has(i);
     const barPct=Math.min(100,Math.round(pct*100));
-    const xpTxt=isMax?'⭐ Максимум':canEvo?'🌟 Готовий до еволюції!':canEvoStone?'💎 Потрібен камінь':`XP: ${c.xp} / ${pk.evoXp}`;
+    const xpTxt=isMax?'⭐ Максимум':canEvo?'🌟 Готовий до еволюції!':canEvoStone?'💎 Потрібен камінь':`XP: ${lvl} / ${pk.evoLevel}`;
     const xpClr=isMax?'#888':canEvo?'#4ade80':canEvoStone?'#fbbf24':'#a78bfa';
     return`<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.06);cursor:${isUsed?'not-allowed':'pointer'};opacity:${isUsed?.4:1}" ${isUsed?'':`onclick="pickSlot(${si},${i})"`}>
       <img src="${img(pk.pid)}" style="width:38px;height:38px;image-rendering:pixelated;flex-shrink:0" onerror="this.style.display='none'">
@@ -732,12 +755,13 @@ function renderDex(){
     const i=c._i;
     const pk=gp(c.dbId);
     const isAct=d.activePokes.includes(i);
-    const canEvo=pk.evo&&!pk.stoneEvo&&c.xp>=(pk.evoXp||0);
-    const needStone=pk.stoneEvo&&pk.evo&&c.xp>=(pk.evoXp||0);
+    const lvl=d.level||0;
+    const canEvo=pk.evo&&!pk.stoneEvo&&lvl>=(pk.evoLevel||10);
+    const needStone=pk.stoneEvo&&pk.evo&&lvl>=(pk.evoLevel||80);
     const evoDots=getEvoDots(pk.id);
     const dotsHtml=evoDots.total>1?`<div class="evo-dots">${Array.from({length:evoDots.total},(_,j)=>`<div class="evo-dot ${j<evoDots.current?'filled':''}"></div>`).join('')}</div>`:'';
     const isMax=!pk.evo;
-    const subTxt=needStone?'💎 Камінь!':canEvo?'🌟 Ево!':isMax?'Макс':'XP:'+c.xp;
+    const subTxt=needStone?'💎 Камінь!':canEvo?'🌟 Ево!':isMax?'Макс':'📖'+lvl+'/'+(pk.evoLevel||'?');
     const dupeCount=d.collection.filter(x=>x.dbId===c.dbId).length;
     return`<div class="dex-card ${isAct?'act':''}" onclick="openDexCard(${i})">
       ${isMax?'<div style="position:absolute;top:2px;right:3px;font-size:9px;line-height:1;color:#fbbf24">⭐</div>':''}
@@ -950,19 +974,20 @@ function openDexCard(i){
   const d=pd();const c=d.collection[i];if(!c)return;const pk=gp(c.dbId);
   if(!pk){qM(()=>mEmoji('❓','Невідомий покемон','Цей покемон більше не існує в грі.',[{l:'Ок',ok:true,cb:closeModal}]));return;}
   const isAct=d.activePokes.includes(i);
-  const canEvoXp=pk.evo&&!pk.stoneEvo&&c.xp>=(pk.evoXp||0);
-  const canEvoS=pk.stoneEvo&&pk.evo&&(d.inventory[pk.stoneEvo]||0)>0&&c.xp>=(pk.evoXp||0);
-  const needsStone=pk.stoneEvo&&pk.evo&&c.xp>=(pk.evoXp||0);
+  const lvl=d.level||0;
+  const canEvoXp=pk.evo&&!pk.stoneEvo&&lvl>=(pk.evoLevel||10);
+  const canEvoS=pk.stoneEvo&&pk.evo&&(d.inventory[pk.stoneEvo]||0)>0&&lvl>=(pk.evoLevel||80);
+  const needsStone=pk.stoneEvo&&pk.evo&&lvl>=(pk.evoLevel||80);
   const stoneOwned=(d.inventory[pk.stoneEvo]||0)>0;
   const isDupe=d.collection.filter(x=>x.dbId===c.dbId).length>1;
   const hasCrystal=(d.inventory['evo_crystal']||0)>0;
-  const canUseCrystal=hasCrystal&&pk.evo&&c.xp<(pk.evoXp||0);
-  const xpPct=pk.evo?Math.min(100,Math.round(c.xp/(pk.evoXp||1)*100)):100;
+  const canUseCrystal=hasCrystal&&pk.evo&&!pk.stoneEvo&&!canEvoXp;
+  const xpPct=pk.evo?Math.min(100,Math.round((lvl/(pk.evoLevel||10))*100)):100;
   const types=pk.types.map(t=>`<span class="type-b" style="background:${TYPE_C[t]||'#374151'}">${t}</span>`).join('');
   mHTML(`<img class="m-img" src="${img(pk.pid)}" onerror="this.style.display='none'">
     <div class="m-title">${pk.name}${isAct?' ★':''}</div>
     <div style="text-align:center;margin-bottom:8px">${types}</div>
-    <div style="font-size:11px;color:#aaa;text-align:center">XP: ${c.xp}${pk.evo?' / '+pk.evoXp:' (макс)'}</div>
+    <div style="font-size:11px;color:#aaa;text-align:center">Досвід: ${lvl}${pk.evo?' / '+pk.evoLevel+' XP':' (макс)'}</div>
     <div class="xp-wrap" style="margin:6px 0 6px"><div class="xp-fill" style="width:${xpPct}%"></div></div>
     ${needsStone?`<div style="background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.25);border-radius:8px;padding:7px;font-size:11px;color:#fbbf24;text-align:center;margin-bottom:8px">
       ${STONES[pk.stoneEvo]?.emoji||'💎'} Потрібен ${STONES[pk.stoneEvo]?.name||'камінь'} для еволюції<br>
@@ -970,7 +995,7 @@ function openDexCard(i){
     </div>`:''}
     ${pk.isKey?`<div style="background:rgba(74,222,128,.1);border:1px solid rgba(74,222,128,.25);border-radius:8px;padding:8px;font-size:11px;color:#4ade80;margin-bottom:10px">🔑 ${pk.isKey.desc}</div>`:''}
     ${canEvoXp||canEvoS?`<button class="btn-ok" style="width:100%;margin-bottom:8px;padding:13px;font-size:14px;min-height:44px" onclick="doEvoDex(${i})">🌟 Еволюція в ${pk.evoN}!</button>`:''}
-    ${canUseCrystal?`<button style="width:100%;margin-bottom:8px;padding:13px;font-size:14px;min-height:44px;background:linear-gradient(135deg,rgba(52,211,153,.15),rgba(16,185,129,.1));border:1px solid rgba(52,211,153,.5);border-radius:10px;color:#34d399;font-weight:700;cursor:pointer" onclick="useEvoCrystal(${i})">🟢 Кристал пробудження → готовий до еволюції</button>`:''}
+    ${canUseCrystal?`<button style="width:100%;margin-bottom:8px;padding:13px;font-size:14px;min-height:44px;background:linear-gradient(135deg,rgba(52,211,153,.15),rgba(16,185,129,.1));border:1px solid rgba(52,211,153,.5);border-radius:10px;color:#34d399;font-weight:700;cursor:pointer" onclick="useEvoCrystal(${i})">🟢 Кристал пробудження → еволюція без рівня</button>`:''}
     ${isDupe?`<button class="btn-cancel" style="width:100%;margin-bottom:8px;padding:13px;font-size:14px;min-height:44px" onclick="sellDupe(${i})">Продати дублікат — 🪙${dupeP(pk)}</button>`:''}
     <div style="font-size:10px;color:#888;text-align:center;margin-bottom:8px">📍 Де ловиться: <b style="color:#aaa">${getPokeLocName(c.dbId)}</b></div>
     <button class="btn-cancel" style="width:100%;padding:13px;font-size:14px;min-height:44px" onclick="closeModal()">Закрити</button>`);
@@ -980,18 +1005,19 @@ function doEvoDex(i){
   const d=pd();const c=d.collection[i];const pk=gp(c.dbId);
   if(pk.stoneEvo)d.inventory[pk.stoneEvo]--;
   const nPk=POKE.find(p=>p.id===pk.evo);
-  const old=pk.name;c.dbId=nPk.id;c.xp=0;
+  const old=pk.name;c.dbId=nPk.id;
   closeModal();renderPballs();renderDex();saveToCloud(cur);
   qM(()=>mImg(img(nPk.pid),old+' → '+nPk.name,'Еволюція!',[{l:'Чудово!',ok:true,cb:closeModal}]));
 }
 
 function useEvoCrystal(i){
   const d=pd();const c=d.collection[i];const pk=gp(c.dbId);
-  if(!pk||!pk.evo||(d.inventory['evo_crystal']||0)<=0)return;
-  c.xp=pk.evoXp||0;
+  if(!pk||!pk.evo||pk.stoneEvo||(d.inventory['evo_crystal']||0)<=0)return;
+  const nPk=POKE.find(p=>p.id===pk.evo);if(!nPk)return;
+  const old=pk.name;c.dbId=nPk.id;
   d.inventory['evo_crystal']--;
-  closeModal();renderDex();saveToCloud(cur);
-  qM(()=>mEmoji('🟢','Кристал використано!',`${pk.name} готовий до еволюції!\nXP: ${c.xp} / ${pk.evoXp}`,[{l:'Чудово!',ok:true,cb:()=>{closeModal();openDexCard(i);}}]));
+  closeModal();renderPballs();renderDex();saveToCloud(cur);
+  qM(()=>mImg(img(nPk.pid),old+' → '+nPk.name,'Кристал пробудження!\nЕволюція здійснена!',[{l:'Чудово!',ok:true,cb:closeModal}]));
 }
 
 function dupeP(pk){return{starter:15,common:5,uncommon:10,rare:20,evolved:12,mega:30,legendary:50}[pk.rar]||5;}
@@ -1116,9 +1142,21 @@ function renderMap(){
 function onLocClick(locId){
   const d=pd();
   if(d.enemy){qM(()=>mEmoji('⚔️','Бій!','Спочатку переможи ворога!',[{l:'Ок',ok:true,cb:closeModal}]));return;}
+  const curLoc=cLoc();
+  const isAdjacent=(curLoc.connects||[]).includes(locId);
+  const loc=_anyLoc(locId);if(!loc)return;
+  if(!isAdjacent){
+    const hasTicket=(d.inventory['airship_ticket']||0)>0;
+    if(hasTicket){
+      qM(()=>mEmoji('🎫','Білет на повітроплав',`${loc.emoji} ${loc.name} не сусідня локація.\n\nВикористати квиток (залишилось: ${d.inventory['airship_ticket']}) і перелетіти за 1 ⚡?`,
+        [{l:'Летімо! 🎫',ok:true,cb:()=>{closeModal();doAirshipMove(locId);}},{l:'Ні',cb:closeModal}]));
+    } else {
+      qM(()=>mEmoji('🗺️','Не сусідня локація',`Щоб дістатись до ${loc.name}, треба рухатись крок за кроком по карті.\n\nАбо знайди 🎫 Білет на повітроплав у рідкісній траві!`,[{l:'Зрозуміло',ok:true,cb:closeModal}]));
+    }
+    return;
+  }
   const cost=ECOST.move;
   if(d.energy<cost){qM(()=>mEmoji('⚡','Мало енергії',`Потрібно ${cost} ⚡ на перехід.\n\nДодай сторінки через ☰`,[{l:'Додати',ok:true,cb:()=>{closeModal();openSidePanel();}},{l:'Ок',cb:closeModal}]));return;}
-  const loc=LOCS[locId];
   qM(()=>mEmoji(loc.emoji,'Перейти до '+loc.name,`Витратити ${cost} ⚡ і перейти до ${loc.name}?`,
     [{l:'Так!',ok:true,cb:()=>{closeModal();doMove(locId);}},{l:'Ні',cb:closeModal}]));
 }
@@ -1197,6 +1235,69 @@ function aRow(icon,title,desc,badge,bbg,btxt,onclick,cost){
 
 function noEnergy(){qM(()=>mEmoji('⚡','Мало енергії','Прочитай книгу та додай сторінки через ☰',[{l:'Додати сторінки',ok:true,cb:()=>{closeModal();openSidePanel();}},{l:'Ок',cb:closeModal}]));}
 
+function openItemInfo(id){
+  const d=pd();
+  const qty=(d.inventory[id]||0);
+  const si=SHOP_ITEMS.find(x=>x.id===id)||STONES[id]||ITEM_INFO[id];
+  let emoji='📦',name=id,desc='';
+  if(si){emoji=si.emoji;name=si.name;desc=si.desc||'';}
+  if(id.startsWith('frag_')){
+    const st=id.replace('frag_','');const s=STONES[st];
+    emoji=qty>=3?(s?s.emoji:'💎'):'🪨';
+    name='Фрагмент '+(s?s.name:st);
+    desc='Збирається з рідкісної трави. Зберіть 3 фрагменти — автоматично складуться в '+(s?s.name:'камінь')+'.';
+  }
+  const tip=ITEM_TIPS[id]||'';
+  const actionBtn=id.startsWith('xp_card_')
+    ?`<button class="btn-ok" style="width:100%;padding:13px;font-size:14px;min-height:44px;margin-bottom:8px" onclick="closeModal();useXpCard('${id}')">Використати (є: ${qty})</button>`
+    :id==='airship_ticket'
+    ?`<button class="btn-ok" style="width:100%;padding:13px;font-size:14px;min-height:44px;margin-bottom:8px" onclick="closeModal();openAirshipMenu()">Летіти ✈ (є: ${qty})</button>`:'';
+  mHTML(`<div style="text-align:center;font-size:44px;margin-bottom:6px">${emoji}</div>
+    <div class="m-title">${name}</div>
+    ${desc?`<div class="m-desc">${desc}</div>`:''}
+    ${tip?`<div style="background:rgba(255,255,255,.06);border-radius:10px;padding:11px 12px;margin:10px 0 14px;font-size:12px;color:#ccc;text-align:left;line-height:1.5">💡 <b style="color:#fff">Як використати:</b><br>${tip}</div>`:''}
+    ${actionBtn}
+    <button class="btn-cancel" style="width:100%;padding:13px;font-size:14px;min-height:44px" onclick="closeModal()">Закрити</button>`);
+}
+
+function useXpCard(id){
+  const d=pd();
+  if((d.inventory[id]||0)<=0)return;
+  const xpMap={xp_card_bronze:1,xp_card_silver:3,xp_card_gold:5};
+  const gain=xpMap[id]||1;
+  d.inventory[id]--;d.level=(d.level||0)+gain;
+  renderRes();_rebuildSideContent();saveToCloud(cur);
+  const info=ITEM_INFO[id];
+  showToast(info.emoji+' +'+gain+' XP!');
+  const evoMsgs=checkLevelEvolutions(d);
+  evoMsgs.forEach(m=>qM(()=>mImg(img(m.pid),m.title,m.desc,[{l:'Чудово!',ok:true,cb:closeModal}])));
+}
+
+function openAirshipMenu(){
+  const d=pd();
+  if((d.inventory['airship_ticket']||0)<=0)return;
+  if(d.enemy){qM(()=>mEmoji('⚔️','Бій!','Спочатку переможи ворога!',[{l:'Ок',ok:true,cb:closeModal}]));return;}
+  const allLocs=(d.region||'kanto')==='johto'?LOCS_JOHTO:LOCS;
+  const dests=d.unlockedLocs.filter(id=>id!==d.location&&allLocs[id]);
+  if(!dests.length){qM(()=>mEmoji('🎫','Немає куди летіти','Відкрий нові локації!',[{l:'Ок',ok:true,cb:closeModal}]));return;}
+  const rows=dests.map(id=>{const l=allLocs[id];return`<button onclick="closeModal();doAirshipMove('${id}')" style="width:100%;margin-bottom:6px;padding:12px;font-size:13px;font-weight:600;background:rgba(251,191,36,.12);border:1px solid rgba(251,191,36,.3);border-radius:10px;color:#fbbf24;cursor:pointer;text-align:left">${l.emoji} ${l.name}<span style="font-size:10px;opacity:.6;float:right">${l.badge}</span></button>`;}).join('');
+  mHTML(`<div class="m-title">🎫 Куди летимо?</div><div class="m-desc" style="margin-bottom:12px">Залишилось квитків: ${d.inventory['airship_ticket']} · Коштує 1 ⚡</div>${rows}<button class="btn-cancel" style="width:100%;padding:13px;font-size:14px;min-height:44px;margin-top:4px" onclick="closeModal()">Скасувати</button>`);
+}
+
+function doAirshipMove(locId){
+  const d=pd();
+  if(d.energy<ECOST.move){noEnergy();return;}
+  if((d.inventory['airship_ticket']||0)<=0)return;
+  d.inventory['airship_ticket']--;
+  d.energy-=ECOST.move;d.location=locId;
+  const loc=_anyLoc(locId);
+  document.getElementById('hdr-loc').textContent='📍 '+loc.name;
+  renderRes();renderMap();renderActions();
+  const opened=checkUnlocks();renderMap();
+  opened.forEach(u=>qM(()=>mEmoji('🎉','Відкрито!',`${u.emoji} ${u.name} тепер доступна!`,[{l:'Чудово!',ok:true,cb:closeModal}])));
+  showToast('🎫 → '+loc.name);
+}
+
 // ═══════════ OAK ═══════════
 // Пороги зростають: 10, 20, 35, 55, 80, 110, 145, 185, 230
 // (кількість покемонів у колекції включно з дублікатами)
@@ -1220,7 +1321,7 @@ function openOak(){
 
 function receiveStarter(dbId){
   const d=pd();const pk=gp(dbId);
-  d.collection.push({dbId,xp:0});
+  d.collection.push({dbId});
   d.activePokes=[0];
   d.hasStarter=true;d.startersGiven=1;
   if(!d.unlockedLocs.includes('pallet'))d.unlockedLocs.push('pallet');
@@ -1253,7 +1354,7 @@ function openOakBonus(){
 
 function giveBonus(dbId){
   const d=pd();const pk=gp(dbId);
-  d.collection.push({dbId,xp:0});d.startersGiven++;d.oakPending=false;
+  d.collection.push({dbId});d.startersGiven++;d.oakPending=false;
   closeModal();renderMain();saveToCloud(cur);
   qM(()=>mImg(img(pk.pid),'Від Оука!',pk.name+' тепер у твоїй колекції!',[{l:'Чудово!',ok:true,cb:closeModal}]));
 }
@@ -1313,25 +1414,37 @@ function doGrassLoot(loc,rare){
       } else {
         qM(()=>mEmoji('🪨','Фрагмент каменю!','Знайшов фрагмент '+stone.name+' ('+fragCount+'/3). Збери 3 щоб отримати камінь!',[{l:'Ок',ok:true,cb:closeModal}]));
       }
-    } else if(r<0.55){
+    } else if(r<0.51){
       d.inventory['rare_lure']=(d.inventory['rare_lure']||0)+1;
       qM(()=>mEmoji('✨','Знахідка!','Знайшов Рідкісну приманку!',[{l:'Чудово!',ok:true,cb:closeModal}]));
-    } else if(r<0.78){
+    } else if(r<0.62){
       const coins=ri(10,30);d.coins+=coins;renderRes();
       qM(()=>mEmoji('🪙','+'+coins+' монет!','Знайшов монети в рідкісній траві!',[{l:'Ок',ok:true,cb:closeModal}]));
-    } else if(r<0.92){
+    } else if(r<0.71){
+      d.inventory['xp_card_gold']=(d.inventory['xp_card_gold']||0)+1;
+      qM(()=>mEmoji('🥇','Золота карта XP!','Знайшов Золоту карту досвіду! +5 XP при використанні.',[{l:'Чудово!',ok:true,cb:closeModal}]));
+    } else if(r<0.81){
       d.inventory['xp_amulet']=(d.inventory['xp_amulet']||0)+1;
-      qM(()=>mEmoji('🔮','Амулет досвіду!','Знайшов Амулет досвіду! ×1.5 XP за наступний бій.',[{l:'Чудово!',ok:true,cb:closeModal}]));
+      qM(()=>mEmoji('🔮','Амулет досвіду!','Знайшов Амулет досвіду! ×2 монети за наступний бій.',[{l:'Чудово!',ok:true,cb:closeModal}]));
+    } else if(r<0.90){
+      d.inventory['airship_ticket']=(d.inventory['airship_ticket']||0)+1;
+      qM(()=>mEmoji('🎫','Білет на повітроплав!','Знайшов Білет на повітроплав! Телепортує на будь-яку відкриту локацію за 1 ⚡.',[{l:'Чудово!',ok:true,cb:closeModal}]));
     } else {
       d.inventory['evo_crystal']=(d.inventory['evo_crystal']||0)+1;
       qM(()=>mEmoji('🟢','Рідкісна знахідка!','Знайшов Кристал пробудження! Миттєво готує покемона до еволюції.',[{l:'Чудово!',ok:true,cb:closeModal}]));
     }
   } else {
-    // Regular grass: coins, lure, rare_lure
-    if(r<0.45){
+    // Regular grass: coins, xp cards, lure, rare_lure
+    if(r<0.30){
       const coins=ri(3,12);d.coins+=coins;renderRes();
       qM(()=>mEmoji('🪙','+'+coins+' монет!','Знайшов монети в траві!',[{l:'Ок',ok:true,cb:closeModal}]));
-    } else if(r<0.80){
+    } else if(r<0.52){
+      d.inventory['xp_card_bronze']=(d.inventory['xp_card_bronze']||0)+1;
+      qM(()=>mEmoji('🥉','Бронзова карта XP!','Знайшов Бронзову карту досвіду! +1 XP при використанні.',[{l:'Чудово!',ok:true,cb:closeModal}]));
+    } else if(r<0.66){
+      d.inventory['xp_card_silver']=(d.inventory['xp_card_silver']||0)+1;
+      qM(()=>mEmoji('🥈','Срібна карта XP!','Знайшов Срібну карту досвіду! +3 XP при використанні.',[{l:'Чудово!',ok:true,cb:closeModal}]));
+    } else if(r<0.83){
       d.inventory['lure']=(d.inventory['lure']||0)+1;
       qM(()=>mEmoji('🎣','Знахідка!','Знайшов Приманку!',[{l:'Чудово!',ok:true,cb:closeModal}]));
     } else {
@@ -1376,7 +1489,7 @@ function openCombat(){
   </div>
   <div class="hp-wrap"><div class="hp-fill" style="width:${pct}%"></div></div>
   ${extraPokes?`<div style="display:flex;gap:4px;justify-content:center;margin-bottom:8px;align-items:center"><span style="font-size:10px;color:#888">Також активні:</span>${extraPokes}</div>`:''}
-  ${d.amuletActive?'<div style="text-align:center;font-size:11px;color:#4ade80;margin-bottom:8px">🔮 Амулет активний — ×1.5 XP!</div>':''}
+  ${d.amuletActive?'<div style="text-align:center;font-size:11px;color:#4ade80;margin-bottom:8px">🔮 Амулет активний — ×2 монети!</div>':''}
   <div style="background:rgba(255,255,255,.05);border-radius:10px;padding:10px;margin-bottom:10px;font-size:12px;color:#aaa">
     Доступно ⚔️: <b style="color:#fb923c">${d.atk}</b> очки атаки<br>
     Завдамо шкоди: <b style="color:#ef4444">${dmg}</b><br>
@@ -1407,12 +1520,12 @@ function doAttack(){
     // VICTORY
     const pk=gp(e.dbId);
     const isDupe=d.collection.some(c=>c.dbId===e.dbId);
-    d.collection.push({dbId:e.dbId,xp:0});
+    d.collection.push({dbId:e.dbId});
     if(d.activePokes.length===0) d.activePokes=[d.collection.length-1];
-    const coins=Math.max(1,Math.floor(dmg/10));d.coins+=coins;
-    // XP to actives
-    const evoMsgs=giveXp(dmg);
-    d.amuletActive=false;d.enemy=null;
+    const coinDiv=(pk.rar==='rare'||pk.rar==='legendary')?15:10;
+    const coins=Math.max(1,Math.floor(dmg/coinDiv));
+    const evoMsgs=giveXp(coins);
+    d.enemy=null;
     closeModal();renderRes();renderPballs();renderDex();renderActions();saveToCloud(cur);
     // check unlocks
     const opened=checkUnlocks();renderMap();
@@ -1432,27 +1545,12 @@ function doAttack(){
   }
 }
 
-function giveXp(amount){
-  const d=pd();const msgs=[];
-  const mult=d.amuletActive?1.5:1;
-  const xpAmt=Math.round(amount*mult);
-  d.activePokes.forEach(ci=>{
-    const c=d.collection[ci];if(!c)return;
-    const pk=gp(c.dbId);
-    if(!pk.evo){
-      // max evo → coins bonus
-      d.coins+=Math.floor(xpAmt*0.1);
-      return;
-    }
-    c.xp+=xpAmt;
-    if(!pk.stoneEvo&&c.xp>=pk.evoXp){
-      const nPk=POKE.find(p=>p.id===pk.evo);
-      const old=pk.name;
-      c.dbId=nPk.id;c.xp=0;
-      msgs.push({pid:nPk.pid,title:old+' → '+nPk.name,desc:'Еволюція!'});
-    }
-  });
-  return msgs;
+function giveXp(coinBase){
+  const d=pd();
+  const mult=d.amuletActive?2:1;
+  d.coins+=Math.floor(coinBase*mult);
+  d.amuletActive=false;
+  return [];
 }
 
 function checkOakBonus(){
@@ -1481,16 +1579,16 @@ function openPC(){
   const rows=d.collection.map((c,i)=>{
     const pk=gp(c.dbId);
     if(!pk)return'';
+    const lvl=d.level||0;
     const isAct=d.activePokes.includes(i);
-    const canEvoXp=pk.evo&&!pk.stoneEvo&&c.xp>=(pk.evoXp||0);
-    const canEvoS=pk.stoneEvo&&pk.evo&&(d.inventory[pk.stoneEvo]||0)>0&&c.xp>=(pk.evoXp||0);
-    const needsStone=pk.stoneEvo&&pk.evo&&c.xp>=(pk.evoXp||0);
+    const canEvoXp=pk.evo&&!pk.stoneEvo&&lvl>=(pk.evoLevel||10);
+    const canEvoS=pk.stoneEvo&&pk.evo&&(d.inventory[pk.stoneEvo]||0)>0&&lvl>=(pk.evoLevel||80);
     const isDupe=d.collection.filter(x=>x.dbId===c.dbId).length>1;
     return`<div style="display:flex;align-items:center;gap:7px;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.06)">
       <img src="${img(pk.pid)}" style="width:30px;height:30px;image-rendering:pixelated" onerror="this.style.display='none'">
       <div style="flex:1;min-width:0">
         <div style="font-size:11px;font-weight:600;color:#fff">${pk.name}${isAct?' ★':''}</div>
-        <div style="font-size:9px;color:#888">XP: ${c.xp}${pk.evo?' / '+pk.evoXp:' (макс)'}</div>
+        <div style="font-size:9px;color:#888">${pk.evo?'XP: '+lvl+' / '+pk.evoLevel:'(макс)'}</div>
       </div>
       ${canEvoXp||canEvoS?`<button class="sh-btn" onclick="pcEvo(${i})">${canEvoS?(STONES[pk.stoneEvo]?.emoji||'💎'):'🌟'}</button>`:''}
       ${isDupe?`<button class="sh-btn" onclick="pcSell(${i})">🪙${dupeP(pk)}</button>`:''}
@@ -1498,21 +1596,6 @@ function openPC(){
   }).join('');
   mHTML(`<div class="m-title" style="margin-bottom:10px">🏥 Покемон-центр</div>
     <div style="max-height:240px;overflow-y:auto;margin-bottom:10px">${rows||'<div style="font-size:12px;color:#555;text-align:center;padding:1rem">Немає покемонів</div>'}</div>
-    <div class="divider"></div>
-    <div style="font-size:10px;color:#7eceff;font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin:10px 0 6px">Передати XP між покемонами</div>
-    <div style="display:flex;gap:6px;margin-bottom:6px">
-      <select id="pc-from" style="flex:1;background:#0d1b2a;color:#fff;border:1px solid rgba(255,255,255,.2);border-radius:8px;padding:6px;font-size:11px">
-        ${d.collection.map((c,i)=>{const pk=gp(c.dbId);if(!pk)return'';return`<option value="${i}">${pk.name} (${c.xp} XP)</option>`;}).join('')}
-      </select>
-      <div style="color:#7eceff;font-size:12px;align-self:center">→</div>
-      <select id="pc-to" style="flex:1;background:#0d1b2a;color:#fff;border:1px solid rgba(255,255,255,.2);border-radius:8px;padding:6px;font-size:11px">
-        ${d.collection.map((c,i)=>{const pk=gp(c.dbId);if(!pk)return'';return`<option value="${i}">${pk.name} (${c.xp} XP)</option>`;}).join('')}
-      </select>
-    </div>
-    <div style="display:flex;gap:6px;margin-bottom:10px">
-      <input type="number" id="pc-amt" placeholder="скільки XP" min="1" class="finput" style="flex:1;margin:0">
-      <button class="btn-ok" onclick="pcXpTransfer()" style="padding:0 14px;font-size:11px">OK</button>
-    </div>
     <button class="btn-cancel" style="width:100%;padding:13px;font-size:14px;min-height:44px" onclick="closeModal()">Закрити</button>`,true);
 }
 
@@ -1520,7 +1603,7 @@ function pcEvo(i){
   const d=pd();const c=d.collection[i];const pk=gp(c.dbId);
   if(pk.stoneEvo)d.inventory[pk.stoneEvo]--;
   const nPk=POKE.find(p=>p.id===pk.evo);
-  const old=pk.name;c.dbId=nPk.id;c.xp=0;
+  const old=pk.name;c.dbId=nPk.id;
   closeModal();renderMain();saveToCloud(cur);
   qM(()=>mImg(img(nPk.pid),old+' → '+nPk.name,'Еволюція!',[{l:'Чудово!',ok:true,cb:closeModal}]));
 }
@@ -1533,24 +1616,7 @@ function pcSell(i){
   qM(()=>mEmoji('🪙',`+${price} монет!`,pk.name+' продано.',[{l:'Ок',ok:true,cb:closeModal}]));
 }
 
-function pcXpTransfer(){
-  const d=pd();
-  const fi=parseInt(document.getElementById('pc-from').value);
-  const ti=parseInt(document.getElementById('pc-to').value);
-  const amt=parseInt(document.getElementById('pc-amt').value);
-  if(fi===ti){showToast('Оберіть різних покемонів');return;}
-  if(!amt||amt<1){showToast('Введи кількість');return;}
-  const from=d.collection[fi];const to=d.collection[ti];
-  if(from.xp<amt){showToast(`Не вистачає XP (є: ${from.xp})`);return;}
-  from.xp-=amt;to.xp+=amt;
-  const pkFrom=gp(from.dbId);const pkTo=gp(to.dbId);
-  closeModal();renderMain();
-  showToast(`${amt} XP: ${pkFrom.name} → ${pkTo.name}`);
-  const pkToD=gp(to.dbId);
-  if(!pkToD.stoneEvo&&pkToD.evo&&to.xp>=(pkToD.evoXp||0)){
-    setTimeout(()=>qM(()=>mImg(img(POKE.find(p=>p.id===pkToD.evo).pid),pkToD.name+' готовий до еволюції!','Відкрий в Покедексі!',[{l:'Ок',ok:true,cb:closeModal}])),400);
-  }
-}
+function pcXpTransfer(){}
 
 // ═══════════ SHOP ═══════════
 function openShop(){
@@ -1600,9 +1666,9 @@ function openExchanger(){
   const d=pd();
   mHTML(`<div class="m-emoji">💱</div>
     <div class="m-title">Міняла</div>
-    <div class="m-desc">Курс: 10 ⚔️ ATK → 2 🪙<br>або 5 🪙 → 10 ⚔️ ATK</div>
+    <div class="m-desc">Курс: 10 ⚔️ ATK → 5 🪙<br>або 5 🪙 → 10 ⚔️ ATK</div>
     <div style="display:flex;gap:8px;margin:16px 0">
-      <button class="btn-ok" style="flex:1;padding:12px 8px" onclick="exchangeAtk2Coins()">Продати ATK<br><span style="font-size:10px;opacity:.7">10 ⚔️ → 2 🪙</span></button>
+      <button class="btn-ok" style="flex:1;padding:12px 8px" onclick="exchangeAtk2Coins()">Продати ATK<br><span style="font-size:10px;opacity:.7">10 ⚔️ → 5 🪙</span></button>
       <button class="btn-ok" style="flex:1;padding:12px 8px" onclick="exchangeCoins2Atk()">Купити ATK<br><span style="font-size:10px;opacity:.7">5 🪙 → 10 ⚔️</span></button>
     </div>
     <div style="font-size:11px;color:#778;margin-bottom:12px;text-align:center">Маєш: ⚔️${d.atk} ATK · 🪙${d.coins}</div>
@@ -1611,7 +1677,7 @@ function openExchanger(){
 function exchangeAtk2Coins(){
   const d=pd();
   if(d.atk<10){showToast('Потрібно мінімум 10 ⚔️ ATK');return;}
-  d.atk-=10;d.coins+=2;renderRes();closeModal();saveToCloud(cur);showToast('10 ⚔️ → 2 🪙');
+  d.atk-=10;d.coins+=5;renderRes();closeModal();saveToCloud(cur);showToast('10 ⚔️ → 5 🪙');
 }
 function exchangeCoins2Atk(){
   const d=pd();
@@ -1646,7 +1712,7 @@ function _rebuildSideContent(){
 function _buildPagesHTML(){
   const d=pd();
   const invR=Object.entries(d.inventory).filter(([k,v])=>v>0).map(([k,v])=>{
-    const si=SHOP_ITEMS.find(x=>x.id===k)||STONES[k];
+    const si=SHOP_ITEMS.find(x=>x.id===k)||STONES[k]||ITEM_INFO[k];
     let emoji='📦',name=k;
     if(si){emoji=si.emoji;name=si.name;}
     else if(k.startsWith('frag_')){
@@ -1654,8 +1720,10 @@ function _buildPagesHTML(){
       emoji='🪨';name='Фрагмент '+(s?s.name:st)+' ('+v+'/3)';
       if(v>=3)emoji=s?s.emoji:'💎';
     }
-    return`<div style="display:flex;align-items:center;gap:6px;padding:5px 0;font-size:12px;border-bottom:1px solid rgba(255,255,255,.05)">
-      <span style="font-size:16px">${emoji}</span><span style="flex:1;color:#ccc">${name}</span><span style="font-weight:600;color:#fff">×${v}</span></div>`;
+    const useBtn=k.startsWith('xp_card_')?`<button onclick="event.stopPropagation();useXpCard('${k}')" style="padding:3px 8px;font-size:10px;font-weight:700;background:rgba(74,222,128,.2);border:1px solid rgba(74,222,128,.4);border-radius:6px;color:#4ade80;cursor:pointer;white-space:nowrap">Використати</button>`
+      :k==='airship_ticket'?`<button onclick="event.stopPropagation();openAirshipMenu()" style="padding:3px 8px;font-size:10px;font-weight:700;background:rgba(251,191,36,.2);border:1px solid rgba(251,191,36,.4);border-radius:6px;color:#fbbf24;cursor:pointer;white-space:nowrap">Летіти ✈</button>`:'';
+    return`<div onclick="openItemInfo('${k}')" style="display:flex;align-items:center;gap:6px;padding:5px 0;font-size:12px;border-bottom:1px solid rgba(255,255,255,.05);cursor:pointer">
+      <span style="font-size:16px">${emoji}</span><span style="flex:1;color:#ccc">${name}</span><span style="font-weight:600;color:#fff;margin-right:4px">×${v}</span>${useBtn}</div>`;
   }).join('');
   return`<div style="margin-bottom:1rem">
       <div style="font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:#7eceff;margin-bottom:10px;font-weight:600">Додати книгу</div>
@@ -1810,10 +1878,24 @@ function updSP(){
   const v=parseInt(document.getElementById('sp-pages').value);
   const el=document.getElementById('sp-prev');
   if(v&&v>0){
-    const e=p2e(v);
+    const e=p2e(v);const xpGain=p2l(v);const a=Math.floor(v/3);
+    const d=pd();const xp=d.level||0;
     el.style.display='block';
-    el.innerHTML=`<div class="ppill">+${e} ⚡ енергії · +${v} ⚔️ очки атаки</div>`;
+    el.innerHTML=`<div class="ppill">+${e} ⚡ · +${a} ⚔️ · 📖${xp}→${xp+xpGain} XP</div>`;
   } else el.style.display='none';
+}
+
+function checkLevelEvolutions(d){
+  const msgs=[];
+  d.collection.forEach(c=>{
+    const pk=gp(c.dbId);if(!pk||!pk.evo||pk.stoneEvo)return;
+    if((d.level||0)>=pk.evoLevel){
+      const nPk=POKE.find(p=>p.id===pk.evo);if(!nPk)return;
+      const old=pk.name;c.dbId=nPk.id;
+      msgs.push({pid:nPk.pid,title:old+' → '+nPk.name,desc:'Еволюція!'});
+    }
+  });
+  return msgs;
 }
 
 function submitPages(){
@@ -1825,17 +1907,22 @@ function submitPages(){
   if(!author){showToast('Введи автора');return;}
   if(!pages||pages<1){showToast('Введи кількість сторінок');return;}
   const d=pd();
+  if(d.level===undefined)d.level=0;
   const energy=p2e(pages);
-  d.energy+=energy;d.atk+=pages;d.totalPages+=pages;
+  const lvlGain=p2l(pages);
+  const atk=Math.floor(pages/3);
+  d.energy+=energy;d.atk+=atk;d.level+=lvlGain;d.totalPages+=pages;
   if(!d.books)d.books=[];
   const book={title,author,pages,date:new Date().toLocaleDateString('uk-UA'),coverUrl:coverUrl||null};
   d.books.push(book);
+  const evoMsgs=checkLevelEvolutions(d);
   renderRes();closeSidePanel();saveToCloud(cur);
   const preview=_renderBookPreviewHTML(book);
+  const evoHtml=evoMsgs.length?evoMsgs.map(e=>`<div class="evo-notif">🎉 ${e.title}: ${e.desc}</div>`).join(''):'';
   if(d.enemy){
-    qM(()=>mHTML(`${preview}<div class="m-title">Очки атаки додано!</div><div class="m-desc">+${energy} ⚡ енергії · +${pages} ⚔️ очки атаки<br><br>Тепер маєш ⚔️${d.atk} — атакуй!</div><div class="m-btns"><button class="btn-ok" onclick="closeModal();renderActions();openCombat()">Атакувати!</button><button class="btn-cancel" onclick="closeModal()">Пізніше</button></div>`));
+    qM(()=>mHTML(`${preview}<div class="m-title">Очки атаки додано!</div><div class="m-desc">+${energy} ⚡ · +${atk} ⚔️ · 📖+${lvlGain} XP<br><br>Тепер маєш ⚔️${d.atk} — атакуй!</div>${evoHtml}<div class="m-btns"><button class="btn-ok" onclick="closeModal();renderActions();openCombat()">Атакувати!</button><button class="btn-cancel" onclick="closeModal()">Пізніше</button></div>`));
   } else {
-    qM(()=>mHTML(`${preview}<div class="m-title">Сторінки зараховано!</div><div class="m-desc" style="text-align:center">+${energy} ⚡ енергії · +${pages} ⚔️ очки атаки</div><div class="m-btns"><button class="btn-ok" onclick="closeModal()">Вперед!</button></div>`));
+    qM(()=>mHTML(`${preview}<div class="m-title">Сторінки зараховано!</div><div class="m-desc" style="text-align:center">+${energy} ⚡ · +${atk} ⚔️ · 📖XP: ${d.level} (+${lvlGain})</div>${evoHtml}<div class="m-btns"><button class="btn-ok" onclick="closeModal()">Вперед!</button></div>`));
   }
 }
 
