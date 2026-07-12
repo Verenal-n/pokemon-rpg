@@ -1969,20 +1969,16 @@ async function loadFromCloud(pid){
 }
 
 
-// ═══════════ LOC ICONS (img sprite — col strip from loc1.png) ═══════════
-// loc1.png: 2830×1472, 7 equal columns; icons are circles centered at ~32% from top
-// Tune LOC_ICON_CY (0–100) if icons appear too high/low
-const LOC_ICON_CY=32;
+// ═══════════ LOC ICONS — individual files (1.png … 7.png) ═══════════
 function locIconEl(locId,size=64){
-  const IDX={oak:0,pallet:1,forest:2,glade:3,butterfly:3,caves:4,shore:5,map2:6};
-  const i=IDX[locId];
+  const FILES={oak:'1.png',pallet:'2.png',forest:'3.png',
+               glade:'4.png',butterfly:'4.png',caves:'5.png',
+               shore:'6.png',map2:'7.png'};
+  const src=FILES[locId];
   const loc=_anyLoc(locId);
-  if(i===undefined) return`<div style="font-size:${Math.round(size*.55)}px;text-align:center;line-height:${size}px;width:${size}px;height:${size}px;margin:0 auto">${loc?loc.emoji:''}</div>`;
-  const iw=size*7;
-  const ih=Math.round(iw*1472/2830);
-  const ml=-(i*size);
-  const mt=-(Math.round(ih*LOC_ICON_CY/100)-Math.round(size/2));
-  return`<div style="width:${size}px;height:${size}px;border-radius:50%;overflow:hidden;margin:0 auto;flex-shrink:0;background:${loc?loc.color:'#1e3a1e'}"><img src="loc1.png" width="${iw}" height="${ih}" style="display:block;max-width:none;margin-left:${ml}px;margin-top:${mt}px" onerror="this.style.display='none'"></div>`;
+  if(!src) return`<div style="font-size:${Math.round(size*.55)}px;text-align:center;line-height:${size}px;width:${size}px;height:${size}px;margin:0 auto">${loc?loc.emoji:''}</div>`;
+  const em=loc?loc.emoji:'?';
+  return`<div style="width:${size}px;height:${size}px;border-radius:50%;overflow:hidden;margin:0 auto;flex-shrink:0"><img src="${src}" style="width:100%;height:100%;object-fit:cover;object-position:center center;display:block" onerror="this.parentElement.style.cssText+='display:flex;align-items:center;justify-content:center;font-size:${Math.round(size*.55)}px';this.parentElement.textContent='${em}'"></div>`;
 }
 
 initState();showSelect();
