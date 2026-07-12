@@ -1969,11 +1969,11 @@ async function loadFromCloud(pid){
 }
 
 
-// ═══════════ LOC ICONS — individual files (1.png … 7.png) ═══════════
+// ═══════════ LOC ICONS — individual files ═══════════
 function locIconEl(locId,size=64){
-  const FILES={oak:'1.png',pallet:'2.png',forest:'3.png',
-               glade:'4.png',butterfly:'4.png',caves:'5.png',
-               shore:'6.png',map2:'7.png'};
+  const FILES={oak:'loc_oak.png',pallet:'loc_pallet.png',forest:'loc_forest.png',
+               glade:'loc_glade.png',butterfly:'loc_butterfly.png',caves:'loc_caves.png',
+               shore:'loc_shore.png',map2:'loc_map2.png'};
   const src=FILES[locId];
   const loc=_anyLoc(locId);
   if(!src) return`<div style="font-size:${Math.round(size*.55)}px;text-align:center;line-height:${size}px;width:${size}px;height:${size}px;margin:0 auto">${loc?loc.emoji:''}</div>`;
