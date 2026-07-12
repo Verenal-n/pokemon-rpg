@@ -1969,19 +1969,20 @@ async function loadFromCloud(pid){
 }
 
 
-// ═══════════ LOC ICONS (CSS sprite — no canvas needed) ═══════════
-// loc1.png: 2830×1472, 7 columns, circles centered at ~18% of height
-// Tune LOC_ICON_CY (0–100) if icons appear too high or too low
-const LOC_ICON_CY=18; // % from top where icon centers are
+// ═══════════ LOC ICONS (img sprite — col strip from loc1.png) ═══════════
+// loc1.png: 2830×1472, 7 equal columns; icons are circles centered at ~32% from top
+// Tune LOC_ICON_CY (0–100) if icons appear too high/low
+const LOC_ICON_CY=32;
 function locIconEl(locId,size=64){
   const IDX={oak:0,pallet:1,forest:2,glade:3,butterfly:3,caves:4,shore:5,map2:6};
   const i=IDX[locId];
-  if(i===undefined){const l=_anyLoc(locId);return`<div style="font-size:${Math.round(size*.55)}px;text-align:center;line-height:${size}px;width:${size}px;height:${size}px;margin:0 auto">${l?l.emoji:''}</div>`;}
-  const bw=size*7;
-  const bh=Math.round(bw*1472/2830);
-  const bx=-(i*size);
-  const by=-(Math.round(bh*LOC_ICON_CY/100)-Math.round(size/2));
-  return`<div style="width:${size}px;height:${size}px;border-radius:50%;overflow:hidden;background:url(loc1.png) ${bx}px ${by}px;background-size:${bw}px ${bh}px;margin:0 auto;flex-shrink:0"></div>`;
+  const loc=_anyLoc(locId);
+  if(i===undefined) return`<div style="font-size:${Math.round(size*.55)}px;text-align:center;line-height:${size}px;width:${size}px;height:${size}px;margin:0 auto">${loc?loc.emoji:''}</div>`;
+  const iw=size*7;
+  const ih=Math.round(iw*1472/2830);
+  const ml=-(i*size);
+  const mt=-(Math.round(ih*LOC_ICON_CY/100)-Math.round(size/2));
+  return`<div style="width:${size}px;height:${size}px;border-radius:50%;overflow:hidden;margin:0 auto;flex-shrink:0;background:${loc?loc.color:'#1e3a1e'}"><img src="loc1.png" width="${iw}" height="${ih}" style="display:block;max-width:none;margin-left:${ml}px;margin-top:${mt}px" onerror="this.style.display='none'"></div>`;
 }
 
 initState();showSelect();
