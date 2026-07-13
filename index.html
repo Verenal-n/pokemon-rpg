@@ -1115,9 +1115,9 @@ function renderMap(){
       nh+=`<circle cx="${loc.cx}" cy="${loc.cy}" r="${r}" fill="none" stroke="${loc.stroke}" stroke-width="2.5" opacity=".9"/>`;
     }
     if(!ul){
-      nh+=`<g${loc.unlockReq?` style="cursor:pointer" onclick="showLockedHint('${loc.id}')"`:''}>`;
+      nh+=`<g style="cursor:pointer" onclick="showLockedHint('${loc.id}')">`;
       nh+=`<circle cx="${loc.cx}" cy="${loc.cy}" r="${r}" fill="rgba(3,8,20,0.68)"/>`;
-      if(loc.unlockReq) nh+=`<text x="${loc.cx}" y="${loc.cy+1.5}" text-anchor="middle" dominant-baseline="middle" font-size="15" font-family="sans-serif">${loc.unlockReq.keyPoke?'🔑':'🔒'}</text>`;
+      nh+=`<text x="${loc.cx}" y="${loc.cy+1.5}" text-anchor="middle" dominant-baseline="middle" font-size="15" font-family="sans-serif">${loc.unlockReq?.keyPoke?'🔑':'🔒'}</text>`;
       nh+=`</g>`;
     } else if(canGo){
       nh+=`<circle cx="${loc.cx}" cy="${loc.cy}" r="${r}" fill="transparent" stroke="rgba(255,255,255,.08)" stroke-width="1" style="cursor:pointer" onclick="onLocClick('${loc.id}')"/>`;
@@ -1141,7 +1141,11 @@ function renderMap(){
 
 function showLockedHint(locId){
   const d=pd();
-  const loc=_anyLoc(locId);if(!loc||!loc.unlockReq)return;
+  const loc=_anyLoc(locId);if(!loc)return;
+  if(!loc.unlockReq){
+    qM(()=>mEmoji(loc.emoji,'🔒 '+loc.name,'Спочатку отримай стартового покемона у Лабораторії Оука!',[{l:'Зрозуміло',ok:true,cb:closeModal}]));
+    return;
+  }
   const req=loc.unlockReq;
   const uniqueCount=new Set(d.collection.map(c=>c.dbId)).size;
   let desc;
