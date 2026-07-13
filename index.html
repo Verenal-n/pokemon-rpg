@@ -385,7 +385,7 @@ const POKE=[
 
 const HP_RANGE={common:[60,100],uncommon:[120,200],rare:[250,400],legendary:[500,800],starter:[80,80],evolved:[0,0],mega:[0,0]};
 const TYPE_C={'Трава':'#15803d','Отрута':'#6d28d9','Вогонь':'#b45309','Вода':'#1d4ed8','Летючий':'#0369a1','Електрика':'#a16207','Нормальний':'#4b5563','Комаха':'#3f6212','Земля':'#92400e','Камінь':'#374151','Фея':'#be185d','Лід':'#0e7490','Бойовий':'#b91c1c','Темний':'#1e3a5f','Сталь':'#64748b','Психічний':'#db2777'};
-const LOC_TYPES={pallet:['Психічний','Фея','Вогонь','Електрика'],forest:['Трава','Комаха','Нормальний'],glade:['Трава','Фея','Отрута'],butterfly:['Комаха','Летючий'],caves:['Камінь','Земля','Сталь'],shore:['Вода','Лід']};
+const LOC_TYPES={pallet:['Психічний','Фея','Вогонь','Електрика'],forest:['Трава','Комаха','Нормальний','Бойовий'],glade:['Трава','Фея','Отрута'],butterfly:['Комаха','Летючий'],caves:['Камінь','Земля','Сталь'],shore:['Вода','Лід']};
 function locMatch(pk,locId){return(LOC_TYPES[locId]||[]).some(t=>(pk?.types||[]).includes(t));}
 const STONES={mega:{name:'Мега-камінь',emoji:'💎'}};
 const ITEM_INFO={
@@ -410,7 +410,7 @@ const SHOP_ITEMS=[
   {id:'xp_card_bronze',name:'Бронзова карта XP',   desc:'+1 XP активному покемону',           emoji:'🥉', price:10},
   {id:'xp_card_silver',name:'Срібна карта XP',     desc:'+3 XP активному покемону',           emoji:'🥈', price:25},
   {id:'xp_card_gold', name:'Золота карта XP',       desc:'+7 XP активному покемону',           emoji:'🥇', price:50},
-  {id:'mega',         name:'Мега-камінь',           desc:'Мега еволюція (Пінсір, Піджіт, стартери…)', emoji:'💎', price:100},
+  {id:'mega',         name:'Мега-камінь',           desc:'Потрібен для Мега еволюції.', emoji:'💎', price:100},
   {id:'evo_crystal',  name:'Кристал пробудження',   desc:'Миттєво готує покемона до еволюції', emoji:'🟢', price:80},
   {id:'airship_ticket',name:'Білет на повітроплав', desc:'Телепортація на будь-яку локацію',   emoji:'🎫', price:50},
 ];
@@ -591,8 +591,10 @@ function renderPballs(){
       const pk=c?gp(c.dbId):null;
       if(pk){
         const xpPct=pk.evo?Math.min(100,Math.round(((c.xp||0)/(pk.evoLevel||5))*100)):100;
+        const isBonus=locMatch(pk,d.location);
         h+=`<div class="pball-slot filled" onclick="openSlotMenu(${i})">
           <img class="pball-img" src="${img(pk.pid)}" onerror="this.style.display='none'">
+          ${isBonus?'<div style="position:absolute;top:1px;right:2px;font-size:9px;line-height:1">🌿</div>':''}
           <div class="pball-xpbar"><div class="pball-xpfill" style="width:${xpPct}%"></div></div>
         </div>`;
       } else {
@@ -1608,7 +1610,7 @@ function openShop(){
     const qty=d.inventory[si.id]||0;
     return`<div class="shop-row">
       <span class="sh-emoji">${si.emoji}</span>
-      <div class="sh-info"><div class="sh-name">${si.name}${qty>0?` ×${qty}`:''}</div><div class="sh-desc">${si.desc}</div></div>
+      <div class="sh-info"><div class="sh-name">${si.name}${qty>0?`<span style="font-size:10px;font-weight:400;color:#888;margin-left:5px">є: ${qty}</span>`:''}</div><div class="sh-desc">${si.desc}</div></div>
       <div style="text-align:right;flex-shrink:0"><div class="sh-price">🪙${si.price}</div>
       <button class="sh-btn" onclick="buyItem('${si.id}',${si.price})" ${d.coins<si.price?'disabled':''}>Купити</button></div>
     </div>`;
