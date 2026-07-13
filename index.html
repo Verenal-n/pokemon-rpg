@@ -385,7 +385,7 @@ const POKE=[
 
 const HP_RANGE={common:[60,100],uncommon:[120,200],rare:[250,400],legendary:[500,800],starter:[80,80],evolved:[0,0],mega:[0,0]};
 const TYPE_C={'Трава':'#15803d','Отрута':'#6d28d9','Вогонь':'#b45309','Вода':'#1d4ed8','Летючий':'#0369a1','Електрика':'#a16207','Нормальний':'#4b5563','Комаха':'#3f6212','Земля':'#92400e','Камінь':'#374151','Фея':'#be185d','Лід':'#0e7490','Бойовий':'#b91c1c','Темний':'#1e3a5f','Сталь':'#64748b','Психічний':'#db2777'};
-const LOC_TYPES={pallet:['Нормальний','Психічний','Фея'],forest:['Трава','Комаха'],glade:['Трава','Фея','Отрута'],butterfly:['Комаха','Летючий'],caves:['Камінь','Земля','Сталь'],shore:['Вода','Лід']};
+const LOC_TYPES={pallet:['Психічний','Фея','Вогонь','Електрика'],forest:['Трава','Комаха','Нормальний'],glade:['Трава','Фея','Отрута'],butterfly:['Комаха','Летючий'],caves:['Камінь','Земля','Сталь'],shore:['Вода','Лід']};
 function locMatch(pk,locId){return(LOC_TYPES[locId]||[]).some(t=>(pk?.types||[]).includes(t));}
 const STONES={mega:{name:'Мега-камінь',emoji:'💎'}};
 const ITEM_INFO={
@@ -1187,26 +1187,26 @@ function renderMap(){
   document.getElementById('map-markers').innerHTML=mh;
 }
 
+function _locTypeBadges(locId){
+  const types=LOC_TYPES[locId]||[];
+  if(!types.length)return'';
+  const badges=types.map(t=>`<span class="type-b" style="background:${TYPE_C[t]||'#374151'}">${t}</span>`).join(' ');
+  return`<div style="margin:10px 0 2px;text-align:center"><span style="font-size:9px;color:#4ade80;display:block;margin-bottom:4px">🌿 Бонус +1 XP для типів:</span>${badges}</div>`;
+}
+
 function showLockedHint(locId){
   const d=pd();
   const loc=_anyLoc(locId);if(!loc)return;
-  if(!loc.unlockReq){
-    qM(()=>mEmoji(loc.emoji,'🔒 '+loc.name,'Спочатку отримай стартового покемона у Лабораторії Оука!',[{l:'Зрозуміло',ok:true,cb:closeModal}]));
-    return;
-  }
-  const req=loc.unlockReq;
-  const uniqueCount=new Set(d.collection.map(c=>c.dbId)).size;
   let desc;
-  if(req.keyPoke){
-    const pk=gp(req.keyPoke);
-    desc='Потрібен ключовий покемон:\n🔑 '+(pk?pk.name:'?')+'\n\nЗнайди його — і локація відкриється!';
-  } else if(req.count){
-    const need=Math.max(0,req.count-uniqueCount);
-    desc=need>0
-      ?`Злови ще ${need} різних покемонів\n(${uniqueCount} / ${req.count})`
-      :'Умова виконана! Перейди кудись і повернись.';
+  if(!loc.unlockReq){
+    desc='Спочатку отримай стартового покемона у Лабораторії Оука!';
+  } else {
+    const req=loc.unlockReq;
+    const uniqueCount=new Set(d.collection.map(c=>c.dbId)).size;
+    if(req.keyPoke){const pk=gp(req.keyPoke);desc='Потрібен ключовий покемон:<br>🔑 '+(pk?pk.name:'?')+'<br><br>Знайди його — і локація відкриється!';}
+    else if(req.count){const need=Math.max(0,req.count-uniqueCount);desc=need>0?`Злови ще ${need} різних покемонів<br>(${uniqueCount} / ${req.count})`:'Умова виконана! Перейди кудись і повернись.';}
   }
-  qM(()=>mEmoji(loc.emoji,'🔒 '+loc.name,desc||'Виконай умову для відкриття',[{l:'Зрозуміло',ok:true,cb:closeModal}]));
+  qM(()=>mHTML(`<div class="m-emoji">${loc.emoji}</div><div class="m-title">🔒 ${loc.name}</div><div class="m-desc">${desc||'Виконай умову для відкриття'}</div>${_locTypeBadges(locId)}<div class="m-btns"><button class="btn-ok" onclick="closeModal()">Зрозуміло</button></div>`));
 }
 
 function onLocClick(locId){
@@ -1217,16 +1217,15 @@ function onLocClick(locId){
   if(!isAdjacent){
     const hasTicket=(d.inventory['airship_ticket']||0)>0;
     if(hasTicket){
-      qM(()=>mEmoji('🎫','Білет на повітроплав',`${loc.emoji} ${loc.name} не сусідня локація.\n\nВикористати квиток (залишилось: ${d.inventory['airship_ticket']}) і перелетіти за 1 ⚡?`,
-        [{l:'Летімо! 🎫',ok:true,cb:()=>{closeModal();doAirshipMove(locId);}},{l:'Ні',cb:closeModal}]));
+      qM(()=>mHTML(`<div class="m-emoji">🎫</div><div class="m-title">Білет на повітроплав</div><div class="m-desc">${loc.emoji} ${loc.name} не сусідня локація.<br><br>Використати квиток (залишилось: ${d.inventory['airship_ticket']}) і перелетіти за 1 ⚡?</div>${_locTypeBadges(locId)}<div class="m-btns"><button class="btn-ok" onclick="closeModal();doAirshipMove('${locId}')">Летімо! 🎫</button><button class="btn-cancel" onclick="closeModal()">Ні</button></div>`));
     } else {
-      qM(()=>mEmoji('🗺️','Не сусідня локація',`Щоб дістатись до ${loc.name}, треба рухатись крок за кроком по карті.\n\nАбо знайди 🎫 Білет на повітроплав у рідкісній траві!`,[{l:'Зрозуміло',ok:true,cb:closeModal}]));
+      qM(()=>mHTML(`<div class="m-emoji">🗺️</div><div class="m-title">Не сусідня локація</div><div class="m-desc">Щоб дістатись до ${loc.name}, треба рухатись крок за кроком по карті.<br><br>Або знайди 🎫 Білет на повітроплав у рідкісній траві!</div>${_locTypeBadges(locId)}<div class="m-btns"><button class="btn-ok" onclick="closeModal()">Зрозуміло</button></div>`));
     }
     return;
   }
   const cost=ECOST.move;
   if(d.energy<cost){qM(()=>mEmoji('⚡','Мало енергії',`Потрібно ${cost} ⚡ на перехід.\n\nДодай сторінки через ☰`,[{l:'Додати',ok:true,cb:()=>{closeModal();openSidePanel();}},{l:'Ок',cb:closeModal}]));return;}
-  qM(()=>mHTML(`<div style="margin-bottom:10px">${locIconEl(locId,72)}</div><div class="m-title" style="text-align:center">Перейти до ${loc.name}</div><div class="m-desc" style="text-align:center">Витратити ${cost} ⚡ і перейти до ${loc.name}?</div><div class="m-btns"><button class="btn-ok" onclick="closeModal();doMove('${locId}')">Так!</button><button class="btn-cancel" onclick="closeModal()">Ні</button></div>`));
+  qM(()=>mHTML(`<div style="margin-bottom:10px">${locIconEl(locId,72)}</div><div class="m-title" style="text-align:center">Перейти до ${loc.name}</div><div class="m-desc" style="text-align:center">Витратити ${cost} ⚡ і перейти до ${loc.name}?</div>${_locTypeBadges(locId)}<div class="m-btns"><button class="btn-ok" onclick="closeModal();doMove('${locId}')">Так!</button><button class="btn-cancel" onclick="closeModal()">Ні</button></div>`));
 }
 
 function doMove(locId){
@@ -1321,13 +1320,16 @@ function useXpCard(id){
   const gain=xpMap[id]||1;
   d.inventory[id]--;d.level=(d.level||0)+gain;
   const xpCi=d.activePokes[0];
+  let xpCoins=0;
   if(xpCi!==undefined&&d.collection[xpCi]){
-    d.collection[xpCi].xp=(d.collection[xpCi].xp||0)+gain;
+    const c=d.collection[xpCi];const pk=gp(c.dbId);
+    if(pk&&!pk.evo){xpCoins=gain*2;d.coins=(d.coins||0)+xpCoins;}
+    else{c.xp=(c.xp||0)+gain;}
   }
   const evoMsgs=checkLevelEvolutions(d);
   renderRes();renderPballs();renderDex();_rebuildSideContent();saveToCloud(cur);
   const info=ITEM_INFO[id];
-  showToast(info.emoji+' +'+gain+' XP!');
+  showToast(xpCoins?info.emoji+' +'+xpCoins+' 🪙 (макс. форма)':info.emoji+' +'+gain+' XP!');
   evoMsgs.forEach(m=>qM(()=>mImg(img(m.pid),m.title,m.desc,[{l:'Чудово!',ok:true,cb:closeModal}])));
 }
 
@@ -1894,14 +1896,20 @@ function updSP(){
 
 function checkLevelEvolutions(d){
   const msgs=[];
-  d.collection.forEach(c=>{
-    const pk=gp(c.dbId);if(!pk||!pk.evo||pk.stoneEvo)return;
-    if((c.xp||0)>=pk.evoLevel){
-      const nPk=POKE.find(p=>p.id===pk.evo);if(!nPk)return;
-      const old=pk.name;c.dbId=nPk.id;
-      msgs.push({pid:nPk.pid,title:old+' → '+nPk.name,desc:'Еволюція!'});
-    }
-  });
+  let changed=true;
+  while(changed){
+    changed=false;
+    d.collection.forEach(c=>{
+      const pk=gp(c.dbId);if(!pk||!pk.evo||pk.stoneEvo)return;
+      if((c.xp||0)>=pk.evoLevel){
+        const nPk=POKE.find(p=>p.id===pk.evo);if(!nPk)return;
+        const overflow=Math.max(0,(c.xp||0)-pk.evoLevel);
+        const old=pk.name;c.dbId=nPk.id;changed=true;
+        if(!nPk.evo&&overflow>0){d.coins=(d.coins||0)+overflow*2;}
+        msgs.push({pid:nPk.pid,title:old+' → '+nPk.name,desc:'Еволюція!'+(overflow&&!nPk.evo?'\n+'+overflow*2+' 🪙 з надлишку XP':'')});
+      }
+    });
+  }
   return msgs;
 }
 
@@ -1920,11 +1928,16 @@ function submitPages(){
   d.energy+=energy;
   d.coins=(d.coins||0)+coins;
   const xpCi=d.activePokes[0];
-  let pkName='',bonus=0;
+  let pkName='',bonus=0,xpCoins=0;
   if(xpCi!==undefined&&d.collection[xpCi]){
-    d.collection[xpCi].xp=(d.collection[xpCi].xp||0)+xpGain;
-    const pk=gp(d.collection[xpCi].dbId);
-    if(pk){pkName=pk.name;if(locMatch(pk,d.location)){d.collection[xpCi].xp++;bonus=1;}}
+    const c=d.collection[xpCi];const pk=gp(c.dbId);
+    if(pk){
+      pkName=pk.name;
+      if(locMatch(pk,d.location))bonus=1;
+      const totalGain=xpGain+bonus;
+      if(!pk.evo){xpCoins=totalGain*2;d.coins=(d.coins||0)+xpCoins;}
+      else{c.xp=(c.xp||0)+totalGain;}
+    }
   }
   if(!d.books)d.books=[];
   const book={title,author,pages,date:new Date().toLocaleDateString('uk-UA'),coverUrl:coverUrl||null};
@@ -1932,7 +1945,7 @@ function submitPages(){
   const evoMsgs=checkLevelEvolutions(d);
   renderRes();renderPballs();renderDex();closeSidePanel();saveToCloud(cur);
   const preview=_renderBookPreviewHTML(book);
-  const pkLine=pkName?`<div>${pkName} +${xpGain+bonus} XP${bonus?' 🌿':''}</div>`:'';
+  const pkLine=pkName?`<div>${pkName} ${xpCoins?'+'+xpCoins+' 🪙 (макс. форма)':'+'+(xpGain+bonus)+' XP'+(bonus?' 🌿':'')}</div>`:'';
   qM(()=>mHTML(`${preview}<div class="m-title">Книга додана!</div><div class="m-desc" style="text-align:center">${pkLine}<div>+${energy} ⚡ &nbsp; +${coins} 🪙</div></div><div class="m-btns"><button class="btn-ok" onclick="closeModal()">Вперед!</button></div>`));
   evoMsgs.forEach(m=>qM(()=>mImg(img(m.pid),m.title,m.desc,[{l:'Чудово!',ok:true,cb:closeModal}])));
 }
