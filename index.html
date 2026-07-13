@@ -583,7 +583,7 @@ function renderPballs(){
       const c=ci!==undefined?d.collection[ci]:null;
       const pk=c?gp(c.dbId):null;
       if(pk){
-        const xpPct=pk.evo?Math.min(100,Math.round(((d.level||0)/(pk.evoLevel||10))*100)):100;
+        const xpPct=pk.evo?Math.min(100,Math.round(((c.xp||0)/(pk.evoLevel||10))*100)):100;
         h+=`<div class="pball-slot filled" onclick="openSlotMenu(${i})">
           <img class="pball-img" src="${img(pk.pid)}" onerror="this.style.display='none'">
           <div class="pball-xpbar"><div class="pball-xpfill" style="width:${xpPct}%"></div></div>
@@ -604,7 +604,7 @@ function openSlotMenu(si){
   if(ci===undefined){openSlotPicker(si);return;}
   const c=d.collection[ci];const pk=gp(c.dbId);
   if(!pk){openSlotPicker(si);return;}
-  const lvl=d.level||0;
+  const lvl=c.xp||0;
   const xpPct=pk.evo?Math.min(100,Math.round((lvl/(pk.evoLevel||10))*100)):100;
   const canEvo=pk.evo&&!pk.stoneEvo&&lvl>=(pk.evoLevel||10);
   const canEvoS=pk.stoneEvo&&pk.evo&&(d.inventory[pk.stoneEvo]||0)>0&&lvl>=(pk.evoLevel||80);
@@ -657,7 +657,7 @@ function _buildSlotPickerHTML(){
     const pk=gp(c.dbId);
     if(!pk)return null;
     const isMax=!pk.evo;
-    const lvl=d.level||0;
+    const lvl=c.xp||0;
     const canEvo=pk.evo&&!pk.stoneEvo&&lvl>=(pk.evoLevel||10);
     const canEvoStone=!!(pk.stoneEvo&&pk.evo);
     const pct=pk.evo&&pk.evoLevel?Math.min(1,lvl/pk.evoLevel):isMax?1:0;
@@ -755,7 +755,7 @@ function renderDex(){
     const i=c._i;
     const pk=gp(c.dbId);
     const isAct=d.activePokes.includes(i);
-    const lvl=d.level||0;
+    const lvl=c.xp||0;
     const canEvo=pk.evo&&!pk.stoneEvo&&lvl>=(pk.evoLevel||10);
     const needStone=pk.stoneEvo&&pk.evo&&lvl>=(pk.evoLevel||80);
     const evoDots=getEvoDots(pk.id);
@@ -985,7 +985,7 @@ function openDexCard(i){
   const d=pd();const c=d.collection[i];if(!c)return;const pk=gp(c.dbId);
   if(!pk){qM(()=>mEmoji('❓','Невідомий покемон','Цей покемон більше не існує в грі.',[{l:'Ок',ok:true,cb:closeModal}]));return;}
   const isAct=d.activePokes.includes(i);
-  const lvl=d.level||0;
+  const lvl=c.xp||0;
   const canEvoXp=pk.evo&&!pk.stoneEvo&&lvl>=(pk.evoLevel||10);
   const canEvoS=pk.stoneEvo&&pk.evo&&(d.inventory[pk.stoneEvo]||0)>0&&lvl>=(pk.evoLevel||80);
   const needsStone=pk.stoneEvo&&pk.evo&&lvl>=(pk.evoLevel||80);
@@ -1269,6 +1269,10 @@ function useXpCard(id){
   const xpMap={xp_card_bronze:1,xp_card_silver:3,xp_card_gold:5};
   const gain=xpMap[id]||1;
   d.inventory[id]--;d.level=(d.level||0)+gain;
+  const xpCi=d.activePokes[0];
+  if(xpCi!==undefined&&d.collection[xpCi]){
+    d.collection[xpCi].xp=(d.collection[xpCi].xp||0)+gain;
+  }
   renderRes();_rebuildSideContent();saveToCloud(cur);
   const info=ITEM_INFO[id];
   showToast(info.emoji+' +'+gain+' XP!');
@@ -1324,7 +1328,7 @@ function openOak(){
 
 function receiveStarter(dbId){
   const d=pd();const pk=gp(dbId);
-  d.collection.push({dbId});
+  d.collection.push({dbId,xp:0});
   d.activePokes=[0];
   d.hasStarter=true;d.startersGiven=1;
   if(!d.unlockedLocs.includes('pallet'))d.unlockedLocs.push('pallet');
@@ -1357,7 +1361,7 @@ function openOakBonus(){
 
 function giveBonus(dbId){
   const d=pd();const pk=gp(dbId);
-  d.collection.push({dbId});d.startersGiven++;d.oakPending=false;
+  d.collection.push({dbId,xp:0});d.startersGiven++;d.oakPending=false;
   closeModal();renderMain();saveToCloud(cur);
   qM(()=>mImg(img(pk.pid),'Від Оука!',pk.name+' тепер у твоїй колекції!',[{l:'Чудово!',ok:true,cb:closeModal}]));
 }
@@ -1477,7 +1481,7 @@ function openCombat(){
   const myLeft=myPk?`<div class="battle-my">
     <img class="battle-img-my" src="${img(myPk.pid)}" onerror="this.style.display='none'">
     <div class="battle-name">${myPk.name}</div>
-    <div class="battle-xp">📖 ${d.level||0} XP</div>
+    <div class="battle-xp">⭐ ${myPoke?myPoke.xp||0:0}${myPk&&myPk.evo?' / '+myPk.evoLevel:''} XP</div>
   </div>`:`<div class="battle-my" style="opacity:.4"><div style="font-size:40px">❓</div><div class="battle-name" style="font-size:10px">Немає покемона</div></div>`;
   // Extra active pokes row
   const extraPokes=actives.slice(1).map(c=>{const pk=gp(c.dbId);return`<img src="${img(pk.pid)}" style="width:28px;height:28px;image-rendering:pixelated;opacity:.7" title="${pk.name}">`;}).join('');
@@ -1523,7 +1527,15 @@ function doAttack(){
     // VICTORY
     const pk=gp(e.dbId);
     const isDupe=d.collection.some(c=>c.dbId===e.dbId);
-    d.collection.push({dbId:e.dbId});
+    // XP до активного покемона (до того як додаємо спійманого)
+    const battleXp=Math.max(1,Math.floor(e.maxHp/50));
+    const activeCi=d.activePokes[0];
+    if(activeCi!==undefined&&d.collection[activeCi]){
+      d.collection[activeCi].xp=(d.collection[activeCi].xp||0)+battleXp;
+    }
+    const evoMsgs=checkLevelEvolutions(d);
+    // Додаємо спійманого покемона
+    d.collection.push({dbId:e.dbId,xp:0});
     if(d.activePokes.length===0) d.activePokes=[d.collection.length-1];
     const coinDiv=(pk.rar==='rare'||pk.rar==='legendary')?15:10;
     const coins=Math.max(1,Math.floor(dmg/coinDiv));
@@ -1535,12 +1547,9 @@ function doAttack(){
     const opened=checkUnlocks();renderMap();
     const needOak=checkOakBonus();
     qM(()=>mImg(img(pk.pid),isDupe?pk.name+' — дублікат!':'Спіймано!',
-      `${pk.name} ${isDupe?'вже є! Дублікат в PC.':'в Покедексі!'}\n+${Math.floor(coins*mult)} 🪙`,
+      `${pk.name} ${isDupe?'вже є! Дублікат в PC.':'в Покедексі!'}\n+${Math.floor(coins*mult)} 🪙 · +${battleXp} ⭐ XP`,
       [{l:'Чудово!',ok:true,cb:closeModal}]));
-    // Show deferred evolution messages from books added during combat
-    const pendingEvo=d._pendingEvo||[];
-    d._pendingEvo=[];
-    pendingEvo.forEach(m=>qM(()=>mImg(img(m.pid),m.title,m.desc,[{l:'Чудово!',ok:true,cb:closeModal}])));
+    evoMsgs.forEach(m=>qM(()=>mImg(img(m.pid),m.title,m.desc,[{l:'Чудово!',ok:true,cb:closeModal}])));
     opened.forEach(u=>qM(()=>mEmoji('🎉','Відкрито!',`${u.emoji} ${u.name} доступна!`,[{l:'Чудово!',ok:true,cb:closeModal}])));
     if(needOak){pd().oakPending=true;qM(()=>mEmoji('🧪','Проф. Оук кличе!','Є сюрприз! Зайди до лабораторії.',[{l:'Ок!',ok:true,cb:closeModal}]));}
   } else {
@@ -1566,7 +1575,7 @@ function openPC(){
   const rows=d.collection.map((c,i)=>{
     const pk=gp(c.dbId);
     if(!pk)return'';
-    const lvl=d.level||0;
+    const lvl=c.xp||0;
     const isAct=d.activePokes.includes(i);
     const canEvoXp=pk.evo&&!pk.stoneEvo&&lvl>=(pk.evoLevel||10);
     const canEvoS=pk.stoneEvo&&pk.evo&&(d.inventory[pk.stoneEvo]||0)>0&&lvl>=(pk.evoLevel||80);
@@ -1874,7 +1883,7 @@ function checkLevelEvolutions(d){
   const msgs=[];
   d.collection.forEach(c=>{
     const pk=gp(c.dbId);if(!pk||!pk.evo||pk.stoneEvo)return;
-    if((d.level||0)>=pk.evoLevel){
+    if((c.xp||0)>=pk.evoLevel){
       const nPk=POKE.find(p=>p.id===pk.evo);if(!nPk)return;
       const old=pk.name;c.dbId=nPk.id;
       msgs.push({pid:nPk.pid,title:old+' → '+nPk.name,desc:'Еволюція!'});
@@ -1900,16 +1909,12 @@ function submitPages(){
   if(!d.books)d.books=[];
   const book={title,author,pages,date:new Date().toLocaleDateString('uk-UA'),coverUrl:coverUrl||null};
   d.books.push(book);
-  const evoMsgs=checkLevelEvolutions(d);
   renderRes();closeSidePanel();saveToCloud(cur);
   const preview=_renderBookPreviewHTML(book);
   if(d.enemy){
-    // During combat: defer evo messages until after battle victory
-    if(evoMsgs.length) d._pendingEvo=(d._pendingEvo||[]).concat(evoMsgs);
     qM(()=>mHTML(`${preview}<div class="m-title">Книга додана!</div><div class="m-desc">+${energy} ⚡ · +${atk} ⚔️ · 📖+${lvlGain} XP<br><br>Тепер маєш ⚔️${d.atk} — атакуй!</div><div class="m-btns"><button class="btn-ok" onclick="closeModal();renderActions();openCombat()">Атакувати!</button><button class="btn-cancel" onclick="closeModal()">Пізніше</button></div>`));
   } else {
-    const evoHtml=evoMsgs.length?evoMsgs.map(e=>`<div class="evo-notif">🎉 ${e.title}: ${e.desc}</div>`).join(''):'';
-    qM(()=>mHTML(`${preview}<div class="m-title">Книга додана!</div><div class="m-desc" style="text-align:center">+${energy} ⚡ · +${atk} ⚔️ · 📖XP: ${d.level} (+${lvlGain})</div>${evoHtml}<div class="m-btns"><button class="btn-ok" onclick="closeModal()">Вперед!</button></div>`));
+    qM(()=>mHTML(`${preview}<div class="m-title">Книга додана!</div><div class="m-desc" style="text-align:center">+${energy} ⚡ · +${atk} ⚔️ · 📖XP: ${d.level} (+${lvlGain})</div><div class="m-btns"><button class="btn-ok" onclick="closeModal()">Вперед!</button></div>`));
   }
 }
 
