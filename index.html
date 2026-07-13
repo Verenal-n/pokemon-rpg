@@ -608,6 +608,8 @@ function renderPballs(){
   document.getElementById('pball-bar').innerHTML=h;
 }
 
+function useXpCardInSlot(cardId,si){closeModal();useXpCard(cardId);qM(()=>openSlotMenu(si));}
+
 function openSlotMenu(si){
   const d=pd();const ci=d.activePokes[si];
   if(ci===undefined){openSlotPicker(si);return;}
@@ -615,17 +617,32 @@ function openSlotMenu(si){
   if(!pk){openSlotPicker(si);return;}
   const lvl=c.xp||0;
   const xpPct=pk.evo?Math.min(100,Math.round((lvl/(pk.evoLevel||5))*100)):100;
+  const stoneOwned=pk.stoneEvo?(d.inventory[pk.stoneEvo]||0)>0:false;
   const canEvo=pk.evo&&!pk.stoneEvo&&lvl>=(pk.evoLevel||5);
-  const canEvoS=pk.stoneEvo&&pk.evo&&(d.inventory[pk.stoneEvo]||0)>0&&lvl>=(pk.evoLevel||5);
-  const needsStone=pk.stoneEvo&&pk.evo&&lvl>=(pk.evoLevel||5);
-  const stoneOwned=(d.inventory[pk.stoneEvo]||0)>0;
+  const canEvoS=pk.stoneEvo&&pk.evo&&stoneOwned&&lvl>=(pk.evoLevel||5);
+  const xpOk=lvl>=(pk.evoLevel||5);
+  const hasCrystal=(d.inventory['evo_crystal']||0)>0;
+  const canUseCrystal=hasCrystal&&pk.evo&&!xpOk&&(pk.stoneEvo?stoneOwned:true);
   const types=pk.types.map(t=>`<span class="type-b" style="background:${TYPE_C[t]||'#374151'}">${t}</span>`).join('');
+  let megaBlock='';
+  if(pk.stoneEvo&&pk.evo){
+    const stoneName=STONES[pk.stoneEvo]?.name||'Мега-камінь';
+    const stoneEmoji=STONES[pk.stoneEvo]?.emoji||'💎';
+    if(stoneOwned&&xpOk) megaBlock=`<div style="background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.35);border-radius:8px;padding:7px;font-size:11px;color:#fbbf24;text-align:center;margin-bottom:8px">${stoneEmoji} ${stoneName} є в інвентарі!<br><span style="color:#4ade80;font-size:10px">✓ Можна еволюціонувати</span></div>`;
+    else if(stoneOwned&&!xpOk) megaBlock=`<div style="background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.25);border-radius:8px;padding:7px;font-size:11px;color:#fbbf24;text-align:center;margin-bottom:8px">${stoneEmoji} ${stoneName} є!<br><span style="color:#aaa;font-size:10px">Ще потрібно ${(pk.evoLevel||5)-lvl} XP</span></div>`;
+    else megaBlock=`<div style="background:rgba(239,68,68,.07);border:1px solid rgba(239,68,68,.2);border-radius:8px;padding:7px;font-size:11px;color:#fca5a5;text-align:center;margin-bottom:8px">${stoneEmoji} Для мега-еволюції потрібен ${stoneName}<br><span style="color:#f87171;font-size:10px">✗ Ще не маєш</span></div>`;
+  }
+  const XPV={xp_card_bronze:1,xp_card_silver:3,xp_card_gold:7};
+  const xpBtns=['xp_card_bronze','xp_card_silver','xp_card_gold'].filter(k=>(d.inventory[k]||0)>0).map(k=>`<button onclick="useXpCardInSlot('${k}',${si})" style="flex:1;padding:7px 4px;font-size:11px;font-weight:700;background:rgba(167,139,250,.12);border:1px solid rgba(167,139,250,.3);border-radius:8px;color:#c4b5fd;cursor:pointer;min-height:40px;line-height:1.3">${ITEM_INFO[k].emoji} +${XPV[k]} XP<br><span style="font-size:9px;font-weight:400;opacity:.7">є: ${d.inventory[k]}</span></button>`).join('');
   mHTML(`<img class="m-img" src="${img(pk.pid)}" onerror="this.style.display='none'">
     <div class="m-title">${pk.name}</div>
     <div style="text-align:center;margin-bottom:8px">${types}</div>
-    ${pk.evo?`<div style="font-size:11px;color:#aaa;text-align:center">${lvl} / ${pk.evoLevel} XP</div><div class="xp-wrap" style="margin-bottom:12px"><div class="xp-fill" style="width:${xpPct}%"></div></div>`:''}
+    ${pk.evo?`<div style="font-size:11px;color:#aaa;text-align:center">${lvl} / ${pk.evoLevel} XP</div><div class="xp-wrap" style="margin:6px 0 10px"><div class="xp-fill" style="width:${xpPct}%"></div></div>`:''}
+    ${megaBlock}
     ${pk.isKey?`<div style="background:rgba(74,222,128,.1);border:1px solid rgba(74,222,128,.25);border-radius:8px;padding:8px;font-size:11px;color:#4ade80;margin-bottom:10px">🔑 ${pk.isKey.desc}</div>`:''}
+    ${xpBtns?`<div style="display:flex;gap:6px;margin-bottom:8px">${xpBtns}</div>`:''}
     ${canEvo||canEvoS?`<button class="btn-ok" style="width:100%;margin-bottom:8px;padding:13px;font-size:14px;min-height:44px" onclick="doEvoSlot(${si})">🌟 Еволюція в ${pk.evoN}!</button>`:''}
+    ${canUseCrystal?`<button style="width:100%;margin-bottom:8px;padding:13px;font-size:14px;min-height:44px;background:linear-gradient(135deg,rgba(52,211,153,.15),rgba(16,185,129,.1));border:1px solid rgba(52,211,153,.5);border-radius:10px;color:#34d399;font-weight:700;cursor:pointer" onclick="useEvoCrystal(${ci})">🟢 Кристал${pk.stoneEvo?' + '+(STONES[pk.stoneEvo]?.emoji||'💎'):''}  → еволюціонувати зараз!</button>`:''}
     <div style="display:flex;gap:8px">
       <button class="btn-cancel" style="flex:1;padding:13px;font-size:14px;min-height:44px" onclick="closeModal();openSlotPicker(${si})">Змінити</button>
       <button class="btn-cancel" style="flex:1" onclick="closeModal()">Закрити</button>
