@@ -11,7 +11,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .screen{display:none;min-height:100vh;flex-direction:column;}.screen.active{display:flex;}
 
 /* SELECT */
-.sel-bg{background:url('start.png') center top/cover no-repeat;flex:1;display:flex;flex-direction:column;justify-content:flex-end;padding:0 1rem 2rem;overflow-y:auto;}
+.sel-bg{background:url('start.png') center top/cover no-repeat;flex:1;display:flex;flex-direction:column;justify-content:flex-end;padding:0 1rem calc(1rem + env(safe-area-inset-bottom, 0px));overflow-y:auto;}
 .sel-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
 .sel-card{background:rgba(10,15,35,.72);border:1px solid rgba(255,255,255,.15);backdrop-filter:blur(6px);border-radius:16px;padding:1.25rem .75rem;cursor:pointer;text-align:center;transition:all .2s;}
 .sel-card:hover{background:rgba(255,255,255,.14);transform:translateY(-2px);}
@@ -55,6 +55,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .dex-tabs::-webkit-scrollbar{display:none;}
 .dex-tab{font-size:9px;font-weight:600;padding:3px 9px;border-radius:12px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.05);color:#888;cursor:pointer;white-space:nowrap;flex-shrink:0;transition:all .15s;}
 .dex-tab.act{background:rgba(126,206,255,.2);border-color:#7eceff;color:#7eceff;}
+.dex-tab.loc{border-color:rgba(74,222,128,.4);color:#4ade80;}
 .dex-grid{display:flex;flex-direction:row;overflow-x:auto;gap:6px;margin-bottom:10px;padding-bottom:4px;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.1) transparent;}
 .dex-grid::-webkit-scrollbar{height:3px;}.dex-grid::-webkit-scrollbar-thumb{background:rgba(255,255,255,.15);border-radius:2px;}
 .dex-card{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.07);border-radius:10px;padding:0 3px 5px;text-align:center;cursor:pointer;transition:all .15s;overflow:hidden;width:68px;flex-shrink:0;position:relative;}
@@ -721,8 +722,9 @@ function renderDex(){
 
   // type tabs from current collection
   const allTypes=[...new Set(d.collection.flatMap(c=>gp(c.dbId)?.types||[]))];
+  const locT=LOC_TYPES[d.location]||[];
   tabsEl.innerHTML=[`<div class="dex-tab ${dexTypeFilter==='all'?'act':''}" onclick="setDexTab('all')">Всі</div>`,
-    ...allTypes.map(t=>`<div class="dex-tab ${dexTypeFilter===t?'act':''}" onclick="setDexTab('${t}')">${t}</div>`)
+    ...allTypes.map(t=>`<div class="dex-tab ${dexTypeFilter===t?'act':''} ${locT.includes(t)?'loc':''}" onclick="setDexTab('${t}')">${t}</div>`)
   ].join('');
 
   // sort: group by evo chain (base first), chains ordered by first catch
@@ -1756,7 +1758,7 @@ function _renderBookPreviewHTML(book){
   return`<div style="width:${vw}px;height:${vh}px;overflow:hidden;margin:0 auto 12px"><div style="width:${sw+cw}px;transform:scale(${scale});transform-origin:top left">${inner}</div></div>`;
 }
 
-function _renderBookHTML(book, i){
+function _renderBookHTML(book, i, sc=1){
   const p=book.pages||1;
   const h=_bookH(p),sw=_spineW(p);
   const coverUrl=book.coverUrl||null;
@@ -1771,13 +1773,18 @@ function _renderBookHTML(book, i){
     <div style="font-size:${tsz}px;font-weight:800;text-align:center;color:#fff;white-space:normal;word-break:break-word;overflow:visible;flex:1;display:flex;align-items:center;justify-content:center">${book.title}</div>
     <div style="font-size:8px;opacity:.45;color:#fff;text-align:right;align-self:flex-end">${p} стор.</div>
   </div>`:'';
-  return`<div class="book-wrap" style="height:${h}px" onclick="openBookDetail(${i})" title="">
-    <div class="book-tooltip">${book.title} · ${p} стор.</div>
+  const sh=Math.round(h*sc),stotal=Math.round((sw+cw)*sc);
+  const inner=`
     <div class="book-spine" style="width:${sw}px;height:${h}px;background:${spineGrad};box-shadow:inset 2px 0 5px rgba(255,255,255,.06),inset -3px 0 8px rgba(0,0,0,.45),-3px 3px 10px rgba(0,0,0,.55)">${spineText}</div>
     <div class="book-cover" style="width:${cw}px;height:${h}px;background:${coverGrad};box-shadow:2px 2px 0 rgba(0,0,0,.3),4px 5px 0 rgba(0,0,0,.18),6px 10px 20px rgba(0,0,0,.55),inset -4px 0 12px rgba(0,0,0,.22)">
       ${coverUrl?`<img src="${coverUrl}" onerror="this.style.display='none'">`:''}
       ${textOverlay}
       <div class="book-pages-edge"></div>
+    </div>`;
+  return`<div class="book-wrap" style="height:${sh}px;${sc<1?'width:'+stotal+'px;overflow:hidden':''}" onclick="openBookDetail(${i})" title="">
+    <div class="book-tooltip">${book.title} · ${p} стор.</div>
+    <div style="display:flex;flex-direction:row;${sc<1?'transform:scale('+sc+');transform-origin:bottom left;width:'+(sw+cw)+'px;height:'+h+'px':''}">
+      ${inner}
     </div>
   </div>`;
 }
@@ -1798,7 +1805,7 @@ function _buildLibraryHTML(){
   for(let r=0;r<reversed.length;r+=PER_ROW)rows.push(reversed.slice(r,r+PER_ROW));
   let shelves='';
   rows.forEach(row=>{
-    shelves+=`<div class="shelf-row"><div class="shelf-books">${row.map(({b,i})=>_renderBookHTML(b,i)).join('')}</div><div class="shelf-plank"></div></div>`;
+    shelves+=`<div class="shelf-row"><div class="shelf-books">${row.map(({b,i})=>_renderBookHTML(b,i,0.65)).join('')}</div><div class="shelf-plank"></div></div>`;
   });
   return header+`<div class="shelf-wrap">${shelves}</div>`;
 }
