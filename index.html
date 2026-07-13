@@ -411,7 +411,7 @@ const STONE_FRAGS={
   shore:     ['mega'],
 };
 const LOCS={
-  oak:{id:'oak',name:'Лабораторія Оука',mLabel:'Лаб. Оука',emoji:'🧪',cx:46,cy:122,
+  oak:{id:'oak',name:'Лабораторія Оука',mLabel:'Лабораторія',emoji:'🧪',cx:46,cy:122,
     color:'#1e3a1e',stroke:'#4ade80',badge:'Старт',badgeBg:'rgba(74,222,128,.2)',badgeTxt:'#4ade80',
     connects:['pallet'],actions:['oak_lab']},
   pallet:{id:'pallet',name:'Містечко Палет',mLabel:'Палет',emoji:'🏘️',cx:148,cy:122,
@@ -438,7 +438,7 @@ const LOCS={
     color:'#0c2a4a',stroke:'#38bdf8',badge:'Зона 5',badgeBg:'rgba(56,189,248,.2)',badgeTxt:'#38bdf8',
     connects:['caves'],pool:[67,70,72],rarePool:[74],encounterChance:.6,
     unlockReq:{count:14},actions:['grass']},
-  map2:{id:'map2',name:'Регіон Джото',mLabel:'Рег. Джото',emoji:'🌏',cx:398,cy:182,
+  map2:{id:'map2',name:'Регіон Джото',mLabel:'Регіон Джото',emoji:'🌏',cx:398,cy:182,
     color:'#172554',stroke:'#60a5fa',badge:'Карта 2',badgeBg:'rgba(96,165,250,.2)',badgeTxt:'#60a5fa',
     connects:['caves'],pool:[],rarePool:[],encounterChance:0,
     unlockReq:{keyPoke:53},actions:['enter_johto']},
@@ -485,8 +485,6 @@ function _anyLoc(id){return LOCS[id]||LOCS_JOHTO[id];}
 function gp(id){return POKE.find(p=>p.id===id);}
 function img(pid){return`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pid}.png`;}
 function ri(a,b){return Math.floor(Math.random()*(b-a+1))+a;}
-function p2e(p){if(p<100)return 2;if(p<250)return 4;if(p<400)return 6;if(p<600)return 8;if(p<850)return 11;if(p<1200)return 14;return 18;}
-function p2l(p){if(p<100)return 1;if(p<250)return 2;if(p<400)return 3;if(p<600)return 5;if(p<850)return 7;if(p<1200)return 10;return 14;}
 
 // ═══════════ MODAL QUEUE ═══════════
 function qM(fn){mQueue.push(fn);if(!mOpen)nextM();}
@@ -610,7 +608,7 @@ function openSlotMenu(si){
   mHTML(`<img class="m-img" src="${img(pk.pid)}" onerror="this.style.display='none'">
     <div class="m-title">${pk.name}</div>
     <div style="text-align:center;margin-bottom:8px">${types}</div>
-    ${pk.evo?`<div style="font-size:11px;color:#aaa;text-align:center">${lvl} / ${pk.evoLevel} XP${lvl<pk.evoLevel?' · ще '+(pk.evoLevel-lvl)+' XP':''}</div><div class="xp-wrap" style="margin-bottom:12px"><div class="xp-fill" style="width:${xpPct}%"></div></div>`:''}
+    ${pk.evo?`<div style="font-size:11px;color:#aaa;text-align:center">${lvl} / ${pk.evoLevel} XP</div><div class="xp-wrap" style="margin-bottom:12px"><div class="xp-fill" style="width:${xpPct}%"></div></div>`:''}
     ${pk.isKey?`<div style="background:rgba(74,222,128,.1);border:1px solid rgba(74,222,128,.25);border-radius:8px;padding:8px;font-size:11px;color:#4ade80;margin-bottom:10px">🔑 ${pk.isKey.desc}</div>`:''}
     ${canEvo||canEvoS?`<button class="btn-ok" style="width:100%;margin-bottom:8px;padding:13px;font-size:14px;min-height:44px" onclick="doEvoSlot(${si})">🌟 Еволюція в ${pk.evoN}!</button>`:''}
     <div style="display:flex;gap:8px">
@@ -667,7 +665,7 @@ function _buildSlotPickerHTML(){
   const rows=filtered.map(({c,i,pk,isMax,canEvo,canEvoStone,pct,lvl})=>{
     const isUsed=used.has(i);
     const barPct=Math.min(100,Math.round(pct*100));
-    const xpTxt=isMax?'⭐ Максимум':canEvo?'🌟 Готовий до еволюції!':canEvoStone?'💎 Потрібен камінь':`${lvl} / ${pk.evoLevel} XP${lvl<pk.evoLevel?' · ще '+(pk.evoLevel-lvl)+' XP':''}`;
+    const xpTxt=isMax?'⭐ Максимум':canEvo?'🌟 Готовий до еволюції!':canEvoStone?'💎 Потрібен камінь':`${lvl} / ${pk.evoLevel} XP`;
     const xpClr=isMax?'#888':canEvo?'#4ade80':canEvoStone?'#fbbf24':'#a78bfa';
     return`<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.06);cursor:${isUsed?'not-allowed':'pointer'};opacity:${isUsed?.4:1}" ${isUsed?'':`onclick="pickSlot(${si},${i})"`}>
       <img src="${img(pk.pid)}" style="width:38px;height:38px;image-rendering:pixelated;flex-shrink:0" onerror="this.style.display='none'">
@@ -810,7 +808,7 @@ function isChainComplete(d,dbId){
 function getPokeLocName(dbId){
   const baseId=getBaseDbId(dbId);
   const pk=gp(baseId);if(!pk)return"—";
-  if(pk.rar==="starter") return"Лабораторія Проф. Оука";
+  if(pk.rar==="starter") return"Лабораторія Професора Оука";
   const allLocs=[...Object.values(LOCS),...Object.values(LOCS_JOHTO)];
   const loc=allLocs.find(l=>l.pool&&l.pool.includes(baseId));
   if(loc) return loc.name;
@@ -844,7 +842,7 @@ function renderQuests(){
   if(!d.hasStarter){
     quests.push({
       img:img(1),
-      title:'Відвідай Проф. Оука',
+      title:'Відвідай Професора Оука',
       desc:'Зайди в лабораторію і отримай свого першого покемона!',
       badge:'Перший крок',badgeBg:'rgba(74,222,128,.2)',badgeTxt:'#4ade80'
     });
@@ -993,7 +991,7 @@ function openDexCard(i){
   mHTML(`<img class="m-img" src="${img(pk.pid)}" onerror="this.style.display='none'">
     <div class="m-title">${pk.name}${isAct?' ★':''}</div>
     <div style="text-align:center;margin-bottom:8px">${types}</div>
-    ${pk.evo?`<div style="font-size:11px;color:#aaa;text-align:center">${lvl} / ${pk.evoLevel} XP${lvl<pk.evoLevel?' · ще '+(pk.evoLevel-lvl)+' XP':''}</div><div class="xp-wrap" style="margin:6px 0 6px"><div class="xp-fill" style="width:${xpPct}%"></div></div>`:''}
+    ${pk.evo?`<div style="font-size:11px;color:#aaa;text-align:center">${lvl} / ${pk.evoLevel} XP</div><div class="xp-wrap" style="margin:6px 0 6px"><div class="xp-fill" style="width:${xpPct}%"></div></div>`:''}
     ${needsStone?`<div style="background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.25);border-radius:8px;padding:7px;font-size:11px;color:#fbbf24;text-align:center;margin-bottom:8px">
       ${STONES[pk.stoneEvo]?.emoji||'💎'} Потрібен ${STONES[pk.stoneEvo]?.name||'камінь'} для еволюції<br>
       <span style="color:${stoneOwned?'#4ade80':'#f87171'}">${stoneOwned?'✓ Є в інвентарі':'✗ Ще не маєш'}</span>
@@ -1212,13 +1210,13 @@ function renderActions(){
   (loc.actions||[]).forEach(a=>{
     const inv=d.inventory;
     if(a==='oak_lab'){
-      if(!d.hasStarter) rows.push(aRow('🧪','Проф. Оук','Отримай стартового покемона!','Зайти','rgba(74,222,128,.2)','#4ade80','openOak()',0));
-      else rows.push(aRow('🧪','Проф. Оук',oakHint(),'Зайти','rgba(156,163,175,.2)','#9ca3af','openOakVisit()',0));
+      if(!d.hasStarter) rows.push(aRow('🧪','Професор Оук','Отримай стартового покемона!','Зайти','rgba(74,222,128,.2)','#4ade80','openOak()',0));
+      else rows.push(aRow('🧪','Професор Оук',oakHint(),'Зайти','rgba(156,163,175,.2)','#9ca3af','openOakVisit()',0));
     }
     if(a==='grass'){
       const hl=(inv['lure']||0)>0;
       const hr=(inv['rare_lure']||0)>0;
-      const desc=hl?'100% зустріч (приманка)':hr?'65% · є рідкісна приманка':'65% шанс зустрічі';
+      const desc=hl?'Гарантована зустріч (приманка)':hr?'Є рідкісна приманка':'Пошук покемонів';
       const badge=hl?'🎣 Приманка':hr?'✨ Рідкісна':'Шукати';
       const fn=hr&&!hl?`goGrass(false,true)`:hl?`goGrass(true,false)`:`goGrass(false,false)`;
       rows.push(aRow('🌿','Пошук покемонів',desc,badge,'rgba(167,139,250,.2)','#a78bfa',fn,1));
@@ -1326,7 +1324,7 @@ function oakHint(){
 function openOak(){
   const starters=[1,5,9];const rnd=starters[ri(0,2)];const pk=gp(rnd);
   qM(()=>mHTML(`<img class="m-img" src="${img(pk.pid)}" onerror="this.style.display='none'">
-    <div class="m-title">Проф. Оук</div>
+    <div class="m-title">Професор Оук</div>
     <div class="m-desc">Вітаю, молодий тренере!<br>Твій стартовий покемон:<br><b style="color:#7eceff">${pk.name}</b>!</div>
     <div class="m-btns"><button class="btn-ok" onclick="receiveStarter(${pk.id})">Взяти ${pk.name}!</button></div>`));
 }
@@ -1344,7 +1342,7 @@ function receiveStarter(dbId){
 function openOakVisit(){
   const d=pd();
   if(d.oakPending||checkOakBonus())openOakBonus();
-  else qM(()=>mEmoji('🧪','Проф. Оук','Лови більше покемонів!\n\n'+oakHint(),[{l:'Дякую!',ok:true,cb:closeModal}]));
+  else qM(()=>mEmoji('🧪','Професор Оук','Лови більше покемонів!\n\n'+oakHint(),[{l:'Дякую!',ok:true,cb:closeModal}]));
 }
 
 function openOakBonus(){
@@ -1358,7 +1356,7 @@ function openOakBonus(){
       <div class="starter-type">${pk.types.join(' / ')}${owned?' ×'+owned:''}</div>
     </div>`;}).join('');
   qM(()=>mHTML(`<div class="m-emoji">🧪</div>
-    <div class="m-title">Проф. Оук</div>
+    <div class="m-title">Професор Оук</div>
     <div class="m-desc">У тебе вже ${n} покемонів! Обирай бонусного стартера для еволюції:</div>
     <div class="starter-grid">${opts}</div>
     <button class="btn-cancel" style="width:100%;padding:13px;font-size:14px;min-height:44px" onclick="closeModal()">Пізніше</button>`));
@@ -1396,12 +1394,12 @@ function goGrass(useLure,useRareLure){
     if(d.activePokes.length===0)d.activePokes=[d.collection.length-1];
     const coins=ri(3,10);d.coins+=coins;
     renderRes();renderPballs();renderDex();renderActions();
-    const opened=checkUnlocks();renderMap();
+    const opened=checkUnlocks();renderMap();renderQuests();
     saveToCloud(cur);
-    opened.forEach(u=>qM(()=>mEmoji('🎉','Відкрито!',`${u.emoji} ${u.name} тепер доступна!`,[{l:'Чудово!',ok:true,cb:closeModal}])));
     qM(()=>mImg(img(pk.pid),isDupe?pk.name+' — дублікат!':'Зустрів '+pk.name+'!',
       `${pk.name}${isDupe?' вже є у колекції! Дублікат в PC.':' тепер у твоїй колекції!'}\n+${coins} 🪙`,
       [{l:'Чудово!',ok:true,cb:closeModal}]));
+    opened.forEach(u=>qM(()=>mEmoji('🎉','Відкрито!',`${u.emoji} ${u.name} тепер доступна!`,[{l:'Чудово!',ok:true,cb:closeModal}])));
   } else {
     giveLoot(false);
   }
@@ -1556,14 +1554,14 @@ function doAttack(){
     d.amuletActive=false;
     d.enemy=null;
     closeModal();renderRes();renderPballs();renderDex();renderActions();saveToCloud(cur);
-    const opened=checkUnlocks();renderMap();
+    const opened=checkUnlocks();renderMap();renderQuests();
     const needOak=checkOakBonus();
     qM(()=>mImg(img(pk.pid),isDupe?pk.name+' — дублікат!':'Спіймано!',
       `${pk.name} ${isDupe?'вже є! Дублікат в PC.':'в Покедексі!'}\n+${Math.floor(coins*mult)} 🪙 · +${battleXp} XP`,
       [{l:'Чудово!',ok:true,cb:closeModal}]));
     evoMsgs.forEach(m=>qM(()=>mImg(img(m.pid),m.title,m.desc,[{l:'Чудово!',ok:true,cb:closeModal}])));
     opened.forEach(u=>qM(()=>mEmoji('🎉','Відкрито!',`${u.emoji} ${u.name} доступна!`,[{l:'Чудово!',ok:true,cb:closeModal}])));
-    if(needOak){pd().oakPending=true;qM(()=>mEmoji('🧪','Проф. Оук кличе!','Є сюрприз! Зайди до лабораторії.',[{l:'Ок!',ok:true,cb:closeModal}]));}
+    if(needOak){pd().oakPending=true;qM(()=>mEmoji('🧪','Професор Оук кличе!','Є сюрприз! Зайди до лабораторії.',[{l:'Ок!',ok:true,cb:closeModal}]));}
   } else {
     closeModal();renderRes();renderActions();
     qM(()=>mImg(img(e.pid),'Удар!',`${dmg} шкоди!\n${e.name} залишилось ${e.hp} HP.\n\nДодай ще сторінки і атакуй знову!`,
@@ -1933,7 +1931,7 @@ function updSP(){
   const v=parseInt(document.getElementById('sp-pages').value);
   const el=document.getElementById('sp-prev');
   if(v&&v>0){
-    const e=p2e(v);
+    const e=2;
     const xp=Math.max(1,Math.floor(v/100));
     const coins=Math.max(1,Math.floor(v/30));
     el.style.display='block';
@@ -1963,7 +1961,7 @@ function submitPages(){
   if(!author){showToast('Введи автора');return;}
   if(!pages||pages<1){showToast('Введи кількість сторінок');return;}
   const d=pd();
-  const energy=p2e(pages);
+  const energy=2;
   const xpGain=Math.max(1,Math.floor(pages/100));
   const coins=Math.max(1,Math.floor(pages/30));
   d.energy+=energy;
