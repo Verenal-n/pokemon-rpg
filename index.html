@@ -15,7 +15,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .sel-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
 .sel-card{background:rgba(10,15,35,.72);border:1px solid rgba(255,255,255,.15);backdrop-filter:blur(6px);border-radius:16px;padding:1.25rem .75rem;cursor:pointer;text-align:center;transition:all .2s;}
 .sel-card:hover{background:rgba(255,255,255,.14);transform:translateY(-2px);}
-.sel-av{width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:24px;margin:0 auto 8px;}
+.sel-av{width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:24px;margin:0 auto 8px;overflow:hidden;}
 .sel-name{font-size:14px;font-weight:600;color:#fff;margin-bottom:3px;}
 .sel-sub{font-size:10px;color:#7eceff;margin-bottom:5px;}
 .spill{font-size:10px;font-weight:500;padding:2px 7px;border-radius:20px;background:rgba(126,206,255,.15);color:#7eceff;display:inline-block;margin:2px 1px;}
@@ -25,7 +25,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 /* HEADER */
 .hdr{background:rgba(0,0,0,.45);padding:9px 12px;display:flex;align-items:center;gap:8px;border-bottom:1px solid rgba(255,255,255,.08);flex-shrink:0;}
 .back-btn{background:none;border:none;cursor:pointer;font-size:18px;color:#7eceff;padding:2px 6px;}
-.hdr-av{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;}
+.hdr-av{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;overflow:hidden;}
 .hdr-info{flex:1;min-width:0;}
 .hdr-name{font-size:13px;font-weight:600;color:#fff;}
 .hdr-loc{font-size:10px;color:#7eceff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
@@ -206,7 +206,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .divider{height:1px;background:rgba(255,255,255,.06);margin:10px 0;}
 
 /* SIDE PANEL */
-#side-panel{position:fixed;top:0;right:-340px;width:310px;height:100vh;background:#1e2d4a;border-left:1px solid rgba(126,206,255,.15);z-index:400;transition:right .25s;padding:1rem;overflow-y:auto;}
+#side-panel{position:fixed;top:0;right:-340px;width:310px;height:100vh;background:#1e2d4a;border-left:1px solid rgba(126,206,255,.15);z-index:400;transition:right .25s;padding:1rem;overflow-y:auto;display:flex;flex-direction:column;}
 #side-panel.open{right:0;}
 #side-ov{position:fixed;inset:0;z-index:399;display:none;background:rgba(0,0,0,.4);}
 #side-ov.open{display:block;}
@@ -283,7 +283,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     <span style="font-size:14px;font-weight:700;color:#fff">Меню гравця</span>
     <button onclick="closeSidePanel()" style="background:none;border:none;cursor:pointer;font-size:18px;color:#7eceff">✕</button>
   </div>
-  <div id="side-content"></div>
+  <div id="side-content" style="flex:1"></div>
+  <div style="padding-top:1rem;margin-top:1rem;border-top:1px solid rgba(255,255,255,.07)">
+    <button onclick="openProfileSettings()" style="width:100%;padding:12px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:10px;color:#7eceff;font-size:13px;font-weight:600;cursor:pointer">⚙️ Налаштування</button>
+  </div>
 </div>
 
 <div class="toast" id="toast"></div>
@@ -506,9 +509,11 @@ function show(id){document.querySelectorAll('.screen').forEach(s=>s.classList.re
 function renderSelGrid(){
   document.getElementById('sel-grid').innerHTML=PLAYERS.map(p=>{
     const d=state.players[p.id];
+    const avContent=d.avatarUrl?`<img src="${d.avatarUrl}" style="width:100%;height:100%;object-fit:cover" onerror="this.style.display='none'">`  :p.emoji;
+    const avBg=d.avatarUrl?'transparent':p.color;
     return`<div class="sel-card" onclick="openPlayer('${p.id}')">
-      <div class="sel-av" style="background:${p.color};border:2px solid ${p.border}">${p.emoji}</div>
-      <div class="sel-name">${p.name}</div>
+      <div class="sel-av" style="background:${avBg};border:2px solid ${p.border}">${avContent}</div>
+      <div class="sel-name">${d.customName||p.name}</div>
       <div>
         <span class="spill">${d.collection.length} покемонів</span>
         <span class="spill">📖${d.books?d.books.length:0} книг</span>
@@ -551,8 +556,10 @@ function openPlayer(id){
 function renderMain(){
   const d=pd();const p=pl();
   const av=document.getElementById('hdr-av');
-  av.textContent=p.emoji;av.style.background=p.color;
-  document.getElementById('hdr-name').textContent=p.name;
+  if(d.avatarUrl){av.innerHTML=`<img src="${d.avatarUrl}" style="width:100%;height:100%;object-fit:cover" onerror="this.innerHTML='${p.emoji}'">`;av.style.background='transparent';}
+  else{av.innerHTML='';av.textContent=p.emoji;av.style.background=p.color;}
+  av.style.border='2px solid '+p.border;
+  document.getElementById('hdr-name').textContent=d.customName||p.name;
   document.getElementById('hdr-loc').textContent='📍 '+(cLoc()?.name||'');
   renderRes();renderPballs();renderDex();renderQuests();renderMap();renderActions();
 }
@@ -1686,6 +1693,40 @@ function exchangeCoins2Atk(){
   const d=pd();
   if(d.coins<5){showToast('Потрібно мінімум 5 🪙');return;}
   d.coins-=5;d.atk+=10;renderRes();closeModal();saveToCloud(cur);showToast('5 🪙 → 10 ⚔️');
+}
+
+// ═══════════ PROFILE SETTINGS ═══════════
+function openProfileSettings(){
+  const d=pd();const p=pl();
+  const name=d.customName||p.name;
+  const url=d.avatarUrl||'';
+  mHTML(`<div class="m-title">⚙️ Налаштування</div>
+    <div style="text-align:left;margin-bottom:16px">
+      <div class="flbl">Нік</div>
+      <input type="text" id="ps-name" class="finput" value="${name}" maxlength="20" placeholder="${p.name}">
+      <div class="flbl" style="margin-top:10px">Аватар (посилання на фото)</div>
+      <input type="url" id="ps-avatar" class="finput" value="${url}" placeholder="https://…" style="font-size:11px"
+        oninput="const i=document.getElementById('ps-prev');i.src=this.value;i.style.display=this.value?'block':'none'">
+      <div style="text-align:center;margin-top:10px">
+        <img id="ps-prev" src="${url}" style="width:72px;height:72px;border-radius:50%;object-fit:cover;border:2px solid ${p.border};display:${url?'block':'none'};margin:0 auto" onerror="this.style.display='none'">
+      </div>
+    </div>
+    <div style="display:flex;gap:8px">
+      <button class="btn-cancel" style="flex:1;padding:13px;font-size:14px;min-height:44px" onclick="closeModal()">Скасувати</button>
+      <button class="btn-ok" style="flex:1;padding:13px;font-size:14px;min-height:44px" onclick="saveProfileSettings()">Зберегти</button>
+    </div>`);
+}
+function saveProfileSettings(){
+  const d=pd();
+  const name=(document.getElementById('ps-name')?.value||'').trim();
+  const url=(document.getElementById('ps-avatar')?.value||'').trim();
+  if(name) d.customName=name; else delete d.customName;
+  d.avatarUrl=url||null;
+  closeModal();
+  renderMain();
+  renderSelGrid();
+  saveToCloud(cur);
+  showToast('Профіль оновлено!');
 }
 
 // ═══════════ SIDE PANEL ═══════════
