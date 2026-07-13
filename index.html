@@ -391,10 +391,16 @@ const POKE=[
   {id:97,name:'Ноктаул',       pid:164,loc:'forest',   rar:'evolved', types:['Нормальний','Летючий']},
   {id:98,name:'Комбі',         pid:415,loc:'butterfly',rar:'common',  types:['Комаха','Летючий'], evo:99, evoLevel:15, evoN:'Веспікен'},
   {id:99,name:'Веспікен',      pid:416,loc:'butterfly',rar:'evolved', types:['Комаха','Летючий']},
+  {id:100,name:'Абра',         pid:63, loc:'pallet',   rar:'common',  types:['Психічний'],            evo:101, evoLevel:5,  evoN:'Кадабра'},
+  {id:101,name:'Кадабра',      pid:64, loc:'pallet',   rar:'evolved', types:['Психічний'],            evo:102, evoLevel:15, evoN:'Аласам'},
+  {id:102,name:'Аласам',       pid:65, loc:'pallet',   rar:'evolved', types:['Психічний'],            evo:103, evoLevel:30, evoN:'Мега Аласам', stoneEvo:'mega'},
+  {id:103,name:'Мега Аласам',  pid:65, loc:'pallet',   rar:'mega',    types:['Психічний']},
+  {id:104,name:'Джиґлипаф',    pid:39, loc:'pallet',   rar:'common',  types:['Нормальний','Фея'],     evo:105, evoLevel:15, evoN:'Віґлитаф'},
+  {id:105,name:'Віґлитаф',     pid:40, loc:'pallet',   rar:'evolved', types:['Нормальний','Фея']},
 ];
 
 const HP_RANGE={common:[60,100],uncommon:[120,200],rare:[250,400],legendary:[500,800],starter:[80,80],evolved:[0,0],mega:[0,0]};
-const TYPE_C={'Трава':'#15803d','Отрута':'#6d28d9','Вогонь':'#b45309','Вода':'#1d4ed8','Летючий':'#0369a1','Електрика':'#a16207','Нормальний':'#4b5563','Комаха':'#3f6212','Земля':'#92400e','Камінь':'#374151','Фея':'#be185d','Лід':'#0e7490','Бойовий':'#b91c1c','Темний':'#1e3a5f','Сталь':'#64748b'};
+const TYPE_C={'Трава':'#15803d','Отрута':'#6d28d9','Вогонь':'#b45309','Вода':'#1d4ed8','Летючий':'#0369a1','Електрика':'#a16207','Нормальний':'#4b5563','Комаха':'#3f6212','Земля':'#92400e','Камінь':'#374151','Фея':'#be185d','Лід':'#0e7490','Бойовий':'#b91c1c','Темний':'#1e3a5f','Сталь':'#64748b','Психічний':'#db2777'};
 const STONES={mega:{name:'Мега-камінь',emoji:'💎'}};
 const ITEM_INFO={
   xp_card_bronze:{emoji:'🥉',name:'Бронзова карта XP',desc:'+1 XP'},
@@ -438,16 +444,16 @@ const LOCS={
     connects:['pallet'],actions:['oak_lab']},
   pallet:{id:'pallet',name:'Містечко Палет',mLabel:'Палет',emoji:'🏘️',cx:148,cy:122,
     color:'#166534',stroke:'#4ade80',badge:'Зона 1',badgeBg:'rgba(74,222,128,.15)',badgeTxt:'#4ade80',
-    connects:['oak','forest'],pool:[36,75,13],rarePool:[13],
+    connects:['oak','forest'],pool:[36,75,13,100,104],rarePool:[13],
     actions:['grass','pokecenter','shop']},
   forest:{id:'forest',name:'Ліс Вірідіан',mLabel:'Ліс Вірідіан',emoji:'🌲',cx:242,cy:62,
     color:'#064e3b',stroke:'#34d399',badge:'Зона 2',badgeBg:'rgba(52,211,153,.2)',badgeTxt:'#34d399',
     connects:['pallet','glade'],pool:[15,19,23,25,96],rarePool:[27],
-    unlockReq:{count:3},actions:['grass']},
+    unlockReq:{count:5},actions:['grass']},
   glade:{id:'glade',name:'Поляна',mLabel:'Поляна',emoji:'🌸',cx:328,cy:122,
     color:'#3b0764',stroke:'#a78bfa',badge:'Зона 3',badgeBg:'rgba(167,139,250,.2)',badgeTxt:'#a78bfa',
     connects:['forest','caves','butterfly'],pool:[29,33,38,82,81],rarePool:[54],
-    unlockReq:{count:6},actions:['grass']},
+    unlockReq:{keyPoke:26},actions:['grass']},
   butterfly:{id:'butterfly',name:'Поляна метеликів',mLabel:'Метелики',emoji:'🦋',cx:242,cy:182,
     color:'#500724',stroke:'#f9a8d4',badge:'Зона 3',badgeBg:'rgba(249,168,212,.2)',badgeTxt:'#f9a8d4',
     connects:['glade'],pool:[21,65,77,94,98],rarePool:[66],
@@ -873,27 +879,31 @@ function renderQuests(){
 
   // Quest: unlock forest
   if(d.hasStarter&&!d.unlockedLocs.includes('forest')){
-    const ok=uniqueCount>=3;
+    const ok=uniqueCount>=5;
     quests.push({
       img:img(16),
       title:'Відкрити Ліс Вірідіан',
-      desc:'Злови 3 різних покемони (зараз: '+uniqueCount+'/3)',
+      desc:'Злови 5 різних покемонів (зараз: '+uniqueCount+'/5)',
       badge:ok?'Готово!':'В процесі',
       badgeBg:ok?'rgba(74,222,128,.2)':'rgba(52,211,153,.2)',
       badgeTxt:ok?'#4ade80':'#34d399'
     });
   }
 
-  // Quest: unlock glade
+  // Quest: unlock glade (need Клефейбл)
   if(d.unlockedLocs.includes('forest')&&!d.unlockedLocs.includes('glade')){
-    const ok=uniqueCount>=6;
+    const hasKlef=d.collection.some(c=>c.dbId===26);
+    const hasKlefairy=d.collection.some(c=>c.dbId===25);
+    let desc,badge;
+    if(hasKlef){desc='Клефейбл є! Поляна відкривається.';badge='Готово!';}
+    else if(hasKlefairy){desc='Клефейрі → Клефейбл (потрібно 15 XP)';badge='В процесі';}
+    else{desc='Знайди Клефейрі в Лісі та еволюціонуй у Клефейбл (15 XP)';badge='Знайди Клефейрі';}
     quests.push({
-      img:img(43),
+      img:img(36),
       title:'Відкрити Поляну',
-      desc:'Злови 6 різних покемонів (зараз: '+uniqueCount+'/6)',
-      badge:ok?'Готово!':'В процесі',
-      badgeBg:ok?'rgba(74,222,128,.2)':'rgba(167,139,250,.2)',
-      badgeTxt:ok?'#4ade80':'#a78bfa'
+      desc,badge,
+      badgeBg:hasKlef?'rgba(74,222,128,.2)':'rgba(167,139,250,.2)',
+      badgeTxt:hasKlef?'#4ade80':'#a78bfa'
     });
   }
 
@@ -1822,6 +1832,7 @@ function _buildPagesHTML(){
     </div>
     <div style="padding-top:1rem;border-top:1px solid rgba(255,255,255,.07);display:flex;flex-direction:column;gap:6px">
       <button onclick="closeSidePanel();saveToCloud(cur)" style="width:100%;padding:11px;font-size:12px;font-weight:600;background:rgba(74,222,128,.15);border:1px solid rgba(74,222,128,.25);border-radius:10px;color:#4ade80;cursor:pointer">${SCRIPT_URL?'💾 Зберегти прогрес':'💾 Зберегти (URL не вказано)'}</button>
+      <button onclick="resetProfile()" style="width:100%;padding:11px;font-size:12px;font-weight:600;background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.25);border-radius:10px;color:#f87171;cursor:pointer">🗑️ Скинути профіль (тест)</button>
     </div>`;
 }
 
@@ -1950,6 +1961,20 @@ function confirmDeleteBook(i){
 function closeSidePanel(){
   document.getElementById('side-panel').classList.remove('open');
   document.getElementById('side-ov').classList.remove('open');
+}
+
+function resetProfile(){
+  closeSidePanel();
+  mEmoji('🗑️','Скинути профіль?','Весь прогрес буде видалено. Це незворотньо!',[
+    {l:'Скинути',cb:()=>{
+      closeModal();
+      delete state.players[cur];
+      initState();
+      saveToCloud(cur);
+      renderMain();
+    }},
+    {l:'Скасувати',ok:true,cb:closeModal}
+  ]);
 }
 
 function updSP(){
