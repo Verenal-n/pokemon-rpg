@@ -465,7 +465,7 @@ const LOCS={
   shore:{id:'shore',name:'Морський берег',mLabel:'Берег',emoji:'🌊',cx:440,cy:122,
     color:'#0c2a4a',stroke:'#38bdf8',badge:'Зона 5',badgeBg:'rgba(56,189,248,.2)',badgeTxt:'#38bdf8',
     connects:['caves'],pool:[67,70,72,87,90],rarePool:[74],
-    unlockReq:{count:14},actions:['grass']},
+    unlockReq:{keyPoke:86},actions:['grass']},
   map2:{id:'map2',name:'Регіон Джото',mLabel:'Регіон Джото',emoji:'🌏',cx:398,cy:182,
     color:'#172554',stroke:'#60a5fa',badge:'Карта 2',badgeBg:'rgba(96,165,250,.2)',badgeTxt:'#60a5fa',
     connects:['caves'],pool:[],rarePool:[],
@@ -962,16 +962,24 @@ function renderQuests(){
     });
   }
 
-  // Quest: unlock shore
+  // Quest: unlock shore (need Мега Стілікс)
   if(d.unlockedLocs.includes('caves')&&!d.unlockedLocs.includes('shore')){
-    const ok=uniqueCount>=14;
+    const hasMS =d.collection.some(c=>c.dbId===86);
+    const hasSt =d.collection.some(c=>c.dbId===85);
+    const hasOn =d.collection.some(c=>c.dbId===84);
+    const hasMega=(d.inventory['mega']||0)>0;
+    let desc,badge;
+    if(hasMS){desc='Мега Стілікс є! Морський берег відкривається.';badge='Готово!';}
+    else if(hasSt&&hasMega){desc='Стілікс є + Мега-камінь є! Відкрий картку Стілікса і еволюціонуй.';badge='Еволюціонуй!';}
+    else if(hasSt){desc='Стілікс є! Потрібен 💎 Мега-камінь (збери 3 фрагменти або купи за 100🪙)';badge='Потрібен Мега-камінь';}
+    else if(hasOn){desc='Онікс → Стілікс (15 XP) → Мега Стілікс (💎 Мега-камінь)';badge='В процесі';}
+    else{desc='Злови Онікс у Печерах та еволюціонуй до Мега Стілікса';badge='Знайди Онікс';}
     quests.push({
-      img:img(129),
+      img:hasSt||hasMS?img(208):img(95),
       title:'Відкрити Морський берег',
-      desc:'Злови 14 різних покемонів (зараз: '+uniqueCount+'/14)',
-      badge:ok?'Готово!':'В процесі',
-      badgeBg:ok?'rgba(74,222,128,.2)':'rgba(56,189,248,.2)',
-      badgeTxt:ok?'#4ade80':'#38bdf8'
+      desc,badge,
+      badgeBg:hasMS?'rgba(74,222,128,.2)':'rgba(56,189,248,.2)',
+      badgeTxt:hasMS?'#4ade80':'#38bdf8'
     });
   }
 
