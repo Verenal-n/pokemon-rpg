@@ -126,9 +126,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .ppill{background:rgba(126,206,255,.15);color:#7eceff;font-size:12px;font-weight:600;padding:8px;border-radius:10px;text-align:center;margin-bottom:10px;}
 .shelf-wrap{width:100%;display:flex;flex-direction:column;gap:0;background:#111009;border-radius:10px;padding:0;}
 .shelf-row{display:flex;flex-direction:column;}
-.shelf-books{display:flex;align-items:flex-end;gap:5px;padding:22px 12px 0;overflow-x:scroll;overflow-y:visible;-webkit-overflow-scrolling:touch;touch-action:pan-x;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.15) transparent;}
+.shelf-books{display:flex;align-items:flex-end;gap:5px;padding:10px 10px 0;overflow-x:scroll;overflow-y:visible;-webkit-overflow-scrolling:touch;touch-action:pan-x;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.15) transparent;}
 .shelf-books::-webkit-scrollbar{height:3px;}.shelf-books::-webkit-scrollbar-track{background:transparent;}.shelf-books::-webkit-scrollbar-thumb{background:rgba(255,255,255,.15);border-radius:2px;}
-.shelf-plank{width:100%;height:22px;background:linear-gradient(180deg,#7a5a32 0%,#5a3e1e 35%,#3e2a10 100%);box-shadow:0 8px 24px rgba(0,0,0,.75),inset 0 2px 0 rgba(255,255,255,.07);border-top:2px solid #9a7a4a;flex-shrink:0;margin-top:0;}
+.shelf-plank{width:100%;height:13px;background:linear-gradient(180deg,#7a5a32 0%,#5a3e1e 35%,#3e2a10 100%);box-shadow:0 6px 16px rgba(0,0,0,.7),inset 0 2px 0 rgba(255,255,255,.07);border-top:2px solid #9a7a4a;flex-shrink:0;margin-top:0;}
 .book-wrap{position:relative;display:flex;flex-direction:row;flex-shrink:0;cursor:pointer;transition:transform .18s;}
 .book-wrap:hover{transform:translateY(-14px);z-index:20;}
 .book-spine{display:flex;align-items:center;justify-content:center;flex-shrink:0;position:relative;overflow:hidden;}
@@ -674,7 +674,15 @@ function _buildSlotPickerHTML(){
     return a.pct-b.pct;
   });
   const filtered=_slotTypeFilter==='all'?items:items.filter(({pk})=>pk.types?.includes(_slotTypeFilter));
-  const tabs=['all',...allTypes].map(t=>`<button onclick="setSlotType('${t}')" style="border-radius:20px;padding:4px 10px;font-size:10px;cursor:pointer;font-family:inherit;border:1px solid ${_slotTypeFilter===t?'rgba(167,139,250,.5)':'rgba(255,255,255,.1)'};background:${_slotTypeFilter===t?'rgba(167,139,250,.2)':'rgba(255,255,255,.05)'};color:${_slotTypeFilter===t?'#a78bfa':'#888'}">${t==='all'?'Всі':t}</button>`).join('');
+  const locT=LOC_TYPES[d.location]||[];
+  const tabs=['all',...allTypes].map(t=>{
+    const isSel=_slotTypeFilter===t, isLoc=locT.includes(t);
+    const border=isSel?'rgba(167,139,250,.5)':isLoc?'rgba(74,222,128,.35)':'rgba(255,255,255,.1)';
+    const bg=isSel?'rgba(167,139,250,.2)':isLoc?'rgba(74,222,128,.12)':'rgba(255,255,255,.05)';
+    const clr=isSel?'#a78bfa':isLoc?'#4ade80':'#888';
+    return`<button onclick="setSlotType('${t}')" style="border-radius:20px;padding:4px 10px;font-size:10px;cursor:pointer;font-family:inherit;border:1px solid ${border};background:${bg};color:${clr}">${t==='all'?'Всі':t}</button>`;
+  }).join('');
+  const bonusHint=locT.length?`<div style="font-size:9px;color:#4ade80;margin-bottom:8px">🌿 Бонус +1 XP на цій локації: ${locT.join(', ')}</div>`:'';
   const rows=filtered.map(({c,i,pk,isMax,canEvo,canEvoStone,pct,lvl})=>{
     const isUsed=used.has(i);
     const barPct=Math.min(100,Math.round(pct*100));
@@ -693,6 +701,7 @@ function _buildSlotPickerHTML(){
     </div>`;
   }).join('');
   return`<div class="m-title" style="margin-bottom:10px">Слот ${si+1} — обери покемона</div>
+    ${bonusHint}
     <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:10px">${tabs}</div>
     <div style="max-height:350px;overflow-y:auto">${rows||'<div style="color:#888;font-size:12px;padding:10px 0">Немає покемонів цього типу</div>'}</div>
     <button class="btn-cancel" style="width:100%;margin-top:10px;padding:13px;font-size:14px;min-height:44px" onclick="closeModal()">Скасувати</button>`;
@@ -1008,22 +1017,32 @@ function openDexCard(i){
   const isAct=d.activePokes.includes(i);
   const lvl=c.xp||0;
   const canEvoXp=pk.evo&&!pk.stoneEvo&&lvl>=(pk.evoLevel||5);
-  const canEvoS=pk.stoneEvo&&pk.evo&&(d.inventory[pk.stoneEvo]||0)>0&&lvl>=(pk.evoLevel||5);
-  const needsStone=pk.stoneEvo&&pk.evo&&lvl>=(pk.evoLevel||5);
-  const stoneOwned=(d.inventory[pk.stoneEvo]||0)>0;
+  const stoneOwned=pk.stoneEvo?(d.inventory[pk.stoneEvo]||0)>0:false;
+  const canEvoS=pk.stoneEvo&&pk.evo&&stoneOwned&&lvl>=(pk.evoLevel||5);
+  const hasMegaEvo=!!(pk.stoneEvo&&pk.evo);
   const isDupe=d.collection.filter(x=>x.dbId===c.dbId).length>1;
   const hasCrystal=(d.inventory['evo_crystal']||0)>0;
   const canUseCrystal=hasCrystal&&pk.evo&&!pk.stoneEvo&&!canEvoXp;
   const xpPct=pk.evo?Math.min(100,Math.round((lvl/(pk.evoLevel||5))*100)):100;
   const types=pk.types.map(t=>`<span class="type-b" style="background:${TYPE_C[t]||'#374151'}">${t}</span>`).join('');
+  let megaBlock='';
+  if(hasMegaEvo){
+    const xpOk=lvl>=(pk.evoLevel||5);
+    const stoneName=STONES[pk.stoneEvo]?.name||'Мега-камінь';
+    const stoneEmoji=STONES[pk.stoneEvo]?.emoji||'💎';
+    if(stoneOwned&&xpOk){
+      megaBlock=`<div style="background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.35);border-radius:8px;padding:7px;font-size:11px;color:#fbbf24;text-align:center;margin-bottom:8px">${stoneEmoji} ${stoneName} є в інвентарі!<br><span style="color:#4ade80;font-size:10px">✓ Можна еволюціонувати</span></div>`;
+    } else if(stoneOwned&&!xpOk){
+      megaBlock=`<div style="background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.25);border-radius:8px;padding:7px;font-size:11px;color:#fbbf24;text-align:center;margin-bottom:8px">${stoneEmoji} ${stoneName} є!<br><span style="color:#aaa;font-size:10px">Ще потрібно ${(pk.evoLevel||5)-lvl} XP для еволюції</span></div>`;
+    } else {
+      megaBlock=`<div style="background:rgba(239,68,68,.07);border:1px solid rgba(239,68,68,.2);border-radius:8px;padding:7px;font-size:11px;color:#fca5a5;text-align:center;margin-bottom:8px">${stoneEmoji} Для мега-еволюції потрібен ${stoneName}<br><span style="color:#f87171;font-size:10px">✗ Ще не маєш</span></div>`;
+    }
+  }
   mHTML(`<img class="m-img" src="${img(pk.pid)}" onerror="this.style.display='none'">
     <div class="m-title">${pk.name}${isAct?' ★':''}</div>
     <div style="text-align:center;margin-bottom:8px">${types}</div>
     ${pk.evo?`<div style="font-size:11px;color:#aaa;text-align:center">${lvl} / ${pk.evoLevel} XP</div><div class="xp-wrap" style="margin:6px 0 6px"><div class="xp-fill" style="width:${xpPct}%"></div></div>`:''}
-    ${needsStone?`<div style="background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.25);border-radius:8px;padding:7px;font-size:11px;color:#fbbf24;text-align:center;margin-bottom:8px">
-      ${STONES[pk.stoneEvo]?.emoji||'💎'} Потрібен ${STONES[pk.stoneEvo]?.name||'камінь'} для еволюції<br>
-      <span style="color:${stoneOwned?'#4ade80':'#f87171'}">${stoneOwned?'✓ Є в інвентарі':'✗ Ще не маєш'}</span>
-    </div>`:''}
+    ${megaBlock}
     ${pk.isKey?`<div style="background:rgba(74,222,128,.1);border:1px solid rgba(74,222,128,.25);border-radius:8px;padding:8px;font-size:11px;color:#4ade80;margin-bottom:10px">🔑 ${pk.isKey.desc}</div>`:''}
     ${canEvoXp||canEvoS?`<button class="btn-ok" style="width:100%;margin-bottom:8px;padding:13px;font-size:14px;min-height:44px" onclick="doEvoDex(${i})">🌟 Еволюція в ${pk.evoN}!</button>`:''}
     ${canUseCrystal?`<button style="width:100%;margin-bottom:8px;padding:13px;font-size:14px;min-height:44px;background:linear-gradient(135deg,rgba(52,211,153,.15),rgba(16,185,129,.1));border:1px solid rgba(52,211,153,.5);border-radius:10px;color:#34d399;font-weight:700;cursor:pointer" onclick="useEvoCrystal(${i})">🟢 Кристал пробудження → еволюціонувати зараз!</button>`:''}
@@ -1781,7 +1800,7 @@ function _renderBookHTML(book, i, sc=1){
       ${textOverlay}
       <div class="book-pages-edge"></div>
     </div>`;
-  return`<div class="book-wrap" style="height:${sh}px;${sc<1?'width:'+stotal+'px;overflow:hidden':''}" onclick="openBookDetail(${i})" title="">
+  return`<div class="book-wrap" style="height:${sh}px;${sc<1?'width:'+stotal+'px':''}" onclick="openBookDetail(${i})" title="">
     <div class="book-tooltip">${book.title} · ${p} стор.</div>
     <div style="display:flex;flex-direction:row;${sc<1?'transform:scale('+sc+');transform-origin:bottom left;width:'+(sw+cw)+'px;height:'+h+'px':''}">
       ${inner}
@@ -1805,7 +1824,7 @@ function _buildLibraryHTML(){
   for(let r=0;r<reversed.length;r+=PER_ROW)rows.push(reversed.slice(r,r+PER_ROW));
   let shelves='';
   rows.forEach(row=>{
-    shelves+=`<div class="shelf-row"><div class="shelf-books">${row.map(({b,i})=>_renderBookHTML(b,i,0.65)).join('')}</div><div class="shelf-plank"></div></div>`;
+    shelves+=`<div class="shelf-row"><div class="shelf-books">${row.map(({b,i})=>_renderBookHTML(b,i,0.72)).join('')}</div><div class="shelf-plank"></div></div>`;
   });
   return header+`<div class="shelf-wrap">${shelves}</div>`;
 }
