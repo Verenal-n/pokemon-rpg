@@ -1156,7 +1156,7 @@ function renderMap(){
     if(!ul){
       nh+=`<g style="cursor:pointer" onclick="showLockedHint('${loc.id}')">`;
       nh+=`<circle cx="${loc.cx}" cy="${loc.cy}" r="${r}" fill="rgba(3,8,20,0.68)"/>`;
-      nh+=`<text x="${loc.cx}" y="${loc.cy+1.5}" text-anchor="middle" dominant-baseline="middle" font-size="15" font-family="sans-serif">${loc.unlockReq?.keyPoke?'🔑':'🔒'}</text>`;
+      nh+=`<text x="${loc.cx}" y="${loc.cy+1.5}" text-anchor="middle" dominant-baseline="middle" font-size="15" font-family="sans-serif">🔒</text>`;
       nh+=`</g>`;
     } else if(canGo){
       nh+=`<circle cx="${loc.cx}" cy="${loc.cy}" r="${r}" fill="transparent" stroke="rgba(255,255,255,.08)" stroke-width="1" style="cursor:pointer" onclick="onLocClick('${loc.id}')"/>`;
