@@ -286,21 +286,21 @@ const POKE=[
   {id:1, name:'Бульбазавр',    pid:1,   loc:'pallet', rar:'starter', types:['Трава','Отрута'],  evo:2,  evoLevel:5,  evoN:'Івізавр'},
   {id:2, name:'Івізавр',       pid:2,   loc:'pallet', rar:'evolved', types:['Трава','Отрута'],  evo:3,  evoLevel:15, evoN:'Венузавр'},
   {id:3, name:'Венузавр',      pid:3,   loc:'pallet', rar:'evolved', types:['Трава','Отрута'],  evo:4,  evoLevel:30, evoN:'Мега Венузавр', stoneEvo:'mega'},
-  {id:4, name:'Мега Венузавр', pid:3,   loc:'pallet', rar:'mega',    types:['Трава','Отрута']},
+  {id:4, name:'Мега Венузавр', pid:10033,loc:'pallet', rar:'mega',    types:['Трава','Отрута']},
   {id:5, name:'Чармандер',     pid:4,   loc:'pallet', rar:'starter', types:['Вогонь'],           evo:6,  evoLevel:5,  evoN:'Чармелеон'},
   {id:6, name:'Чармелеон',     pid:5,   loc:'pallet', rar:'evolved', types:['Вогонь'],           evo:7,  evoLevel:15, evoN:'Чаризард'},
   {id:7, name:'Чаризард',      pid:6,   loc:'pallet', rar:'evolved', types:['Вогонь','Летючий'], evo:8,  evoLevel:30, evoN:'Мега Чаризард', stoneEvo:'mega'},
-  {id:8, name:'Мега Чаризард', pid:6,   loc:'pallet', rar:'mega',    types:['Вогонь','Летючий']},
+  {id:8, name:'Мега Чаризард', pid:10035,loc:'pallet', rar:'mega',    types:['Вогонь','Летючий']},
   {id:9, name:'Сквіртл',       pid:7,   loc:'pallet', rar:'starter', types:['Вода'],             evo:10, evoLevel:5,  evoN:'Вартортл'},
   {id:10,name:'Вартортл',      pid:8,   loc:'pallet', rar:'evolved', types:['Вода'],             evo:11, evoLevel:15, evoN:'Бластойз'},
   {id:11,name:'Бластойз',      pid:9,   loc:'pallet', rar:'evolved', types:['Вода'],             evo:12, evoLevel:30, evoN:'Мега Бластойз', stoneEvo:'mega'},
-  {id:12,name:'Мега Бластойз', pid:9,   loc:'pallet', rar:'mega',    types:['Вода']},
+  {id:12,name:'Мега Бластойз', pid:10036,loc:'pallet', rar:'mega',    types:['Вода']},
   {id:13,name:'Пікачу',        pid:25,  loc:'pallet', rar:'rare',    types:['Електрика'],        evo:14, evoLevel:15, evoN:'Райчу'},
   {id:14,name:'Райчу',         pid:26,  loc:'pallet', rar:'evolved', types:['Електрика']},
   {id:15,name:'Піджі',         pid:16,  loc:'forest', rar:'common',  types:['Нормальний','Летючий'], evo:16, evoLevel:5,  evoN:'Піджіотто'},
   {id:16,name:'Піджіотто',     pid:17,  loc:'forest', rar:'evolved', types:['Нормальний','Летючий'], evo:17, evoLevel:15, evoN:'Піджіт'},
   {id:17,name:'Піджіт',        pid:18,  loc:'forest', rar:'evolved', types:['Нормальний','Летючий'], evo:18, evoLevel:30, evoN:'Мега Піджіт', stoneEvo:'mega'},
-  {id:18,name:'Мега Піджіт',   pid:18,  loc:'forest', rar:'mega',    types:['Нормальний','Летючий']},
+  {id:18,name:'Мега Піджіт',   pid:10073,loc:'forest', rar:'mega',    types:['Нормальний','Летючий']},
   {id:19,name:'Еканс',         pid:23,  loc:'forest', rar:'common',  types:['Отрута'],           evo:20, evoLevel:15, evoN:'Ербок'},
   {id:20,name:'Ербок',         pid:24,  loc:'forest', rar:'evolved', types:['Отрута']},
   {id:21,name:'Веномат',       pid:48,  loc:'butterfly',rar:'common', types:['Комаха','Отрута'],  evo:22, evoLevel:15, evoN:'Веномот'},
@@ -310,7 +310,7 @@ const POKE=[
   {id:25,name:'Клефейрі',      pid:35,  loc:'forest', rar:'uncommon',types:['Фея'],              evo:26, evoLevel:15, evoN:'Клефейбл'},
   {id:26,name:'Клефейбл',      pid:36,  loc:'forest', rar:'evolved', types:['Фея']},
   {id:27,name:'Пінсір',        pid:127, loc:'forest', rar:'rare',    types:['Комаха'],           evo:28, evoLevel:30, evoN:'Мега Пінсір', stoneEvo:'mega'},
-  {id:28,name:'Мега Пінсір',   pid:127, loc:'forest', rar:'mega',    types:['Комаха']},
+  {id:28,name:'Мега Пінсір',   pid:10040,loc:'forest', rar:'mega',    types:['Комаха']},
   {id:29,name:'Оддіш',         pid:43,  loc:'glade',  rar:'common',  types:['Трава','Отрута'],   evo:30, evoLevel:5,  evoN:'Глум'},
   {id:30,name:'Глум',          pid:44,  loc:'glade',  rar:'evolved', types:['Трава','Отрута'],   evo:31, evoLevel:15, evoN:'Вайлплюм'},
   {id:31,name:'Вайлплюм',      pid:45,  loc:'glade',  rar:'evolved', types:['Трава','Отрута']},
@@ -333,18 +333,16 @@ const POKE=[
   {id:50,name:'Пюпітар',       pid:247, loc:'caves',  rar:'evolved', types:['Камінь'],            evo:51, evoLevel:15, evoN:'Тіранітар'},
   {id:51,name:'Тіранітар',     pid:248, loc:'caves',  rar:'evolved', types:['Камінь'],            evo:52, evoLevel:30, evoN:'Мега Тіранітар', stoneEvo:'mega'},
   {id:52,name:'Мега Тіранітар',pid:248, loc:'caves',  rar:'mega',    types:['Камінь']},
-  {id:53,name:'Артікуно',      pid:144, loc:'caves',  rar:'legendary',types:['Лід','Летючий'],    isKey:{loc:'map2',desc:'Відкриває перехід до Регіону Джото!'}},
   {id:54,name:'Чімчар',        pid:390, loc:'glade',  rar:'rare',     types:['Вогонь'],            evo:55, evoLevel:5,  evoN:'Монферно'},
   {id:55,name:'Монферно',      pid:391, loc:'glade',  rar:'evolved',  types:['Вогонь','Бойовий'],  evo:56, evoLevel:15, evoN:'Інфернейп'},
-  {id:56,name:'Інфернейп',     pid:392, loc:'glade',  rar:'evolved',  types:['Вогонь','Бойовий'],  evo:57, evoLevel:30, evoN:'Мега Інфернейп', stoneEvo:'mega'},
-  {id:57,name:'Мега Інфернейп',pid:392, loc:'glade',  rar:'mega',     types:['Вогонь','Бойовий'],  isKey:{loc:'caves',desc:'Відкриває Печери!'}},
+  {id:56,name:'Інфернейп',     pid:392, loc:'glade',  rar:'evolved',  types:['Вогонь','Бойовий']},
   {id:60,name:'Маскрейн',     pid:284, loc:'butterfly',rar:'evolved',  types:['Комаха','Летючий']},
   {id:61,name:'Вольказона',   pid:637, loc:'butterfly',rar:'evolved',  types:['Комаха','Вогонь']},
   {id:65,name:'Серскіт',      pid:283, loc:'butterfly',rar:'uncommon', types:['Комаха','Вода'],   evo:60, evoLevel:15, evoN:'Маскрейн'},
   {id:66,name:'Лярвеста',     pid:636, loc:'butterfly',rar:'rare',     types:['Комаха','Вогонь'], evo:61, evoLevel:15, evoN:'Вольказона'},
   {id:67,name:'Магікарп',     pid:129, loc:'shore',    rar:'common',   types:['Вода'],             evo:68, evoLevel:15, evoN:'Ґаладос'},
   {id:68,name:'Ґаладос',      pid:130, loc:'shore',    rar:'evolved',  types:['Вода','Летючий'],   evo:69, evoLevel:30, evoN:'Мега Ґаладос', stoneEvo:'mega'},
-  {id:69,name:'Мега Ґаладос', pid:130, loc:'shore',    rar:'mega',     types:['Вода','Темний']},
+  {id:69,name:'Мега Ґаладос', pid:10041,loc:'shore',   rar:'mega',     types:['Вода','Темний']},
   {id:70,name:'Псайдак',      pid:54,  loc:'shore',    rar:'common',   types:['Вода'],             evo:71, evoLevel:15, evoN:'Ґолдак'},
   {id:71,name:'Ґолдак',       pid:55,  loc:'shore',    rar:'evolved',  types:['Вода']},
   {id:72,name:'Горсі',        pid:116, loc:'shore',    rar:'uncommon', types:['Вода'],             evo:73, evoLevel:15, evoN:'Сідра'},
@@ -361,7 +359,7 @@ const POKE=[
   {id:83,name:'Тангрос',      pid:465, loc:'glade',    rar:'evolved', types:['Трава']},
   {id:84,name:'Онікс',        pid:95,  loc:'caves',    rar:'common',  types:['Камінь','Земля'],       evo:85,  evoLevel:15, evoN:'Стілікс'},
   {id:85,name:'Стілікс',      pid:208, loc:'caves',    rar:'evolved', types:['Сталь','Земля'],        evo:86,  evoLevel:30, evoN:'Мега Стілікс', stoneEvo:'mega'},
-  {id:86,name:'Мега Стілікс', pid:208, loc:'caves',    rar:'mega',    types:['Сталь','Земля']},
+  {id:86,name:'Мега Стілікс', pid:10072,loc:'caves',   rar:'mega',    types:['Сталь','Земля']},
   {id:87,name:'Поліваг',      pid:60,  loc:'shore',    rar:'common',  types:['Вода'],                 evo:88,  evoLevel:5,  evoN:'Полівайрл'},
   {id:88,name:'Полівайрл',    pid:61,  loc:'shore',    rar:'evolved', types:['Вода'],                 evo:89,  evoLevel:15, evoN:'Полівраз'},
   {id:89,name:'Полівраз',     pid:62,  loc:'shore',    rar:'evolved', types:['Вода','Бойовий']},
@@ -381,11 +379,17 @@ const POKE=[
   {id:103,name:'Мега Аласам',  pid:65, loc:'pallet',   rar:'mega',    types:['Психічний']},
   {id:104,name:'Джиґлипаф',    pid:39, loc:'pallet',   rar:'common',  types:['Нормальний','Фея'],     evo:105, evoLevel:15, evoN:'Віґлитаф'},
   {id:105,name:'Віґлитаф',     pid:40, loc:'pallet',   rar:'evolved', types:['Нормальний','Фея']},
+  {id:106,name:'Ґастлі',           pid:92,   loc:'caves',   rar:'common',  types:['Привид','Отрута'],  evo:107, evoLevel:5,  evoN:'Хонтер'},
+  {id:107,name:'Хонтер',           pid:93,   loc:'caves',   rar:'evolved', types:['Привид','Отрута'],  evo:108, evoLevel:15, evoN:'Генгар'},
+  {id:108,name:'Генгар',           pid:94,   loc:'caves',   rar:'rare',    types:['Привид','Отрута'],  evo:109, evoLevel:30, evoN:'Мега Генгар', stoneEvo:'mega'},
+  {id:109,name:'Мега Генгар',      pid:10038,loc:'caves',   rar:'mega',    types:['Привид','Отрута']},
+  {id:110,name:'Аеродактіл',       pid:142,  loc:'glade',   rar:'rare',    types:['Камінь','Летючий'], evo:111, evoLevel:30, evoN:'Мега Аеродактіл', stoneEvo:'mega'},
+  {id:111,name:'Мега Аеродактіл',  pid:10042,loc:'glade',   rar:'mega',    types:['Камінь','Летючий'], isKey:{loc:'caves',desc:'Відкриває Печери!'}},
 ];
 
 const HP_RANGE={common:[60,100],uncommon:[120,200],rare:[250,400],legendary:[500,800],starter:[80,80],evolved:[0,0],mega:[0,0]};
-const TYPE_C={'Трава':'#15803d','Отрута':'#6d28d9','Вогонь':'#b45309','Вода':'#1d4ed8','Летючий':'#0369a1','Електрика':'#a16207','Нормальний':'#4b5563','Комаха':'#3f6212','Земля':'#92400e','Камінь':'#374151','Фея':'#be185d','Лід':'#0e7490','Бойовий':'#b91c1c','Темний':'#1e3a5f','Сталь':'#64748b','Психічний':'#db2777'};
-const LOC_TYPES={pallet:['Психічний','Фея','Вогонь','Електрика'],forest:['Трава','Комаха','Нормальний','Бойовий'],glade:['Трава','Фея','Отрута'],butterfly:['Комаха','Летючий'],caves:['Камінь','Земля','Сталь'],shore:['Вода','Лід']};
+const TYPE_C={'Трава':'#15803d','Отрута':'#6d28d9','Вогонь':'#b45309','Вода':'#1d4ed8','Летючий':'#0369a1','Електрика':'#a16207','Нормальний':'#4b5563','Комаха':'#3f6212','Земля':'#92400e','Камінь':'#374151','Фея':'#be185d','Лід':'#0e7490','Бойовий':'#b91c1c','Темний':'#1e3a5f','Сталь':'#64748b','Психічний':'#db2777','Привид':'#4c1d95'};
+const LOC_TYPES={pallet:['Психічний','Фея','Вогонь','Електрика'],forest:['Трава','Комаха','Нормальний','Бойовий'],glade:['Трава','Фея','Отрута'],butterfly:['Комаха','Летючий'],caves:['Камінь','Земля','Сталь','Привид'],shore:['Вода','Лід']};
 function locMatch(pk,locId){return(LOC_TYPES[locId]||[]).some(t=>(pk?.types||[]).includes(t));}
 const STONES={mega:{name:'Мега-камінь',emoji:'💎'}};
 const ITEM_INFO={
@@ -437,7 +441,7 @@ const LOCS={
     unlockReq:{count:5},actions:['grass']},
   glade:{id:'glade',name:'Поляна',mLabel:'Поляна',emoji:'🌸',cx:328,cy:122,
     color:'#3b0764',stroke:'#a78bfa',badge:'Зона 3',badgeBg:'rgba(167,139,250,.2)',badgeTxt:'#a78bfa',
-    connects:['forest','caves','butterfly'],pool:[29,33,38,82,81],rarePool:[54],
+    connects:['forest','caves','butterfly'],pool:[29,33,38,82,81],rarePool:[54,110],
     unlockReq:{keyPoke:26},actions:['grass']},
   butterfly:{id:'butterfly',name:'Поляна метеликів',mLabel:'Метелики',emoji:'🦋',cx:242,cy:182,
     color:'#500724',stroke:'#f9a8d4',badge:'Зона 3',badgeBg:'rgba(249,168,212,.2)',badgeTxt:'#f9a8d4',
@@ -445,8 +449,8 @@ const LOCS={
     unlockReq:{keyPoke:35},actions:['grass']},
   caves:{id:'caves',name:'Печери',mLabel:'Печери',emoji:'⛏️',cx:398,cy:62,
     color:'#1c1917',stroke:'#a8a29e',badge:'Зона 4',badgeBg:'rgba(168,162,158,.2)',badgeTxt:'#a8a29e',
-    connects:['glade','shore','map2'],pool:[41,44,47,49,84],rarePool:[53],
-    unlockReq:{keyPoke:57},actions:['grass']},
+    connects:['glade','shore','map2'],pool:[41,44,47,49,84,106],rarePool:[108],
+    unlockReq:{keyPoke:111},actions:['grass']},
   shore:{id:'shore',name:'Морський берег',mLabel:'Берег',emoji:'🌊',cx:440,cy:122,
     color:'#0c2a4a',stroke:'#38bdf8',badge:'Зона 5',badgeBg:'rgba(56,189,248,.2)',badgeTxt:'#38bdf8',
     connects:['caves'],pool:[67,70,72,87,90],rarePool:[74],
@@ -454,7 +458,7 @@ const LOCS={
   map2:{id:'map2',name:'Регіон Джото',mLabel:'Регіон Джото',emoji:'🌏',cx:398,cy:182,
     color:'#172554',stroke:'#60a5fa',badge:'Карта 2',badgeBg:'rgba(96,165,250,.2)',badgeTxt:'#60a5fa',
     connects:['caves'],pool:[],rarePool:[],
-    unlockReq:{keyPoke:53},actions:['enter_johto']},
+    unlockReq:{keyPokes:[4,8,12]},actions:['enter_johto']},
 };
 
 const LOCS_JOHTO={
@@ -782,7 +786,7 @@ function renderDex(){
   doneChains.sort((a,b)=>{
     const fa=getFullChain(a);const fb=getFullChain(b);
     const findLast=(fid)=>d.collection.reduce((mx,c,i)=>c.dbId===fid?i:mx,-1);
-    return findLast(fa[fa.length-1])-findLast(fb[fb.length-1]);
+    return findLast(fb[fb.length-1])-findLast(fa[fa.length-1]);
   }).reverse();
 
   // filter incomplete by active tab
@@ -944,39 +948,39 @@ function renderQuests(){
     });
   }
 
-  // Quest: Мега Інфернейп → Caves
+  // Quest: Мега Аеродактіл → Caves
   if(d.unlockedLocs.includes('glade')&&!d.unlockedLocs.includes('caves')){
-    const hasMI=d.collection.some(c=>c.dbId===57);
-    const hasI =d.collection.some(c=>c.dbId===56);
-    const hasMF=d.collection.some(c=>c.dbId===55);
-    const hasC =d.collection.some(c=>c.dbId===54);
+    const hasMA=d.collection.some(c=>c.dbId===111);
+    const hasA =d.collection.some(c=>c.dbId===110);
     const hasMega=(d.inventory['mega']||0)>0;
     let desc,badge;
-    if(hasMI){desc='Мега Інфернейп є! Печери відкриваються.';badge='Готово!';}
-    else if(hasI&&hasMega){desc='Інфернейп є + Мега-камінь є! Відкрий картку Інфернейпа і еволюціонуй.';badge='Еволюціонуй!';}
-    else if(hasI){desc='Інфернейп є! Потрібен 💎 Мега-камінь (збери 3 фрагменти на Поляні або купи в Магазині за 100🪙)';badge='Потрібен Мега-камінь';}
-    else if(hasMF){desc='Монферно → Інфернейп (30 XP) → Мега Інфернейп (💎 Мега-камінь)';badge='В процесі';}
-    else if(hasC){desc='Чімчар → Монферно (10 XP) → Інфернейп (30 XP) → Мега (💎)';badge='В процесі';}
-    else{desc='Ланцюг: Чімчар→Монферно→Інфернейп→Мега Інфернейп (💎 Мега-камінь)';badge='Отримай Мега Інфернейпа';}
+    if(hasMA){desc='Мега Аеродактіл є! Печери відкриваються.';badge='Готово!';}
+    else if(hasA&&hasMega){desc='Аеродактіл є + Мега-камінь є! Відкрий картку Аеродактіла і еволюціонуй.';badge='Еволюціонуй!';}
+    else if(hasA){desc='Аеродактіл є! Потрібен 💎 Мега-камінь (збери 3 фрагменти або купи за 100🪙)';badge='Потрібен Мега-камінь';}
+    else{desc='Знайди Аеродактіла на Поляні (рідкісна приманка ✨) та еволюціонуй у Мега Аеродактіла (💎)';badge='Знайди Аеродактіла';}
     quests.push({
-      img:hasI||hasMF?img(392):img(390),
+      img:hasMA?img(10042):img(142),
       title:'Відкрити Печери',
       desc,badge,
-      badgeBg:hasMI?'rgba(74,222,128,.2)':'rgba(251,146,60,.2)',
-      badgeTxt:hasMI?'#4ade80':'#fb923c'
+      badgeBg:hasMA?'rgba(74,222,128,.2)':'rgba(251,146,60,.2)',
+      badgeTxt:hasMA?'#4ade80':'#fb923c'
     });
   }
 
-  // Quest: Articuno → Johto
+  // Quest: 3 starter megas → Johto
   if(d.unlockedLocs.includes('caves')&&!d.unlockedLocs.includes('map2')){
-    const hasArt=d.collection.some(c=>c.dbId===53);
+    const hasMV=d.collection.some(c=>c.dbId===4);
+    const hasMC=d.collection.some(c=>c.dbId===8);
+    const hasMB=d.collection.some(c=>c.dbId===12);
+    const megaCount=[hasMV,hasMC,hasMB].filter(Boolean).length;
+    const allDone=megaCount===3;
     quests.push({
-      img:img(144),
+      img:img(10033),
       title:'Відкрити Регіон Джото',
-      desc:hasArt?'Артікуно спійманий! Переходь до Регіону Джото.':'Злови легендарного Артікуно в Печерах (рідкісна трава)',
-      badge:hasArt?'Готово!':'Шукай в Печерах',
-      badgeBg:hasArt?'rgba(74,222,128,.2)':'rgba(96,165,250,.2)',
-      badgeTxt:hasArt?'#4ade80':'#60a5fa'
+      desc:allDone?'Всі три стартові меги є! Регіон Джото відкривається!':`Еволюціонуй стартерів Оука до Мега форм (${megaCount}/3): Мега Венузавр${hasMV?' ✓':''}, Мега Чаризард${hasMC?' ✓':''}, Мега Бластойз${hasMB?' ✓':''}`,
+      badge:allDone?'Готово!':`${megaCount}/3 Мег`,
+      badgeBg:allDone?'rgba(74,222,128,.2)':'rgba(96,165,250,.2)',
+      badgeTxt:allDone?'#4ade80':'#60a5fa'
     });
   }
 
@@ -1005,6 +1009,8 @@ function renderQuests(){
   d.collection.forEach(c=>{
     const pk=gp(c.dbId);
     if(!pk||!pk.stoneEvo||!pk.evo)return;
+    // mega form already obtained — quest done
+    if(d.collection.some(x=>x.dbId===pk.evo))return;
     const stone=STONES[pk.stoneEvo];
     const has=(d.inventory[pk.stoneEvo]||0)>0;
     // avoid duplicates
@@ -1126,7 +1132,8 @@ function checkUnlocks(){
     const req=loc.unlockReq;
     const cntOk=!req.count||uniqueCount>=req.count;
     const keyOk=!req.keyPoke||d.collection.some(c=>c.dbId===req.keyPoke);
-    if(cntOk&&keyOk){d.unlockedLocs.push(loc.id);opened.push(loc);}
+    const keysOk=!req.keyPokes||req.keyPokes.every(id=>d.collection.some(c=>c.dbId===id));
+    if(cntOk&&keyOk&&keysOk){d.unlockedLocs.push(loc.id);opened.push(loc);}
   });
   return opened;
 }
