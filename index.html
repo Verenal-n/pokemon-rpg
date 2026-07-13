@@ -61,7 +61,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .dex-card{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.07);border-radius:10px;padding:0 3px 5px;text-align:center;cursor:pointer;transition:all .15s;overflow:hidden;width:68px;flex-shrink:0;position:relative;}
 .dex-card:hover{background:rgba(255,255,255,.1);}
 .dex-card.act{border-color:#7eceff;background:rgba(126,206,255,.1);}
-.dex-card.loc-match{border-color:rgba(74,222,128,.45);box-shadow:0 0 6px rgba(74,222,128,.15);}
+.dex-card.loc-match{border-color:#4ade80;background:rgba(74,222,128,.08);}
 .dex-img{width:calc(100% + 6px);height:68px;object-fit:contain;object-position:bottom center;image-rendering:pixelated;margin:0 -3px;display:block;}
 .dex-name{font-size:8px;color:#ccc;margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;line-height:1.2;}
 .dex-sub{font-size:8px;color:#7eceff;line-height:1.2;}
@@ -190,7 +190,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .divider{height:1px;background:rgba(255,255,255,.06);margin:10px 0;}
 
 /* SIDE PANEL */
-#side-panel{position:fixed;top:0;right:-340px;width:310px;height:100vh;background:#1e2d4a;border-left:1px solid rgba(126,206,255,.15);z-index:400;transition:right .25s;padding:1rem;overflow-y:auto;display:flex;flex-direction:column;}
+#side-panel{position:fixed;top:0;right:-340px;width:310px;height:100vh;height:100dvh;background:#1e2d4a;border-left:1px solid rgba(126,206,255,.15);z-index:400;transition:right .25s;padding:1rem;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;display:flex;flex-direction:column;}
 #side-panel.open{right:0;}
 #side-ov{position:fixed;inset:0;z-index:399;display:none;background:rgba(0,0,0,.4);}
 #side-ov.open{display:block;}
@@ -635,7 +635,7 @@ function doEvoSlot(si){
   if(pk.stoneEvo)d.inventory[pk.stoneEvo]--;
   const nPk=POKE.find(p=>p.id===pk.evo);
   const old=pk.name;c.dbId=nPk.id;
-  closeModal();renderPballs();renderDex();saveToCloud(cur);
+  closeModal();renderPballs();renderDex();renderQuests();saveToCloud(cur);
   qM(()=>mImg(img(nPk.pid),old+' → '+nPk.name,'Еволюція!',[{l:'Чудово!',ok:true,cb:closeModal}]));
 }
 
@@ -782,10 +782,9 @@ function renderDex(){
     const isLocMatch=locMatch(pk,d.location);
     return`<div class="dex-card ${isAct?'act':''} ${isLocMatch?'loc-match':''}" onclick="openDexCard(${i})">
       ${isMax?'<div style="position:absolute;top:2px;right:3px;font-size:9px;line-height:1;color:#fbbf24">⭐</div>':''}
-      ${isLocMatch?'<div style="position:absolute;top:2px;left:3px;font-size:9px;line-height:1">🌿</div>':''}
       ${dupeCount>1?`<div style="position:absolute;top:0;left:0;background:#ef4444;color:#fff;font-size:7px;font-weight:700;padding:1px 4px;border-radius:0 0 5px 0;line-height:1.5">×${dupeCount}</div>`:''}
       <img class="dex-img" src="${img(pk.pid)}" onerror="this.outerHTML='<div style=font-size:24px;text-align:center;height:52px;line-height:52px>${pk.name[0]}</div>'">
-      <div class="dex-name">${pk.name}</div>
+      <div class="dex-name">${isLocMatch?'🌿 ':''}${pk.name}</div>
       <div class="dex-sub">${subTxt}</div>
       ${dotsHtml}
     </div>`;
@@ -806,7 +805,7 @@ function renderDex(){
           <div style="font-size:6.5px;color:${isAct?'#7eceff':'#999'};overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:44px;margin-top:1px;line-height:1.2">${pk.name}</div>
         </div>`;
     }).join('');
-    return`<div class="chain-block" style="${chainLocMatch?'border-color:rgba(74,222,128,.45);background:rgba(74,222,128,.07)':''}"><div class="chain-block-badge" style="${chainLocMatch?'background:#4ade80':''}">✓</div>${sprites}</div>`;
+    return`<div class="chain-block" style="${chainLocMatch?'border-color:#4ade80;background:rgba(74,222,128,.07)':''}"><div class="chain-block-badge" style="${chainLocMatch?'background:#4ade80':''}">✓</div>${sprites}</div>`;
   }).join('');
   completeEl.innerHTML=`<div style="font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:#fbbf24;margin:4px 0 5px;opacity:.8">🏆 Завершені</div><div class="chain-row">${chainHtml}</div>`;
 }
@@ -1058,7 +1057,7 @@ function doEvoDex(i){
   if(pk.stoneEvo)d.inventory[pk.stoneEvo]--;
   const nPk=POKE.find(p=>p.id===pk.evo);
   const old=pk.name;c.dbId=nPk.id;
-  closeModal();renderPballs();renderDex();saveToCloud(cur);
+  closeModal();renderPballs();renderDex();renderQuests();saveToCloud(cur);
   qM(()=>mImg(img(nPk.pid),old+' → '+nPk.name,'Еволюція!',[{l:'Чудово!',ok:true,cb:closeModal}]));
 }
 
@@ -1070,7 +1069,7 @@ function useEvoCrystal(i){
   const old=pk.name;c.dbId=nPk.id;
   d.inventory['evo_crystal']--;
   if(pk.stoneEvo)d.inventory[pk.stoneEvo]--;
-  closeModal();renderPballs();renderDex();saveToCloud(cur);
+  closeModal();renderPballs();renderDex();renderQuests();saveToCloud(cur);
   qM(()=>mImg(img(nPk.pid),old+' → '+nPk.name,'Кристал пробудження!\nЕволюція здійснена!',[{l:'Чудово!',ok:true,cb:closeModal}]));
 }
 
