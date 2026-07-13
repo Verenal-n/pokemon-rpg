@@ -126,7 +126,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .ppill{background:rgba(126,206,255,.15);color:#7eceff;font-size:12px;font-weight:600;padding:8px;border-radius:10px;text-align:center;margin-bottom:10px;}
 .shelf-wrap{width:100%;display:flex;flex-direction:column;gap:0;background:#111009;border-radius:10px;padding:0;}
 .shelf-row{display:flex;flex-direction:column;}
-.shelf-books{display:flex;align-items:flex-end;gap:5px;padding:10px 10px 0;height:186px;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;touch-action:pan-x;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.15) transparent;}
+.shelf-books{display:flex;align-items:flex-end;gap:5px;padding:16px 10px 0;height:192px;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;touch-action:pan-x;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.15) transparent;}
 .shelf-books::-webkit-scrollbar{height:3px;}.shelf-books::-webkit-scrollbar-track{background:transparent;}.shelf-books::-webkit-scrollbar-thumb{background:rgba(255,255,255,.15);border-radius:2px;}
 .shelf-plank{width:100%;height:13px;background:linear-gradient(180deg,#7a5a32 0%,#5a3e1e 35%,#3e2a10 100%);box-shadow:0 6px 16px rgba(0,0,0,.7),inset 0 2px 0 rgba(255,255,255,.07);border-top:2px solid #9a7a4a;flex-shrink:0;margin-top:0;}
 .book-wrap{position:relative;display:flex;flex-direction:row;flex-shrink:0;cursor:pointer;transition:transform .18s;}
@@ -795,6 +795,7 @@ function renderDex(){
   if(!doneChains.length){completeEl.innerHTML='';return;}
   const chainHtml=doneChains.map(rootId=>{
     const chainIds=getFullChain(rootId);
+    const chainLocMatch=chainIds.some(fid=>locMatch(gp(fid),d.location));
     const sprites=chainIds.map((fid,idx)=>{
       const pk=gp(fid);
       const ci=d.collection.findIndex(c=>c.dbId===fid);
@@ -805,7 +806,7 @@ function renderDex(){
           <div style="font-size:6.5px;color:${isAct?'#7eceff':'#999'};overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:44px;margin-top:1px;line-height:1.2">${pk.name}</div>
         </div>`;
     }).join('');
-    return`<div class="chain-block"><div class="chain-block-badge">✓</div>${sprites}</div>`;
+    return`<div class="chain-block" style="${chainLocMatch?'border-color:rgba(74,222,128,.45);background:rgba(74,222,128,.07)':''}"><div class="chain-block-badge" style="${chainLocMatch?'background:#4ade80':''}">✓</div>${sprites}</div>`;
   }).join('');
   completeEl.innerHTML=`<div style="font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:#fbbf24;margin:4px 0 5px;opacity:.8">🏆 Завершені</div><div class="chain-row">${chainHtml}</div>`;
 }
@@ -1022,7 +1023,8 @@ function openDexCard(i){
   const hasMegaEvo=!!(pk.stoneEvo&&pk.evo);
   const isDupe=d.collection.filter(x=>x.dbId===c.dbId).length>1;
   const hasCrystal=(d.inventory['evo_crystal']||0)>0;
-  const canUseCrystal=hasCrystal&&pk.evo&&!pk.stoneEvo&&!canEvoXp;
+  const xpOk=lvl>=(pk.evoLevel||5);
+  const canUseCrystal=hasCrystal&&pk.evo&&!xpOk&&(pk.stoneEvo?stoneOwned:true);
   const xpPct=pk.evo?Math.min(100,Math.round((lvl/(pk.evoLevel||5))*100)):100;
   const types=pk.types.map(t=>`<span class="type-b" style="background:${TYPE_C[t]||'#374151'}">${t}</span>`).join('');
   let megaBlock='';
@@ -1045,7 +1047,7 @@ function openDexCard(i){
     ${megaBlock}
     ${pk.isKey?`<div style="background:rgba(74,222,128,.1);border:1px solid rgba(74,222,128,.25);border-radius:8px;padding:8px;font-size:11px;color:#4ade80;margin-bottom:10px">🔑 ${pk.isKey.desc}</div>`:''}
     ${canEvoXp||canEvoS?`<button class="btn-ok" style="width:100%;margin-bottom:8px;padding:13px;font-size:14px;min-height:44px" onclick="doEvoDex(${i})">🌟 Еволюція в ${pk.evoN}!</button>`:''}
-    ${canUseCrystal?`<button style="width:100%;margin-bottom:8px;padding:13px;font-size:14px;min-height:44px;background:linear-gradient(135deg,rgba(52,211,153,.15),rgba(16,185,129,.1));border:1px solid rgba(52,211,153,.5);border-radius:10px;color:#34d399;font-weight:700;cursor:pointer" onclick="useEvoCrystal(${i})">🟢 Кристал пробудження → еволюціонувати зараз!</button>`:''}
+    ${canUseCrystal?`<button style="width:100%;margin-bottom:8px;padding:13px;font-size:14px;min-height:44px;background:linear-gradient(135deg,rgba(52,211,153,.15),rgba(16,185,129,.1));border:1px solid rgba(52,211,153,.5);border-radius:10px;color:#34d399;font-weight:700;cursor:pointer" onclick="useEvoCrystal(${i})">🟢 Кристал${pk.stoneEvo?' + '+(STONES[pk.stoneEvo]?.emoji||'💎'):''}  → еволюціонувати зараз!</button>`:''}
     ${isDupe?`<button class="btn-cancel" style="width:100%;margin-bottom:8px;padding:13px;font-size:14px;min-height:44px" onclick="sellDupe(${i})">Продати дублікат — 🪙${dupeP(pk)}</button>`:''}
     <div style="font-size:10px;color:#888;text-align:center;margin-bottom:8px">📍 Де ловиться: <b style="color:#aaa">${getPokeLocName(c.dbId)}</b></div>
     <button class="btn-cancel" style="width:100%;padding:13px;font-size:14px;min-height:44px" onclick="closeModal()">Закрити</button>`);
@@ -1062,10 +1064,12 @@ function doEvoDex(i){
 
 function useEvoCrystal(i){
   const d=pd();const c=d.collection[i];const pk=gp(c.dbId);
-  if(!pk||!pk.evo||pk.stoneEvo||(d.inventory['evo_crystal']||0)<=0)return;
+  if(!pk||!pk.evo||(d.inventory['evo_crystal']||0)<=0)return;
+  if(pk.stoneEvo&&!(d.inventory[pk.stoneEvo]>0))return;
   const nPk=POKE.find(p=>p.id===pk.evo);if(!nPk)return;
   const old=pk.name;c.dbId=nPk.id;
   d.inventory['evo_crystal']--;
+  if(pk.stoneEvo)d.inventory[pk.stoneEvo]--;
   closeModal();renderPballs();renderDex();saveToCloud(cur);
   qM(()=>mImg(img(nPk.pid),old+' → '+nPk.name,'Кристал пробудження!\nЕволюція здійснена!',[{l:'Чудово!',ok:true,cb:closeModal}]));
 }
@@ -1230,7 +1234,7 @@ function doMove(locId){
   const d=pd();d.energy-=ECOST.move;d.location=locId;
   const loc=cLoc();
   document.getElementById('hdr-loc').textContent='📍 '+loc.name;
-  renderRes();renderMap();renderActions();
+  renderRes();renderDex();renderMap();renderActions();
   const opened=checkUnlocks();renderMap();
   opened.forEach(u=>qM(()=>mEmoji('🎉','Відкрито!',`${u.emoji} ${u.name} тепер доступна!`,[{l:'Чудово!',ok:true,cb:closeModal}])));
   showToast('→ '+loc.name);
@@ -1346,7 +1350,7 @@ function doAirshipMove(locId){
   d.energy-=ECOST.move;d.location=locId;
   const loc=_anyLoc(locId);
   document.getElementById('hdr-loc').textContent='📍 '+loc.name;
-  renderRes();renderMap();renderActions();
+  renderRes();renderDex();renderMap();renderActions();
   const opened=checkUnlocks();renderMap();
   opened.forEach(u=>qM(()=>mEmoji('🎉','Відкрито!',`${u.emoji} ${u.name} тепер доступна!`,[{l:'Чудово!',ok:true,cb:closeModal}])));
   showToast('🎫 → '+loc.name);
@@ -1609,7 +1613,7 @@ function enterJohto(){
   const d=pd();
   d.region='johto';d.location='newbark';
   document.getElementById('hdr-loc').textContent='📍 Нью-Барк-Таун';
-  renderRes();renderMap();renderActions();saveToCloud(cur);
+  renderRes();renderDex();renderMap();renderActions();saveToCloud(cur);
   qM(()=>mEmoji('🌏','Ласкаво просимо до Джото!','Новий регіон відкрито!\n\nНью-Барк-Таун — перше місто Регіону Джото.',[{l:'Дослідимо!',ok:true,cb:closeModal}]));
 }
 
@@ -1617,7 +1621,7 @@ function returnToKanto(){
   const d=pd();
   d.region='kanto';d.location='caves';
   document.getElementById('hdr-loc').textContent='📍 Печери';
-  renderRes();renderMap();renderActions();saveToCloud(cur);
+  renderRes();renderDex();renderMap();renderActions();saveToCloud(cur);
   showToast('→ Регіон Канто: Печери');
 }
 
@@ -1779,31 +1783,28 @@ function _renderBookPreviewHTML(book){
 
 function _renderBookHTML(book, i, sc=1){
   const p=book.pages||1;
-  const h=_bookH(p),sw=_spineW(p);
+  const h=Math.round(_bookH(p)*sc);
+  const sw=Math.round(_spineW(p)*sc);
   const coverUrl=book.coverUrl||null;
-  const cw=coverUrl?Math.round(h*2/3):_coverW(p);
+  const cw=coverUrl?Math.round(h*2/3):Math.round(_coverW(p)*sc);
   const [top,bot,spine]=_colorFor(book.title);
-  const tsz=_titleSz(book.title,cw);
+  const tsz=Math.max(7,Math.round(_titleSz(book.title,cw)*sc));
+  const fsz=Math.max(6,Math.round(8*sc));
   const spineGrad=`linear-gradient(90deg,${bot} 0%,${spine} 40%,${top} 100%)`;
   const coverGrad=`linear-gradient(150deg,${top} 0%,${bot} 100%)`;
-  const spineText=sw>=12?`<span style="writing-mode:vertical-rl;transform:rotate(180deg);font-size:${Math.max(7,sw>20?9:8)}px;font-weight:700;color:rgba(255,255,255,.75);white-space:normal;word-break:break-word;text-align:center;overflow:visible;max-height:${h-16}px">${book.title}</span>`:'';
+  const spineText=sw>=10?`<span style="writing-mode:vertical-rl;transform:rotate(180deg);font-size:${Math.max(6,sw>14?Math.round(9*sc):Math.round(8*sc))}px;font-weight:700;color:rgba(255,255,255,.75);white-space:normal;word-break:break-word;text-align:center;overflow:visible;max-height:${h-10}px">${book.title}</span>`:'';
   const textOverlay=!coverUrl?`<div class="book-cover-inner">
-    <div style="font-size:8px;opacity:.5;text-transform:uppercase;letter-spacing:.08em;color:#fff;margin-bottom:auto">${book.author||''}</div>
+    <div style="font-size:${fsz}px;opacity:.5;text-transform:uppercase;letter-spacing:.06em;color:#fff;margin-bottom:auto">${book.author||''}</div>
     <div style="font-size:${tsz}px;font-weight:800;text-align:center;color:#fff;white-space:normal;word-break:break-word;overflow:visible;flex:1;display:flex;align-items:center;justify-content:center">${book.title}</div>
-    <div style="font-size:8px;opacity:.45;color:#fff;text-align:right;align-self:flex-end">${p} стор.</div>
+    <div style="font-size:${fsz}px;opacity:.45;color:#fff;text-align:right;align-self:flex-end">${p} стор.</div>
   </div>`:'';
-  const sh=Math.round(h*sc),stotal=Math.round((sw+cw)*sc);
-  const inner=`
-    <div class="book-spine" style="width:${sw}px;height:${h}px;background:${spineGrad};box-shadow:inset 2px 0 5px rgba(255,255,255,.06),inset -3px 0 8px rgba(0,0,0,.45),-3px 3px 10px rgba(0,0,0,.55)">${spineText}</div>
-    <div class="book-cover" style="width:${cw}px;height:${h}px;background:${coverGrad};box-shadow:2px 2px 0 rgba(0,0,0,.3),4px 5px 0 rgba(0,0,0,.18),6px 10px 20px rgba(0,0,0,.55),inset -4px 0 12px rgba(0,0,0,.22)">
+  return`<div class="book-wrap" style="height:${h}px" onclick="openBookDetail(${i})" title="">
+    <div class="book-tooltip">${book.title} · ${p} стор.</div>
+    <div class="book-spine" style="width:${sw}px;height:${h}px;background:${spineGrad};box-shadow:inset 2px 0 4px rgba(255,255,255,.06),inset -2px 0 6px rgba(0,0,0,.45),-2px 2px 8px rgba(0,0,0,.55)">${spineText}</div>
+    <div class="book-cover" style="width:${cw}px;height:${h}px;background:${coverGrad};box-shadow:2px 2px 0 rgba(0,0,0,.3),3px 4px 0 rgba(0,0,0,.18),5px 8px 16px rgba(0,0,0,.55),inset -3px 0 10px rgba(0,0,0,.22)">
       ${coverUrl?`<img src="${coverUrl}" onerror="this.style.display='none'">`:''}
       ${textOverlay}
       <div class="book-pages-edge"></div>
-    </div>`;
-  return`<div class="book-wrap" style="height:${sh}px;${sc<1?'width:'+stotal+'px':''}" onclick="openBookDetail(${i})" title="">
-    <div class="book-tooltip">${book.title} · ${p} стор.</div>
-    <div style="display:flex;flex-direction:row;${sc<1?'transform:scale('+sc+');transform-origin:bottom left;width:'+(sw+cw)+'px;height:'+h+'px':''}">
-      ${inner}
     </div>
   </div>`;
 }
