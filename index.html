@@ -398,7 +398,7 @@ const SHOP_ITEMS=[
   {id:'xp_card_silver',name:'Срібна карта XP',     desc:'+3 XP активному покемону',           emoji:'🥈', price:25},
   {id:'xp_card_gold', name:'Золота карта XP',       desc:'+5 XP активному покемону',           emoji:'🥇', price:50},
   {id:'mega',         name:'Мега-камінь',           desc:'Мега еволюція (Пінсір, Піджіт, стартери…)', emoji:'💎', price:100},
-  {id:'evo_crystal',  name:'Кристал пробудження',   desc:'Миттєво готує покемона до еволюції', emoji:'🟢', price:150},
+  {id:'evo_crystal',  name:'Кристал пробудження',   desc:'Миттєво готує покемона до еволюції', emoji:'🟢', price:80},
   {id:'airship_ticket',name:'Білет на повітроплав', desc:'Телепортація на будь-яку локацію',   emoji:'🎫', price:80},
 ];
 
@@ -466,7 +466,7 @@ let dexTypeFilter='all';
 function initState(){
   PLAYERS.forEach(p=>{
     if(!state.players[p.id]) state.players[p.id]={
-      energy:3, atk:0, coins:0,
+      energy:1, atk:0, coins:0,
       location:'oak', region:'kanto',
       collection:[], activePokes:[], pokeballs:1,
       inventory:{},
@@ -1392,12 +1392,11 @@ function goGrass(useLure,useRareLure){
     const isDupe=d.collection.some(c=>c.dbId===dbId);
     d.collection.push({dbId,xp:0});
     if(d.activePokes.length===0)d.activePokes=[d.collection.length-1];
-    const coins=ri(3,10);d.coins+=coins;
     renderRes();renderPballs();renderDex();renderActions();
     const opened=checkUnlocks();renderMap();renderQuests();
     saveToCloud(cur);
     qM(()=>mImg(img(pk.pid),isDupe?pk.name+' — дублікат!':'Зустрів '+pk.name+'!',
-      `${pk.name}${isDupe?' вже є у колекції! Дублікат в PC.':' тепер у твоїй колекції!'}\n+${coins} 🪙`,
+      `${pk.name}${isDupe?' вже є у колекції! Дублікат в PC.':' тепер у твоїй колекції!'}`,
       [{l:'Чудово!',ok:true,cb:closeModal}]));
     opened.forEach(u=>qM(()=>mEmoji('🎉','Відкрито!',`${u.emoji} ${u.name} тепер доступна!`,[{l:'Чудово!',ok:true,cb:closeModal}])));
   } else {
