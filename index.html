@@ -399,7 +399,7 @@ const SHOP_ITEMS=[
   {id:'xp_card_gold', name:'Золота карта XP',       desc:'+5 XP активному покемону',           emoji:'🥇', price:50},
   {id:'mega',         name:'Мега-камінь',           desc:'Мега еволюція (Пінсір, Піджіт, стартери…)', emoji:'💎', price:100},
   {id:'evo_crystal',  name:'Кристал пробудження',   desc:'Миттєво готує покемона до еволюції', emoji:'🟢', price:80},
-  {id:'airship_ticket',name:'Білет на повітроплав', desc:'Телепортація на будь-яку локацію',   emoji:'🎫', price:80},
+  {id:'airship_ticket',name:'Білет на повітроплав', desc:'Телепортація на будь-яку локацію',   emoji:'🎫', price:50},
 ];
 
 
@@ -1276,10 +1276,10 @@ function useXpCard(id){
   if(xpCi!==undefined&&d.collection[xpCi]){
     d.collection[xpCi].xp=(d.collection[xpCi].xp||0)+gain;
   }
-  renderRes();_rebuildSideContent();saveToCloud(cur);
+  const evoMsgs=checkLevelEvolutions(d);
+  renderRes();renderPballs();renderDex();_rebuildSideContent();saveToCloud(cur);
   const info=ITEM_INFO[id];
   showToast(info.emoji+' +'+gain+' XP!');
-  const evoMsgs=checkLevelEvolutions(d);
   evoMsgs.forEach(m=>qM(()=>mImg(img(m.pid),m.title,m.desc,[{l:'Чудово!',ok:true,cb:closeModal}])));
 }
 
@@ -1460,9 +1460,12 @@ function giveLoot(rare){
     } else if(r<0.66){
       d.inventory['xp_card_silver']=(d.inventory['xp_card_silver']||0)+1;
       qM(()=>mEmoji('🥈','Срібна карта XP!','Знайшов Срібну карту досвіду! +3 XP при використанні.',[{l:'Чудово!',ok:true,cb:closeModal}]));
-    } else if(r<0.83){
+    } else if(r<0.78){
       d.inventory['lure']=(d.inventory['lure']||0)+1;
       qM(()=>mEmoji('🎣','Знахідка!','Знайшов Приманку!',[{l:'Чудово!',ok:true,cb:closeModal}]));
+    } else if(r<0.91){
+      d.energy+=3;renderRes();
+      qM(()=>mEmoji('⚡','+3 Енергії!','Знайшов заряджений кристал у траві!',[{l:'Чудово!',ok:true,cb:closeModal}]));
     } else {
       d.inventory['rare_lure']=(d.inventory['rare_lure']||0)+1;
       qM(()=>mEmoji('✨','Знахідка!','Знайшов Рідкісну приманку!',[{l:'Чудово!',ok:true,cb:closeModal}]));
@@ -1934,7 +1937,7 @@ function updSP(){
     const xp=Math.max(1,Math.floor(v/100));
     const coins=Math.max(1,Math.floor(v/30));
     el.style.display='block';
-    el.innerHTML=`<div class="ppill">+${xp} XP · +${e} ⚡ · +${coins} 🪙</div>`;
+    el.innerHTML=`<div class="ppill">+${xp} XP &nbsp; +${e} ⚡ &nbsp; +${coins} 🪙</div>`;
   } else el.style.display='none';
 }
 
@@ -1976,10 +1979,10 @@ function submitPages(){
   const book={title,author,pages,date:new Date().toLocaleDateString('uk-UA'),coverUrl:coverUrl||null};
   d.books.push(book);
   const evoMsgs=checkLevelEvolutions(d);
-  renderRes();closeSidePanel();saveToCloud(cur);
+  renderRes();renderPballs();renderDex();closeSidePanel();saveToCloud(cur);
   const preview=_renderBookPreviewHTML(book);
-  const pkLine=pkName?`${pkName} +${xpGain} XP · `:'';
-  qM(()=>mHTML(`${preview}<div class="m-title">Книга додана!</div><div class="m-desc" style="text-align:center">${pkLine}+${energy} ⚡ · +${coins} 🪙</div><div class="m-btns"><button class="btn-ok" onclick="closeModal()">Вперед!</button></div>`));
+  const pkLine=pkName?`<div>${pkName} +${xpGain} XP</div>`:'';
+  qM(()=>mHTML(`${preview}<div class="m-title">Книга додана!</div><div class="m-desc" style="text-align:center">${pkLine}<div>+${energy} ⚡ &nbsp; +${coins} 🪙</div></div><div class="m-btns"><button class="btn-ok" onclick="closeModal()">Вперед!</button></div>`));
   evoMsgs.forEach(m=>qM(()=>mImg(img(m.pid),m.title,m.desc,[{l:'Чудово!',ok:true,cb:closeModal}])));
 }
 
