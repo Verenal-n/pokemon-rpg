@@ -396,7 +396,6 @@ const ITEM_INFO={
   xp_card_bronze:{emoji:'🥉',name:'Бронзова карта XP',desc:'+1 XP'},
   xp_card_silver:{emoji:'🥈',name:'Срібна карта XP',desc:'+3 XP'},
   xp_card_gold:  {emoji:'🥇',name:'Золота карта XP',desc:'+7 XP'},
-  airship_ticket:{emoji:'🎫',name:'Білет на повітроплав',desc:'Телепортація на будь-яку локацію за 1 ⚡'},
 };
 const ITEM_TIPS={
   lure:           'Використовується автоматично при наступному пошуку у звичайній траві — гарантує зустріч з покемоном замість лута.',
@@ -406,7 +405,6 @@ const ITEM_TIPS={
   xp_card_bronze: 'Натисни "Використати" — одразу зараховується +1 XP. Знаходиться у звичайній траві.',
   xp_card_silver: 'Натисни "Використати" — одразу зараховується +3 XP. Знаходиться у звичайній траві.',
   xp_card_gold:   'Натисни "Використати" — одразу зараховується +7 XP. Знаходиться лише у рідкісній траві.',
-  airship_ticket: 'Натисни "Летіти ✈" або клікни на будь-яку відкриту (але не сусідню) локацію на карті. Коштує 1 ⚡. Знаходиться у рідкісній траві.',
 };
 const SHOP_ITEMS=[
   {id:'lure',         name:'Приманка',             desc:'100% зустріч з покемоном',          emoji:'🎣', price:20},
@@ -416,7 +414,6 @@ const SHOP_ITEMS=[
   {id:'xp_card_gold', name:'Золота карта XP',       desc:'+7 XP активному покемону',           emoji:'🥇', price:50},
   {id:'mega',         name:'Мега-камінь',           desc:'Потрібен для Мега еволюції.', emoji:'💎', price:100},
   {id:'evo_crystal',  name:'Кристал пробудження',   desc:'Миттєво готує покемона до еволюції', emoji:'🟢', price:80},
-  {id:'airship_ticket',name:'Білет на повітроплав', desc:'Телепортація на будь-яку локацію',   emoji:'🎫', price:50},
 ];
 
 
@@ -1256,18 +1253,7 @@ function showLockedHint(locId){
 
 function onLocClick(locId){
   const d=pd();
-  const curLoc=cLoc();
-  const isAdjacent=(curLoc.connects||[]).includes(locId);
   const loc=_anyLoc(locId);if(!loc)return;
-  if(!isAdjacent){
-    const hasTicket=(d.inventory['airship_ticket']||0)>0;
-    if(hasTicket){
-      qM(()=>mHTML(`<div class="m-emoji">🎫</div><div class="m-title">Білет на повітроплав</div><div class="m-desc">${loc.emoji} ${loc.name} не сусідня локація.<br><br>Використати квиток (залишилось: ${d.inventory['airship_ticket']}) і перелетіти за 1 ⚡?</div>${_locTypeBadges(locId)}<div class="m-btns"><button class="btn-ok" onclick="closeModal();doAirshipMove('${locId}')">Летімо! 🎫</button><button class="btn-cancel" onclick="closeModal()">Ні</button></div>`));
-    } else {
-      qM(()=>mHTML(`<div class="m-emoji">🗺️</div><div class="m-title">Не сусідня локація</div><div class="m-desc">Щоб дістатись до ${loc.name}, треба рухатись крок за кроком по карті.<br><br>Або знайди 🎫 Білет на повітроплав у рідкісній траві!</div>${_locTypeBadges(locId)}<div class="m-btns"><button class="btn-ok" onclick="closeModal()">Зрозуміло</button></div>`));
-    }
-    return;
-  }
   const cost=ECOST.move;
   if(d.energy<cost){qM(()=>mEmoji('⚡','Мало енергії',`Потрібно ${cost} ⚡ на перехід.\n\nДодай сторінки через ☰`,[{l:'Додати',ok:true,cb:()=>{closeModal();openSidePanel();}},{l:'Ок',cb:closeModal}]));return;}
   qM(()=>mHTML(`<div style="margin-bottom:10px">${locIconEl(locId,72)}</div><div class="m-title" style="text-align:center">Перейти до ${loc.name}</div><div class="m-desc" style="text-align:center">Витратити ${cost} ⚡ і перейти до ${loc.name}?</div>${_locTypeBadges(locId)}<div class="m-btns"><button class="btn-ok" onclick="closeModal();doMove('${locId}')">Так!</button><button class="btn-cancel" onclick="closeModal()">Ні</button></div>`));
@@ -1348,8 +1334,7 @@ function openItemInfo(id){
   const tip=ITEM_TIPS[id]||'';
   const actionBtn=id.startsWith('xp_card_')
     ?`<button class="btn-ok" style="width:100%;padding:13px;font-size:14px;min-height:44px;margin-bottom:8px" onclick="closeModal();useXpCard('${id}')">Використати (є: ${qty})</button>`
-    :id==='airship_ticket'
-    ?`<button class="btn-ok" style="width:100%;padding:13px;font-size:14px;min-height:44px;margin-bottom:8px" onclick="closeModal();openAirshipMenu()">Летіти ✈ (є: ${qty})</button>`:'';
+    :'';
   mHTML(`<div style="text-align:center;font-size:44px;margin-bottom:6px">${emoji}</div>
     <div class="m-title">${name}</div>
     ${desc?`<div class="m-desc">${desc}</div>`:''}
@@ -1378,29 +1363,6 @@ function useXpCard(id){
   evoMsgs.forEach(m=>qM(()=>mImg(img(m.pid),m.title,m.desc,[{l:'Чудово!',ok:true,cb:closeModal}])));
 }
 
-function openAirshipMenu(){
-  const d=pd();
-  if((d.inventory['airship_ticket']||0)<=0)return;
-  const allLocs=(d.region||'kanto')==='johto'?LOCS_JOHTO:LOCS;
-  const dests=d.unlockedLocs.filter(id=>id!==d.location&&allLocs[id]);
-  if(!dests.length){qM(()=>mEmoji('🎫','Немає куди летіти','Відкрий нові локації!',[{l:'Ок',ok:true,cb:closeModal}]));return;}
-  const rows=dests.map(id=>{const l=allLocs[id];return`<button onclick="closeModal();doAirshipMove('${id}')" style="width:100%;margin-bottom:6px;padding:12px;font-size:13px;font-weight:600;background:rgba(251,191,36,.12);border:1px solid rgba(251,191,36,.3);border-radius:10px;color:#fbbf24;cursor:pointer;text-align:left">${l.emoji} ${l.name}<span style="font-size:10px;opacity:.6;float:right">${l.badge}</span></button>`;}).join('');
-  mHTML(`<div class="m-title">🎫 Куди летимо?</div><div class="m-desc" style="margin-bottom:12px">Залишилось квитків: ${d.inventory['airship_ticket']} · Коштує 1 ⚡</div>${rows}<button class="btn-cancel" style="width:100%;padding:13px;font-size:14px;min-height:44px;margin-top:4px" onclick="closeModal()">Скасувати</button>`);
-}
-
-function doAirshipMove(locId){
-  const d=pd();
-  if(d.energy<ECOST.move){noEnergy();return;}
-  if((d.inventory['airship_ticket']||0)<=0)return;
-  d.inventory['airship_ticket']--;
-  d.energy-=ECOST.move;d.location=locId;
-  const loc=_anyLoc(locId);
-  document.getElementById('hdr-loc').textContent='📍 '+loc.name;
-  renderRes();renderDex();renderMap();renderActions();
-  const opened=checkUnlocks();renderMap();
-  opened.forEach(u=>qM(()=>mEmoji('🎉','Відкрито!',`${u.emoji} ${u.name} тепер доступна!`,[{l:'Чудово!',ok:true,cb:closeModal}])));
-  showToast('🎫 → '+loc.name);
-}
 
 // ═══════════ OAK ═══════════
 // Пороги зростають: 10, 20, 35, 55, 80, 110, 145, 185, 230
@@ -1536,9 +1498,6 @@ function giveLoot(rare){
     } else if(r<0.81){
       const coins=ri(15,40);d.coins+=coins;renderRes();
       qM(()=>mEmoji('🪙','+'+coins+' монет!','Знайшов монети в рідкісній зоні!',[{l:'Ок',ok:true,cb:closeModal}]));
-    } else if(r<0.90){
-      d.inventory['airship_ticket']=(d.inventory['airship_ticket']||0)+1;
-      qM(()=>mEmoji('🎫','Білет на повітроплав!','Знайшов Білет на повітроплав! Телепортує на будь-яку відкриту локацію за 1 ⚡.',[{l:'Чудово!',ok:true,cb:closeModal}]));
     } else {
       d.inventory['evo_crystal']=(d.inventory['evo_crystal']||0)+1;
       qM(()=>mEmoji('🟢','Рідкісна знахідка!','Знайшов Кристал пробудження! Миттєво готує покемона до еволюції.',[{l:'Чудово!',ok:true,cb:closeModal}]));
@@ -1757,7 +1716,7 @@ function _buildPagesHTML(){
       if(v>=3)emoji=s?s.emoji:'💎';
     }
     const useBtn=k.startsWith('xp_card_')?`<button onclick="event.stopPropagation();useXpCard('${k}')" style="padding:3px 8px;font-size:10px;font-weight:700;background:rgba(74,222,128,.2);border:1px solid rgba(74,222,128,.4);border-radius:6px;color:#4ade80;cursor:pointer;white-space:nowrap">Використати</button>`
-      :k==='airship_ticket'?`<button onclick="event.stopPropagation();openAirshipMenu()" style="padding:3px 8px;font-size:10px;font-weight:700;background:rgba(251,191,36,.2);border:1px solid rgba(251,191,36,.4);border-radius:6px;color:#fbbf24;cursor:pointer;white-space:nowrap">Летіти ✈</button>`:'';
+      :'';
     return`<div onclick="openItemInfo('${k}')" style="display:flex;align-items:center;gap:6px;padding:5px 0;font-size:12px;border-bottom:1px solid rgba(255,255,255,.05);cursor:pointer">
       <span style="font-size:16px">${emoji}</span><span style="flex:1;color:#ccc">${name}</span><span style="font-weight:600;color:#fff;margin-right:4px">×${v}</span>${useBtn}</div>`;
   }).join('');
